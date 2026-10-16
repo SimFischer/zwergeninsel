@@ -73,6 +73,12 @@ Auf der Insel: Ratsplatz, Bibliothek, Brunnen und Mühle. Über das Zahnrad läs
 
 Auf der Insel: Leuchtturm, Festhalle und Schiff. Danach feiert die Klasse das fertige Dorf.
 
+## Lernhilfen in allen Kapiteln
+
+- **Meisterin Hammerlind macht es vor:** Vor jeder Station im Hauptstollen löst die Meisterin ein Beispiel Schritt für Schritt und denkt dabei laut. Die Kinder können das überspringen.
+- **Zwergen-Wissensbuch:** Jede geschaffte Station schaltet einen Merksatz mit Beispiel frei (18 Seiten). Das Buch-Symbol in der Halle öffnet es jederzeit, jede Seite lässt sich vorlesen.
+- **Abwechslung:** Jede Station zieht zufällig aus einem größeren Aufgabenpool. Nachbarn haben deshalb meist andere Aufgaben, und erneutes Spielen bleibt spannend.
+
 ## Gerechtigkeit zwischen schnellen und langsameren Kindern
 
 - Das Dorf wird nur aus dem **Hauptstollen** gebaut. Jedes Kind zählt gleich viel, egal wie schnell es ist.
@@ -88,7 +94,7 @@ Auf der Insel: Leuchtturm, Festhalle und Schiff. Danach feiert die Klasse das fe
 
 ## Inhalte anpassen
 
-Alle Aufgaben, Themen und Texte stehen in `js/data.js` (Kapitel 1), `js/data-k2.js` und `js/data-k3.js`. Neue Themen für das Meisterstück oder andere Beispielsätze lassen sich dort einfach ergänzen.
+Alle Aufgaben, Themen und Texte stehen in `js/data.js` (Kapitel 1), `js/data-k2.js`, `js/data-k3.js` und `js/data-mehr.js` (zusätzliche Aufgaben, Vormach-Beispiele, Wissensbuch). Neue Themen für das Meisterstück oder andere Beispielsätze lassen sich dort einfach ergänzen.
 
 ## Bilder
 
