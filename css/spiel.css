@@ -535,3 +535,20 @@ h1, h2, h3 { font-family: var(--titel); font-weight: 400; margin: 0; letter-spac
 @keyframes konfettiFall { to { transform: translate(var(--dx), 110vh) rotate(var(--rot)); } }
 .feuerwerk { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 65; }
 @media (prefers-reduced-motion: reduce) { .huepf-zwerg, .avatar.huepfen, .meisterin { animation: none; } }
+
+/* ---------- Bilder für Abzeichen, Ränge, Krone, Kombo ---------- */
+.medaille-rund.mit-bild img { width: 118%; height: 118%; object-fit: contain; border-radius: 50%; }
+.medaille-rund.mit-bild:has(img) { background: none; border: none; box-shadow: none; }
+.medaille-symbol { display: flex; }
+.medaille-symbol svg { width: 44px; height: 44px; }
+.rang-emblem { width: 90px; height: 90px; object-fit: contain; flex: none; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.3)); }
+.rang-emblem-reihe { display: flex; align-items: flex-end; gap: 14px; }
+.rang-kopf { display: flex; align-items: center; gap: 14px; }
+.krone-marke img { width: 30px; height: 30px; object-fit: contain; }
+.krone-marke:has(img) { background: none; border: none; box-shadow: none; width: 48px; height: 48px; top: -18px; left: -14px; }
+.krone-marke:has(img) img { width: 48px; height: 48px; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35)); }
+.krone-info img { width: 48px; height: 48px; object-fit: contain; flex: none; }
+.kombo { display: inline-flex; align-items: center; gap: 6px; }
+.kombo-flamme { width: 30px; height: 30px; object-fit: contain; margin: -6px 0; }
+.titel-mit-bild { display: flex; align-items: center; gap: 10px; }
+.titel-bild { width: 44px; height: 44px; object-fit: contain; }

@@ -112,7 +112,7 @@ Alle Aufgaben, Themen und Texte stehen in `js/data.js` (Kapitel 1), `js/data-k2.
 
 ## Bilder
 
-Alle Bilder liegen in `bilder/` als PNG. Fehlt ein Bild noch, zeigt die App an seiner Stelle einen beschrifteten Platzhalter. Nach dem Austauschen von Bildern in `sw.js` die Versionsnummer erhöhen, damit die iPads die neuen Bilder laden.
+Alle Bilder liegen in `bilder/` als PNG. Fehlt ein Bild noch, zeigt die App an seiner Stelle einen beschrifteten Platzhalter. Für die zweite Bilderserie (Tiere, Wolken, Möwen, Sonderstücke, Ränge, Abzeichen, Stations-Symbole, Jubel-Posen) gibt es Ersatz: Gezeichnete Möwen und Wolken, Symbole statt Medaillen, und Tiere erscheinen erst, wenn ihre Bilder da sind. Nach dem Austauschen von Bildern in `sw.js` die Versionsnummer erhöhen, damit die iPads die neuen Bilder laden.
 
 ## Technik
 

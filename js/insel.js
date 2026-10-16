@@ -77,20 +77,54 @@
   const schmuckSchicht = h('div');
   const sonderSchicht = h('div');
   /* Lebendige Insel: Wolken, Möwen und Nacht */
-  const wolken = h('div', { class: 'wolken', 'aria-hidden': 'true' }, h('span'), h('span'), h('span'));
-  const moewen = h('div', { class: 'moewen', 'aria-hidden': 'true' }, moeweSvg(), moeweSvg(), moeweSvg());
+  const wolken = h('div', { class: 'wolken', 'aria-hidden': 'true' }, [1, 2, 3].map((n) => {
+    const sp = h('span');
+    const img = h('img', { src: ZI.BILD('wolke-' + n), alt: '' });
+    img.addEventListener('load', () => sp.classList.add('mit-bild'), { once: true });
+    img.addEventListener('error', () => img.remove(), { once: true });
+    sp.appendChild(img);
+    return sp;
+  }));
+  const moewen = h('div', { class: 'moewen', 'aria-hidden': 'true' }, moewe(), moewe(), moewe());
+  /* Tiere auf der Insel – erscheinen erst, wenn ihre Bilder da sind */
+  const TIERE = [
+    { datei: 'krabbe', klasse: 'tier-krabbe', x: 30, y: 89, w: 3 },
+    { datei: 'schildkroete', klasse: 'tier-schildkroete', x: 70, y: 90, w: 4 },
+    { datei: 'huhn', klasse: 'tier-huhn', x: 44, y: 58, w: 2.4 },
+    { datei: 'huhn', klasse: 'tier-huhn zwei', x: 47, y: 60, w: 2.2 },
+    { datei: 'hase', klasse: 'tier-hase', x: 63, y: 70, w: 2.6 },
+    { datei: 'schmetterling', klasse: 'tier-schmetterling', x: 34, y: 56, w: 2 },
+    { datei: 'delfin', klasse: 'tier-delfin', x: 12, y: 82, w: 6 },
+    { datei: 'delfin', klasse: 'tier-delfin zwei', x: 92, y: 60, w: 5 },
+  ];
+  const tiere = h('div', { class: 'tiere', 'aria-hidden': 'true' }, TIERE.map((t) =>
+    h('div', { class: 'tier ' + t.klasse, style: { left: t.x + '%', top: t.y + '%', width: t.w + '%' } }, ZI.bildOder(t.datei, '', null))));
   const nachtSchicht = h('div', { class: 'nacht-schicht', 'aria-hidden': 'true' });
-  buehne.append(schmuckSchicht, sonderSchicht, zwergSchicht, moewen, wolken, nachtSchicht);
+  buehne.append(schmuckSchicht, sonderSchicht, tiere, zwergSchicht, moewen, wolken, nachtSchicht);
   function moeweSvg(geschenk) {
     const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    s.setAttribute('viewBox', '0 0 60 40'); s.setAttribute('class', 'moewe');
+    s.setAttribute('viewBox', '0 0 60 40'); s.setAttribute('class', 'moewe-svg');
     s.innerHTML = '<path d="M2 18 Q15 4 30 18 Q45 4 58 18" fill="none" stroke="#fffaf0" stroke-width="4" stroke-linecap="round"/>' +
       '<path d="M2 18 Q15 4 30 18 Q45 4 58 18" fill="none" stroke="#3a2617" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>' +
       (geschenk ? '<line x1="30" y1="18" x2="30" y2="26" stroke="#3a2617" stroke-width="1.5"/><rect x="23" y="26" width="14" height="12" rx="2" fill="#c2533a" stroke="#3a2617" stroke-width="1.5"/><rect x="28.5" y="26" width="3" height="12" fill="#ffd56e"/>' : '');
     return s;
   }
+  /* Möwe aus zwei Bildern (Flügel oben/unten); fehlen sie, wird sie gezeichnet */
+  function moewe(geschenk) {
+    const box = h('div', { class: 'moewe' + (geschenk ? ' mit-geschenk' : '') });
+    const ersatz = () => { if (!box.dataset.ersatz) { box.dataset.ersatz = '1'; ZI.setze(box, moeweSvg(geschenk)); } };
+    const a = h('img', { src: ZI.BILD(geschenk ? 'moewe-geschenk' : 'moewe-oben'), alt: '', class: 'fluegel-a' });
+    a.addEventListener('error', ersatz, { once: true });
+    box.appendChild(a);
+    if (!geschenk) {
+      const b = h('img', { src: ZI.BILD('moewe-unten'), alt: '', class: 'fluegel-b' });
+      b.addEventListener('error', ersatz, { once: true });
+      box.appendChild(b);
+    }
+    return box;
+  }
   function moeweMitGeschenk(behaelter) {
-    const m = h('div', { class: 'moewe-flug', 'aria-hidden': 'true' }, moeweSvg(true));
+    const m = h('div', { class: 'moewe-flug', 'aria-hidden': 'true' }, moewe(true));
     (behaelter || buehne).appendChild(m);
     setTimeout(() => { ZI.ton.plopp(); }, 2600);
     setTimeout(() => m.remove(), 4200);
@@ -156,7 +190,7 @@
   function zeigeSchmuck(animiert) {
     const anzahl = Math.min(ZI.SCHMUCK.length, Math.floor((edelsteine() + (insel.geschenke || 0) * 5) / ZI.SCHMUCK_PRO));
     ZI.setze(sonderSchicht, ...ZI.SONDERSCHMUCK.slice(0, insel.sonder || 0).map((s) =>
-      h('div', { class: 'schmuck sonder' + (/laterne/.test(s.id) ? ' lampe' : ''), style: { left: s.x + '%', top: s.y + '%', width: s.w + '%', animation: 'none' } }, bild(s.id, s.name))));
+      h('div', { class: 'schmuck sonder' + (/laterne/.test(s.id) ? ' lampe' : ''), style: { left: s.x + '%', top: s.y + '%', width: s.w + '%', animation: 'none' } }, bild([s.id, s.alt], s.name))));
     ZI.setze(schmuckSchicht, ...ZI.SCHMUCK.slice(0, anzahl).map((s, i) => {
       const el = h('div', { class: 'schmuck' + (/laterne/.test(s.id) ? ' lampe' : ''), style: { left: s.x + '%', top: s.y + '%', width: s.w + '%' } }, bild(s.id, s.name));
       if (!animiert || i < insel.schmuck) el.style.animation = 'none';
@@ -240,7 +274,7 @@
     const def = ZI.AUFTRAEGE.find((d) => d.id === a.typ);
     const w = Math.min(a.ziel, Math.max(0, auftragWert(a)));
     return h('div', { class: 'auftrag-box' + (a.erledigt ? ' erledigt' : '') },
-      h('div', { class: 'auftrag-titel' }, a.erledigt ? 'Auftrag erfüllt!' : 'Auftrag des Tages'),
+      h('div', { class: 'auftrag-titel' }, ZI.bildOder('auftrag-rolle', '', null, 'auftrag-bild'), a.erledigt ? 'Auftrag erfüllt!' : 'Auftrag des Tages'),
       h('div', { class: 'klein' }, def.text(a.ziel)),
       h('div', { class: 'balken' }, h('div', { style: { width: (w / a.ziel) * 100 + '%' } })),
       h('div', { class: 'klein' }, w + ' von ' + a.ziel + ' ' + def.einheit));

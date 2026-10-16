@@ -22,7 +22,7 @@
     if (!el) return;
     if (kombo >= 3) {
       el.hidden = false;
-      el.textContent = 'Kombo ×' + kombo;
+      ZI.setze(el, ZI.bildOder('flamme', '', null, 'kombo-flamme'), h('span', null, 'Kombo ×' + kombo));
       el.classList.remove('puls'); void el.offsetWidth; el.classList.add('puls');
       if (kombo % 5 === 0) { ZI.konfetti(40); ZI.meldung('Unglaublich! ' + kombo + ' richtig hintereinander!'); }
     } else el.hidden = true;
@@ -112,7 +112,7 @@
       h('div', { class: 'leiste' },
         h('button', { class: 'rund', 'aria-label': 'Zurück zur Halle', onclick: () => zeigeHalle() }, icon.zurueck()),
         h('div', null,
-          h('div', { class: 'titel' }, 'Zwergen-Wissensbuch'),
+          h('div', { class: 'titel titel-mit-bild' }, ZI.bildOder('buch-offen', '', null, 'titel-bild'), 'Zwergen-Wissensbuch'),
           h('div', { class: 'untertitel' }, frei.length + ' von ' + ZI.WISSEN.length + ' Seiten gefunden'))),
       h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2 } },
         h('div', { class: 'halle-inhalt' }, reiter, h('div', { class: 'pergament auf-pergament stollen' }, seiten)))));
@@ -351,42 +351,42 @@
   const INHALT = [
     { // Kapitel 1
       kern: [
-        { name: 'Stumpf oder scharf?', info: 'Finde die Begründung, die wirklich erklärt, warum.', icon: 'axt-scharf', spiel: () => spielStumpfScharf(), vor: 'k1s1' },
-        { name: 'Erz oder Schlacke?', info: 'Sortiere: Welche Begründung passt zur Meinung?', icon: 'eisen-roh', spiel: () => spielErz(), vor: 'k1s2' },
-        { name: 'Weil-Denn-Amboss', info: 'Bau Begründungssätze mit weil, da und denn.', icon: 'runenplatte', spiel: () => spielWeilDenn(), vor: 'k1s3' },
+        { name: 'Stumpf oder scharf?', info: 'Finde die Begründung, die wirklich erklärt, warum.', icon: ['icon-stumpf-scharf', 'axt-scharf'], spiel: () => spielStumpfScharf(), vor: 'k1s1' },
+        { name: 'Erz oder Schlacke?', info: 'Sortiere: Welche Begründung passt zur Meinung?', icon: ['icon-erz-schlacke', 'eisen-roh'], spiel: () => spielErz(), vor: 'k1s2' },
+        { name: 'Weil-Denn-Amboss', info: 'Bau Begründungssätze mit weil, da und denn.', icon: ['icon-weil-denn', 'runenplatte'], spiel: () => spielWeilDenn(), vor: 'k1s3' },
       ],
       tief: [
-        { name: 'Fehlerjagd', info: 'Der Fehlerkobold hat Sätze verbogen. Finde den richtigen.', icon: 'kobold-frech', spiel: () => spielFehlerjagd() },
-        { name: 'Beispiel-Edelstein', info: 'Finde das Beispiel, das die Begründung stützt.', icon: 'edelstein', spiel: () => spielBeispiele() },
-        { name: 'Meisterstück', info: 'Argumentiere laut – dein Partner prüft.', icon: 'meisterin-erklaert', spiel: () => spielMeisterstueck(1) },
+        { name: 'Fehlerjagd', info: 'Der Fehlerkobold hat Sätze verbogen. Finde den richtigen.', icon: ['icon-fehlerjagd', 'kobold-frech'], spiel: () => spielFehlerjagd() },
+        { name: 'Beispiel-Edelstein', info: 'Finde das Beispiel, das die Begründung stützt.', icon: ['icon-beispiel', 'edelstein'], spiel: () => spielBeispiele() },
+        { name: 'Meisterstück', info: 'Argumentiere laut – dein Partner prüft.', icon: ['icon-meisterstueck', 'meisterin-erklaert'], spiel: () => spielMeisterstueck(1) },
       ],
-      bonus: { name: 'Funkenregen', info: 'Fang die scharfen Begründungen, bevor sie verglühen! Bis zu 3 Sterne.', icon: 'stern', spiel: () => spielFunkenregen(ZI.FUNKENREGEN, 'Funkenregen', 'Oben steht eine Meinung. Von oben regnen Begründungen. Tippe nur die scharfen Begründungen an! Stumpfe kosten einen Punkt.') },
+      bonus: { name: 'Funkenregen', info: 'Fang die scharfen Begründungen, bevor sie verglühen! Bis zu 3 Sterne.', icon: ['icon-funkenregen', 'stern'], spiel: () => spielFunkenregen(ZI.FUNKENREGEN, 'Funkenregen', 'Oben steht eine Meinung. Von oben regnen Begründungen. Tippe nur die scharfen Begründungen an! Stumpfe kosten einen Punkt.') },
     },
     { // Kapitel 2
       kern: [
-        { name: 'Argument-Puzzle', info: 'Setz These, Begründung und Beispiel richtig zusammen.', icon: 'pergament', spiel: () => spielPuzzle(), vor: 'k2s1' },
-        { name: 'Motor oder Bremse?', info: 'Was bringt ein Gespräch weiter, was stoppt es?', icon: 'schleifstein', spiel: () => spielMotor(), vor: 'k2s2' },
-        { name: 'Hör-Stollen', info: 'Hör genau zu und finde Begründung und Beispiel.', icon: 'laterne', spiel: () => spielHoeren(), vor: 'k2s3' },
+        { name: 'Argument-Puzzle', info: 'Setz These, Begründung und Beispiel richtig zusammen.', icon: ['icon-puzzle', 'pergament'], spiel: () => spielPuzzle(), vor: 'k2s1' },
+        { name: 'Motor oder Bremse?', info: 'Was bringt ein Gespräch weiter, was stoppt es?', icon: ['icon-motor-bremse', 'schleifstein'], spiel: () => spielMotor(), vor: 'k2s2' },
+        { name: 'Hör-Stollen', info: 'Hör genau zu und finde Begründung und Beispiel.', icon: ['icon-hoeren', 'laterne'], spiel: () => spielHoeren(), vor: 'k2s3' },
       ],
       tief: [
-        { name: 'Kobold-Kampf', info: 'Der Fehlerkobold ist zurück! Besiege ihn mit allem, was du kannst.', icon: 'kobold-chaos', spiel: () => spielBoss() },
-        { name: 'Argument-Kette', info: 'Welche Stützen machen ein Argument stärker?', icon: 'eisen-gluehend', spiel: () => spielKette() },
-        { name: 'Meisterstück II', info: 'Laut argumentieren mit These, Begründung und Beispiel.', icon: 'meisterin-jubelt', spiel: () => spielMeisterstueck(2) },
+        { name: 'Kobold-Kampf', info: 'Der Fehlerkobold ist zurück! Besiege ihn mit allem, was du kannst.', icon: ['icon-kobold-kampf', 'kobold-chaos'], spiel: () => spielBoss() },
+        { name: 'Argument-Kette', info: 'Welche Stützen machen ein Argument stärker?', icon: ['icon-kette', 'eisen-gluehend'], spiel: () => spielKette() },
+        { name: 'Meisterstück II', info: 'Laut argumentieren mit These, Begründung und Beispiel.', icon: ['icon-meisterstueck2', 'meisterin-jubelt'], spiel: () => spielMeisterstueck(2) },
       ],
-      bonus: { name: 'Beispiel-Regen', info: 'Fang die Beispiele, die wirklich passen! Bis zu 3 Sterne.', icon: 'edelstein', spiel: () => spielFunkenregen(ZI.BEISPIELREGEN, 'Beispiel-Regen', 'Oben stehen eine Meinung und eine Begründung. Von oben regnen Beispiele. Tippe nur die Beispiele an, die zur Begründung passen! Unpassende kosten einen Punkt.') },
+      bonus: { name: 'Beispiel-Regen', info: 'Fang die Beispiele, die wirklich passen! Bis zu 3 Sterne.', icon: ['icon-beispielregen', 'edelstein'], spiel: () => spielFunkenregen(ZI.BEISPIELREGEN, 'Beispiel-Regen', 'Oben stehen eine Meinung und eine Begründung. Von oben regnen Beispiele. Tippe nur die Beispiele an, die zur Begründung passen! Unpassende kosten einen Punkt.') },
     },
     { // Kapitel 3
       kern: [
-        { name: 'Ja, und – ja, aber?', info: 'Wie reagiert jemand auf einen Beitrag?', icon: 'zwerg-04-lina', spiel: () => spielJaUnd(), vor: 'k3s1' },
-        { name: 'Wer hört zu?', info: 'Finde die Antwort, die wirklich anknüpft.', icon: 'meisterin-tipp', spiel: () => spielZuhoeren(), vor: 'k3s2' },
-        { name: 'Überzeug den Inselrat', info: 'Entkräfte die Einwände des Inselrats.', icon: 'zwerg-11-grimbart', spiel: () => spielInselrat(), vor: 'k3s3' },
+        { name: 'Ja, und – ja, aber?', info: 'Wie reagiert jemand auf einen Beitrag?', icon: ['icon-ja-und', 'zwerg-04-lina'], spiel: () => spielJaUnd(), vor: 'k3s1' },
+        { name: 'Wer hört zu?', info: 'Finde die Antwort, die wirklich anknüpft.', icon: ['icon-zuhoeren', 'meisterin-tipp'], spiel: () => spielZuhoeren(), vor: 'k3s2' },
+        { name: 'Überzeug den Inselrat', info: 'Entkräfte die Einwände des Inselrats.', icon: ['icon-inselrat', 'zwerg-11-grimbart'], spiel: () => spielInselrat(), vor: 'k3s3' },
       ],
       tief: [
-        { name: 'Gegenargument-Schmiede', info: 'Finde das Argument, das dagegen spricht.', icon: 'axt-scharf', spiel: () => spielGegenargument() },
-        { name: 'Wer überzeugt wen?', info: 'Das beste Argument passt zur Person.', icon: 'zwerg-10-amara', spiel: () => spielSituation() },
-        { name: 'Streitgespräch', info: 'Zu zweit: Meinung, Zuhören und Gegenargument.', icon: 'meisterin-jubelt', spiel: () => spielMeisterstueck(3) },
+        { name: 'Gegenargument-Schmiede', info: 'Finde das Argument, das dagegen spricht.', icon: ['icon-gegenargument', 'axt-scharf'], spiel: () => spielGegenargument() },
+        { name: 'Wer überzeugt wen?', info: 'Das beste Argument passt zur Person.', icon: ['icon-situation', 'zwerg-10-amara'], spiel: () => spielSituation() },
+        { name: 'Streitgespräch', info: 'Zu zweit: Meinung, Zuhören und Gegenargument.', icon: ['icon-streitgespraech', 'meisterin-jubelt'], spiel: () => spielMeisterstueck(3) },
       ],
-      bonus: { name: 'Sprecherwechsel', info: 'Steig im richtigen Moment ein – ohne zu unterbrechen. Bis zu 3 Sterne.', icon: 'stern', spiel: () => spielSprecherwechsel() },
+      bonus: { name: 'Sprecherwechsel', info: 'Steig im richtigen Moment ein – ohne zu unterbrechen. Bis zu 3 Sterne.', icon: ['icon-sprecherwechsel', 'stern'], spiel: () => spielSprecherwechsel() },
     },
   ];
 
@@ -411,7 +411,7 @@
     function stationKarte(def, k, geschafft, gesperrt, sperrText, i, rohstoff, art, idx) {
       const krone = art === 'kern' && stand.hatKrone(k, idx);
       const b = h('button', { class: 'station' + (geschafft ? ' geschafft' : '') + (gesperrt ? ' gesperrt' : '') + (krone ? ' gekroent' : '') },
-        krone ? h('div', { class: 'krone-marke', 'aria-label': 'Goldene Krone: fehlerfrei geschafft' }, icon.krone()) : null,
+        krone ? h('div', { class: 'krone-marke', 'aria-label': 'Goldene Krone: fehlerfrei geschafft' }, ZI.bildOder('krone', 'Krone', icon.krone())) : null,
         h('div', { class: 'icon' }, bild(def.icon, def.name)),
         h('div', null,
           h('div', { class: 'st-name' }, (i !== undefined ? i + 1 + '. ' : '') + def.name),
@@ -603,10 +603,10 @@
     const f = ZI.fenster([
       h('div', { class: 'geschafft-reihe' },
         h('div', { class: 'gross-bild strahlen' }, bild(datei, alt)),
-        h('div', { class: 'huepf-zwerg' }, bild(z.datei, z.name))),
+        h('div', { class: 'huepf-zwerg' }, bild([z.datei + '-jubel', z.datei], z.name))),
       h('h2', null, titel),
       h('p', { style: { margin: 0, fontSize: '21px' } }, text),
-      krone ? h('div', { class: 'krone-info' }, icon.krone(), h('span', null, schonKrone ? 'Wieder fehlerfrei – deine goldene Krone glänzt!' : 'Ganz ohne Fehler! Dafür bekommst du eine goldene Krone.')) : null,
+      krone ? h('div', { class: 'krone-info' }, ZI.bildOder('krone', 'Krone', icon.krone()), h('span', null, schonKrone ? 'Wieder fehlerfrei – deine goldene Krone glänzt!' : 'Ganz ohne Fehler! Dafür bekommst du eine goldene Krone.')) : null,
       h('button', { class: 'knopf', onclick: () => { f.schliessen(); fortschritt((s) => { eintragen(s); if (krone) s.setzeKrone(st.k, st.i); }, () => zeigeHalle()); } }, 'Zurück zur Halle'),
     ]);
   }
@@ -618,7 +618,7 @@
   }
   function medaille(a, frei) {
     return h('div', { class: 'medaille ' + a.stufe + (frei ? '' : ' gesperrt') },
-      h('div', { class: 'medaille-rund' }, frei ? icon[a.symbol]() : h('span', null, '?')),
+      h('div', { class: 'medaille-rund' + (frei ? ' mit-bild' : '') }, frei ? ZI.bildOder('abzeichen-' + a.id, a.name, h('span', { class: 'medaille-symbol' }, icon[a.symbol]())) : h('span', null, '?')),
       h('div', { class: 'medaille-name' }, frei ? a.name : '???'),
       h('div', { class: 'medaille-text' }, a.text));
   }
@@ -629,7 +629,9 @@
       neuerRang ? h('div', { class: 'rang-neu' },
         h('div', { style: { fontSize: '18px', color: 'var(--tinte-hell)' } }, 'Neuer Rang!'),
         h('h2', null, neuerRang.name),
-        h('div', { class: 'huepf-zwerg gross' }, bild(aktuellerZwerg().datei, aktuellerZwerg().name))) : null,
+        h('div', { class: 'rang-emblem-reihe' },
+          ZI.bildOder('rang-' + (neuerRang.nr + 1), neuerRang.name, null, 'rang-emblem'),
+          h('div', { class: 'huepf-zwerg gross' }, bild([aktuellerZwerg().datei + '-jubel', aktuellerZwerg().datei], aktuellerZwerg().name)))) : null,
       abzeichen.length ? h('h2', { style: { fontSize: '28px' } }, abzeichen.length === 1 ? 'Neues Abzeichen!' : abzeichen.length + ' neue Abzeichen!') : null,
       abzeichen.length ? h('div', { class: 'medaillen' }, abzeichen.map((a) => medaille(a, true))) : null,
       h('button', { class: 'knopf', onclick: () => { f.schliessen(); danach && danach(); } }, 'Weiter'),
@@ -648,7 +650,7 @@
       h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2 } },
         h('div', { class: 'halle-inhalt' },
           h('section', { class: 'pergament auf-pergament stollen' },
-            h('h2', null, 'Dein Rang: ' + rang.name),
+            h('div', { class: 'rang-kopf' }, ZI.bildOder('rang-' + (rang.nr + 1), rang.name, null, 'rang-emblem'), h('h2', null, 'Dein Rang: ' + rang.name)),
             h('p', { class: 'erklaer' }, rang.naechsterName ? 'Noch ' + (rang.naechsterAb - rang.punkte) + ' Punkte bis „' + rang.naechsterName + '“. Punkte gibt es für jede Station, jeden Tiefen Stollen, jeden Bonusstern und jede goldene Krone.' : 'Du hast den höchsten Rang erreicht!'),
             h('div', { class: 'rang-leiter' }, ZI.RAENGE.map((r, i) => h('div', { class: 'stufe' + (i <= rang.nr ? ' erreicht' : '') + (i === rang.nr ? ' jetzt' : '') },
               h('span', { class: 'stufe-punkte' }, String(r.ab)), h('span', null, aktuellerZwerg().w ? r.w : r.m))))),

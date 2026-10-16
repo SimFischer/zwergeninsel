@@ -30,11 +30,24 @@
 
   /* Bild mit Platzhalter: Fehlt die Datei noch, erscheint ein beschrifteter Rahmen. */
   ZI.bild = function bild(datei, alt, cls) {
-    const img = h('img', { src: ZI.BILD(datei), alt: alt || '', class: cls || null, draggable: 'false', decoding: 'async' });
-    img.addEventListener('error', () => {
-      const ph = h('div', { class: 'platzhalter' + (cls ? ' ' + cls : ''), role: 'img', 'aria-label': alt || datei }, alt || datei);
+    /* datei darf auch eine Liste sein: dann wird das erste vorhandene Bild genommen */
+    const liste = Array.isArray(datei) ? datei.slice() : [datei];
+    const img = h('img', { src: ZI.BILD(liste[0]), alt: alt || '', class: cls || null, draggable: 'false', decoding: 'async' });
+    let n = 0;
+    img.addEventListener('error', function weiter() {
+      n++;
+      if (n < liste.length) { img.src = ZI.BILD(liste[n]); return; }
+      img.removeEventListener('error', weiter);
+      const ph = h('div', { class: 'platzhalter' + (cls ? ' ' + cls : ''), role: 'img', 'aria-label': alt || liste[0] }, alt || liste[0]);
       img.replaceWith(ph);
-    }, { once: true });
+    });
+    return img;
+  };
+
+  /* Bild mit eigenem Ersatz: Fehlt das Bild, erscheint ersatz (ein Element) – oder gar nichts */
+  ZI.bildOder = function bildOder(datei, alt, ersatz, cls) {
+    const img = h('img', { src: ZI.BILD(datei), alt: alt || '', class: cls || null, draggable: 'false', decoding: 'async' });
+    img.addEventListener('error', () => { if (ersatz) img.replaceWith(ersatz); else img.remove(); }, { once: true });
     return img;
   };
 

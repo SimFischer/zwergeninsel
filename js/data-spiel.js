@@ -125,11 +125,11 @@
   ];
   /* Sonder-Schmuck für erfüllte Aufträge */
   ZI.SONDERSCHMUCK = [
-    { id: 'statue', name: 'Ehrenstatue', x: 47, y: 86, w: 5 },
-    { id: 'kristall-laterne', name: 'Kristall-Laterne', x: 34, y: 76, w: 3.5 },
-    { id: 'fahne', name: 'Siegesfahne', x: 60, y: 30, w: 4 },
-    { id: 'gemuesegarten', name: 'Festgarten', x: 30, y: 30, w: 7 },
-    { id: 'ziegen', name: 'Inselziegen', x: 78, y: 70, w: 6 },
-    { id: 'wegweiser', name: 'Wegweiser', x: 66, y: 86, w: 4 },
+    { id: 'sonder-amboss-denkmal', alt: 'statue', name: 'Amboss-Denkmal', x: 47, y: 86, w: 6 },
+    { id: 'sonder-pavillon', alt: 'kristall-laterne', name: 'Musikpavillon', x: 34, y: 78, w: 8 },
+    { id: 'sonder-blumenbogen', alt: 'fahne', name: 'Blumenbogen', x: 60, y: 30, w: 6 },
+    { id: 'sonder-baumhaus', alt: 'gemuesegarten', name: 'Baumhaus', x: 30, y: 30, w: 8 },
+    { id: 'sonder-festbaum', alt: 'ziegen', name: 'Festbaum', x: 78, y: 72, w: 5 },
+    { id: 'sonder-aussichtsturm', alt: 'wegweiser', name: 'Aussichtsturm', x: 66, y: 88, w: 6 },
   ];
 })();

@@ -1,7 +1,7 @@
 /* Zwergeninsel – Offline-Speicher
    Beim Start wird alles Wichtige zwischengespeichert. Danach läuft die App auch ohne WLAN.
    Nach jeder Änderung an der App die Versionsnummer erhöhen. */
-const VERSION = 'zwergeninsel-v5';
+const VERSION = 'zwergeninsel-v6';
 const KERN = [
   './', 'index.html', 'insel.html', 'manifest.webmanifest',
   'css/spiel.css', 'css/insel.css',
@@ -25,6 +25,12 @@ const BILDER = [
   'bank', 'faesser', 'statue', 'wegweiser', 'gemuesegarten', 'ziegen',
   'holz', 'stein', 'eisen', 'edelstein', 'stern', 'schloss',
   'pergament', 'holzschild', 'steinrahmen', 'zwergenpass-karte',
+  'moewe-oben', 'moewe-unten', 'moewe-geschenk', 'krabbe', 'delfin', 'huhn', 'hase', 'schildkroete', 'schmetterling',
+  'wolke-1', 'wolke-2', 'wolke-3', 'sonder-pavillon', 'sonder-blumenbogen', 'sonder-amboss-denkmal', 'sonder-aussichtsturm',
+  'sonder-baumhaus', 'sonder-festbaum', 'krone', 'geschenk', 'auftrag-rolle', 'buch-offen', 'flamme',
+  'rang-1', 'rang-2', 'rang-3', 'rang-4', 'rang-5', 'rang-6', 'rang-7',
+  ...['funke', 'k1', 'k2', 'k3', 'fehler', 'kobold', 'rede', 'ohr', 'rat', 'krone1', 'krone5', 'krone9', 'stern3', 'stern9', 'gems', 'buch', 'freunde', 'clan'].map((a) => 'abzeichen-' + a),
+  'icon-beispiel', 'icon-beispielregen', 'icon-erz-schlacke', 'icon-fehlerjagd', 'icon-funkenregen', 'icon-gegenargument', 'icon-hoeren', 'icon-inselrat', 'icon-ja-und', 'icon-kette', 'icon-kobold-kampf', 'icon-meisterstueck', 'icon-meisterstueck2', 'icon-motor-bremse', 'icon-puzzle', 'icon-situation', 'icon-sprecherwechsel', 'icon-streitgespraech', 'icon-stumpf-scharf', 'icon-weil-denn', 'icon-zuhoeren',
 ].map((n) => 'bilder/' + n + '.png');
 
 self.addEventListener('install', (e) => {
