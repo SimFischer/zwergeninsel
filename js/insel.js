@@ -5,7 +5,7 @@
   const KEY = 'zi-insel';
   const KAP = 0;
 
-  const leer = () => ({ klassengroesse: 25, zwerge: {}, gebaut: [], schmuck: 0, rat: null, gefeiert: false });
+  const leer = () => ({ klassengroesse: 27, zwerge: {}, gebaut: [], schmuck: 0, rat: null, gefeiert: false });
   let insel = Object.assign(leer(), speicher.lesen(KEY, {}));
   const sichern = () => speicher.schreiben(KEY, insel);
 
