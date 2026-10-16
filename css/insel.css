@@ -1,0 +1,89 @@
+/* Zwergeninsel – Ansicht für das Board */
+
+.insel-screen { position: fixed; inset: 0; background: #1f6a85; overflow: hidden; }
+.insel-buehne {
+  position: absolute; left: 50%; top: 50%;
+  width: min(100vw, calc(100vh * 16 / 9)); aspect-ratio: 16 / 9;
+  transform: translate(-50%, -50%);
+}
+.insel-grund { position: absolute; inset: 0; }
+.insel-grund img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.insel-ersatz {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 39% 36% at 52% 58%, #7fae54 0 92%, transparent 93%),
+    radial-gradient(ellipse 42% 39% at 52% 58%, #e3c98c 0 92%, transparent 93%),
+    radial-gradient(ellipse 46% 43% at 52% 58%, rgba(140, 220, 220, 0.55) 0 90%, transparent 92%),
+    linear-gradient(180deg, #3f9bb5, #1f6a85);
+}
+.wellen { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(170deg, transparent 0 46px, rgba(255, 255, 255, 0.05) 46px 50px); animation: wellen 9s linear infinite; }
+@keyframes wellen { to { background-position: 0 100px; } }
+
+.bau { position: absolute; transform: translate(-50%, -100%); z-index: 2; pointer-events: none; }
+.bau img, .bau .platzhalter { width: 100%; display: block; filter: drop-shadow(0 0.6vw 0.5vw rgba(0, 0, 0, 0.35)); }
+.bau .platzhalter { font-size: 1vw; border-color: rgba(58, 38, 23, 0.55); color: #3a2617; background: rgba(255, 255, 255, 0.35); }
+.bau .ruine { opacity: 1; }
+.bau.gebaut .ruine { display: none; }
+.bau.wird-gebaut { animation: bauHuepfer 0.9s ease-out; }
+@keyframes bauHuepfer { 0% { transform: translate(-50%, -100%) scale(0.85); } 55% { transform: translate(-50%, -100%) scale(1.12); } 100% { transform: translate(-50%, -100%) scale(1); } }
+.bau.gesperrt { filter: saturate(0.6) brightness(0.92); }
+.staub {
+  position: absolute; z-index: 6; width: 2.4vw; height: 2.4vw; border-radius: 50%;
+  background: radial-gradient(circle, rgba(250, 240, 220, 0.95), rgba(230, 210, 170, 0.6) 60%, transparent 70%);
+  animation: staub 1.1s ease-out forwards; pointer-events: none;
+}
+@keyframes staub { to { transform: translate(var(--dx), var(--dy)) scale(3); opacity: 0; } }
+
+.mini-zwerg { position: absolute; z-index: 3; width: 3.2%; transform: translate(-50%, -100%); animation: wippen 2.6s infinite ease-in-out; pointer-events: none; }
+.mini-zwerg img { width: 100%; display: block; filter: drop-shadow(0 0.3vw 0.3vw rgba(0, 0, 0, 0.35)); }
+.mini-zwerg .platzhalter { font-size: 0.6vw; padding: 2px; }
+.mini-zwerg.neu { animation: ankommen 0.8s ease-out, wippen 2.6s 0.8s infinite ease-in-out; }
+@keyframes wippen { 0%, 100% { transform: translate(-50%, -100%); } 50% { transform: translate(-50%, -106%); } }
+@keyframes ankommen { from { transform: translate(-50%, -200%) scale(0.4); opacity: 0; } }
+
+.schmuck { position: absolute; z-index: 2; transform: translate(-50%, -100%); pointer-events: none; animation: aufploppen 0.6s ease-out; }
+.schmuck img, .schmuck .platzhalter { width: 100%; display: block; }
+.schmuck .platzhalter { font-size: 0.8vw; padding: 2px; color: #3a2617; border-color: rgba(58, 38, 23, 0.5); background: rgba(255, 255, 255, 0.35); }
+
+/* Schrift und Tafeln über der Insel */
+.insel-titel { position: absolute; left: 2vw; top: 2vh; z-index: 10; color: #fff4dc; text-shadow: 0 3px 0 #4a2610, 0 6px 16px rgba(0, 0, 0, 0.5); }
+.insel-titel h1 { font-size: clamp(30px, 3.6vw, 64px); line-height: 1; }
+.insel-titel .unter { font-size: clamp(16px, 1.5vw, 26px); }
+.tafel { position: absolute; right: 2vw; top: 2vh; z-index: 10; width: clamp(280px, 24vw, 420px); padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.tafel .zahl { font-family: var(--titel); font-size: clamp(36px, 3.4vw, 60px); line-height: 1; }
+.balken { height: 22px; border-radius: 11px; border: 3px solid #8a6438; background: #fffaf0; overflow: hidden; }
+.balken > div { height: 100%; background: linear-gradient(180deg, #8db04c, var(--moos)); transition: width 1s ease-out; }
+.tafel .klein { font-size: 17px; color: var(--tinte-hell); line-height: 1.35; }
+.tafel .zeile { display: flex; align-items: center; gap: 10px; font-size: 18px; }
+.tafel .zeile img, .tafel .zeile .platzhalter { width: 36px; height: 36px; font-size: 0; border-width: 2px; padding: 0; }
+.insel-knoepfe { position: absolute; left: 2vw; bottom: 2.5vh; z-index: 10; display: flex; gap: 14px; flex-wrap: wrap; }
+
+/* Scanner */
+.scanner { display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap; justify-content: center; }
+.scanner video { width: min(56vw, 560px); max-height: 60vh; border-radius: 16px; background: #000; object-fit: cover; }
+.scan-liste { min-width: 240px; max-width: 320px; max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; text-align: left; }
+.scan-eintrag { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 12px; background: rgba(111, 143, 58, 0.18); font-size: 18px; animation: einblenden 0.3s; }
+.scan-eintrag img, .scan-eintrag .platzhalter { width: 42px; height: 42px; object-fit: contain; font-size: 0; padding: 0; }
+.fenster.breit { max-width: 980px; }
+
+/* Zwergenrat */
+.rat { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; }
+.rat-inhalt { position: relative; z-index: 2; flex: 1; display: grid; grid-template-columns: 1fr 1fr 0.9fr; gap: 2vw; padding: 2vw; min-height: 0; }
+.rat-frage { grid-column: 1 / -1; text-align: center; padding: 14px 20px; font-size: clamp(26px, 2.6vw, 44px); font-family: var(--titel); }
+.rat-option { padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.rat-option .bild { width: 60%; }
+.rat-option h3 { font-size: clamp(24px, 2.2vw, 38px); }
+.stimmen { display: flex; align-items: center; gap: 16px; font-family: var(--titel); font-size: 44px; }
+.rat-regeln { padding: 18px 20px; font-size: clamp(17px, 1.3vw, 22px); overflow-y: auto; }
+.rat-regeln h3 { font-size: 26px; margin-bottom: 6px; }
+.rat-regeln ul { margin: 0 0 12px; padding-left: 22px; }
+.rat-regeln li { margin-bottom: 6px; }
+.uhr { font-family: var(--titel); font-size: 40px; text-align: center; }
+
+.lieferliste { width: 100%; border-collapse: collapse; font-size: 17px; text-align: left; }
+.lieferliste th, .lieferliste td { padding: 6px 8px; border-bottom: 1px solid rgba(58, 38, 23, 0.2); }
+.lieferliste img, .lieferliste .platzhalter { width: 36px; height: 36px; object-fit: contain; font-size: 0; padding: 0; vertical-align: middle; }
+.einstellung { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; font-size: 20px; }
+.einstellung input[type=number] { width: 90px; font-size: 26px; padding: 6px 10px; border-radius: 10px; border: 3px solid #8a6438; text-align: center; -webkit-user-select: text; user-select: text; }
+
+.runenwort { font-family: var(--titel); font-size: clamp(48px, 6vw, 96px); letter-spacing: 8px; color: var(--gold-dunkel); text-shadow: 0 3px 0 rgba(0, 0, 0, 0.2); }

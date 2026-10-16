@@ -1,0 +1,420 @@
+/* Zwergeninsel – gemeinsames Aussehen für Schüler-App und Insel */
+
+:root {
+  --nacht: #1d140f;
+  --holz-dunkel: #3a2417;
+  --holz: #6b4226;
+  --holz-hell: #9a6a3e;
+  --pergament: #f4e6c8;
+  --pergament-dunkel: #e2cc9f;
+  --tinte: #3a2617;
+  --tinte-hell: #6b5442;
+  --glut: #f28c28;
+  --glut-hell: #ffc261;
+  --gold: #e8b23a;
+  --gold-dunkel: #b9851d;
+  --moos: #6f8f3a;
+  --moos-dunkel: #4f6a26;
+  --eisen: #4a4e57;
+  --eisen-hell: #8a8f99;
+  --edelstein: #2ec4b6;
+  --fehler: #c2533a;
+  --schrift: 'Andika', 'Trebuchet MS', sans-serif;
+  --titel: 'Lilita One', 'Trebuchet MS', sans-serif;
+  --radius: 18px;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--nacht);
+  color: var(--pergament);
+  font-family: var(--schrift);
+  font-size: 20px;
+  line-height: 1.4;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
+img { -webkit-user-drag: none; }
+h1, h2, h3 { font-family: var(--titel); font-weight: 400; margin: 0; letter-spacing: 0.3px; }
+
+/* ---------- Bildschirme ---------- */
+#app { position: fixed; inset: 0; overflow: hidden; }
+.screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  animation: einblenden 0.35s ease-out;
+}
+.screen-scroll { flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+@keyframes einblenden { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* Hintergrundbilder mit Ersatz, solange das Bild fehlt */
+.hintergrund { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+.hintergrund img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hintergrund::after { content: ''; position: absolute; inset: 0; background: var(--abdunkeln, rgba(20, 12, 8, 0.25)); }
+.hg-ersatz-schmiede {
+  background:
+    radial-gradient(ellipse 40% 55% at 12% 70%, rgba(242, 140, 40, 0.55), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, #4a2d1b, transparent 70%),
+    linear-gradient(180deg, #2a1b13 0%, #3b2618 60%, #2a1a11 100%);
+}
+.hg-ersatz-stollen {
+  background:
+    radial-gradient(circle at 18% 30%, rgba(46, 196, 182, 0.25), transparent 22%),
+    radial-gradient(circle at 82% 62%, rgba(150, 100, 230, 0.22), transparent 20%),
+    linear-gradient(180deg, #221812 0%, #33231a 100%);
+}
+.hg-ersatz-titel {
+  background:
+    radial-gradient(ellipse 50% 35% at 50% 62%, #5f8f45, transparent 70%),
+    radial-gradient(ellipse 70% 25% at 50% 64%, #d9b878, transparent 72%),
+    linear-gradient(180deg, #f6c26b 0%, #f0a35e 30%, #4f9db0 55%, #1f6a85 100%);
+}
+.hg-ersatz-vulkan {
+  background:
+    radial-gradient(ellipse 30% 40% at 50% 100%, rgba(255, 120, 30, 0.6), transparent 70%),
+    linear-gradient(180deg, #2b1610 0%, #471f12 100%);
+}
+.glut-flackern {
+  position: absolute; left: 0; top: 30%; width: 38%; height: 60%;
+  background: radial-gradient(ellipse at 30% 60%, rgba(255, 150, 50, 0.35), transparent 65%);
+  animation: flackern 2.4s infinite ease-in-out;
+  pointer-events: none; z-index: 1; mix-blend-mode: screen;
+}
+@keyframes flackern {
+  0%, 100% { opacity: 0.7; } 20% { opacity: 1; } 40% { opacity: 0.8; } 60% { opacity: 0.95; } 80% { opacity: 0.75; }
+}
+
+/* Platzhalter für Bilder, die noch fehlen */
+.platzhalter {
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  border: 3px dashed rgba(244, 230, 200, 0.5);
+  border-radius: 16px;
+  background: rgba(244, 230, 200, 0.08);
+  color: rgba(244, 230, 200, 0.85);
+  font-size: 15px; line-height: 1.2; padding: 8px;
+  aspect-ratio: 1 / 1;
+}
+.auf-pergament .platzhalter { border-color: rgba(58, 38, 23, 0.4); color: var(--tinte-hell); background: rgba(58, 38, 23, 0.05); }
+
+/* ---------- Leisten und Rahmen ---------- */
+.leiste {
+  position: relative; z-index: 5;
+  display: flex; align-items: center; gap: 14px;
+  padding: max(12px, env(safe-area-inset-top)) 20px 12px;
+  background: linear-gradient(180deg, rgba(29, 20, 15, 0.92), rgba(29, 20, 15, 0.7));
+  border-bottom: 3px solid rgba(232, 178, 58, 0.35);
+}
+.leiste .titel { font-family: var(--titel); font-size: 26px; line-height: 1.1; }
+.leiste .untertitel { font-size: 16px; color: #d9c6a3; }
+.spacer { flex: 1 1 auto; }
+
+.avatar {
+  width: 64px; height: 64px; border-radius: 50%; flex: none;
+  background: radial-gradient(circle at 50% 40%, #7a5236, #3a2417);
+  border: 3px solid var(--gold);
+  overflow: hidden; display: flex; align-items: flex-start; justify-content: center;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4);
+}
+.avatar img { width: 150%; margin-top: -2%; }
+.avatar .platzhalter { aspect-ratio: auto; width: 100%; height: 100%; border: none; font-size: 11px; border-radius: 50%; }
+
+.zaehler {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(0, 0, 0, 0.35); border: 2px solid rgba(244, 230, 200, 0.25);
+  border-radius: 999px; padding: 4px 14px 4px 6px;
+  font-family: var(--titel); font-size: 22px; min-height: 44px;
+}
+.zaehler img, .zaehler .platzhalter { width: 34px; height: 34px; font-size: 0; border-width: 2px; padding: 0; border-radius: 50%; }
+
+.pergament {
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, 0.35), transparent 50%),
+    linear-gradient(180deg, var(--pergament), var(--pergament-dunkel));
+  color: var(--tinte);
+  border-radius: var(--radius);
+  border: 3px solid #8a6438;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35), inset 0 0 30px rgba(140, 100, 50, 0.25);
+}
+
+/* ---------- Knöpfe ---------- */
+.knopf {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 56px; padding: 10px 26px 14px;
+  border: none; border-radius: 16px;
+  font-family: var(--titel); font-size: 24px; letter-spacing: 0.3px;
+  color: var(--tinte);
+  background: linear-gradient(180deg, #ffd56e, var(--gold));
+  box-shadow: inset 0 -6px 0 var(--gold-dunkel), 0 4px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.08s;
+}
+.knopf:active { transform: translateY(3px); box-shadow: inset 0 -3px 0 var(--gold-dunkel), 0 1px 0 rgba(0, 0, 0, 0.35); }
+.knopf.holz { color: var(--pergament); background: linear-gradient(180deg, #8a5a34, var(--holz)); box-shadow: inset 0 -6px 0 #4a2c18, 0 4px 0 rgba(0, 0, 0, 0.35); }
+.knopf.moos { color: #fff8e6; background: linear-gradient(180deg, #8db04c, var(--moos)); box-shadow: inset 0 -6px 0 var(--moos-dunkel), 0 4px 0 rgba(0, 0, 0, 0.35); }
+.knopf svg { width: 28px; height: 28px; flex: none; }
+.knopf.klein { min-height: 46px; font-size: 19px; padding: 6px 16px 10px; }
+.knopf:disabled { filter: grayscale(0.8) brightness(0.7); }
+.rund {
+  width: 56px; height: 56px; border-radius: 50%; border: none; flex: none;
+  background: linear-gradient(180deg, #8a5a34, var(--holz));
+  box-shadow: inset 0 -5px 0 #4a2c18, 0 3px 0 rgba(0, 0, 0, 0.35);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--pergament);
+}
+.rund.gold { background: linear-gradient(180deg, #ffd56e, var(--gold)); box-shadow: inset 0 -5px 0 var(--gold-dunkel), 0 3px 0 rgba(0, 0, 0, 0.35); color: var(--tinte); }
+.rund svg { width: 28px; height: 28px; }
+
+/* ---------- Startbildschirm ---------- */
+.start-mitte {
+  position: relative; z-index: 2; flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+  padding: 24px; text-align: center;
+}
+.logo {
+  font-family: var(--titel); font-size: clamp(56px, 10vw, 104px); line-height: 0.95;
+  color: #ffe2a0;
+  text-shadow: 0 4px 0 #8a4d1c, 0 8px 0 #4a2610, 0 14px 24px rgba(0, 0, 0, 0.5);
+}
+.logo-unter { font-size: 24px; color: #fff4dc; text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7); }
+.start-knoepfe { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
+.weiter-karte { display: flex; align-items: center; gap: 14px; padding: 12px 20px; }
+.fusszeile { position: relative; z-index: 2; text-align: center; padding: 10px; font-size: 15px; }
+.fusszeile button { background: none; border: none; color: rgba(255, 244, 220, 0.8); text-decoration: underline; min-height: 44px; }
+
+/* ---------- Zwerg wählen ---------- */
+.zwerg-raster {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px;
+  padding: 20px; max-width: 1100px; margin: 0 auto;
+}
+.zwerg-karte {
+  position: relative; border: none; padding: 10px 10px 12px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.zwerg-karte .bild { width: 100%; aspect-ratio: 1 / 1; display: flex; align-items: flex-end; justify-content: center; }
+.zwerg-karte .bild img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.3)); }
+.zwerg-karte .bild .platzhalter { width: 90%; }
+.zwerg-karte .name { font-family: var(--titel); font-size: 22px; line-height: 1.1; }
+.zwerg-karte .rolle { font-size: 15px; color: var(--tinte-hell); }
+.zwerg-karte.gewaehlt { outline: 5px solid var(--glut); outline-offset: 2px; }
+.zwerg-karte.gesperrt .bild img { filter: brightness(0) opacity(0.45); }
+.zwerg-karte.gesperrt .bedingung { font-size: 14px; line-height: 1.25; color: var(--tinte-hell); }
+.schloss { position: absolute; top: 10px; right: 10px; width: 38px; height: 38px; }
+
+/* ---------- Halle (Kapitelkarte) ---------- */
+.halle-inhalt { position: relative; z-index: 2; padding: 20px; max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+.reiter { display: flex; gap: 10px; flex-wrap: wrap; }
+.reiter button {
+  border: none; border-radius: 14px 14px 0 0; padding: 10px 20px; min-height: 48px;
+  font-family: var(--titel); font-size: 20px;
+  background: rgba(0, 0, 0, 0.4); color: rgba(244, 230, 200, 0.7);
+}
+.reiter button.aktiv { background: var(--pergament); color: var(--tinte); }
+.stollen { padding: 18px 20px 22px; }
+.stollen h2 { font-size: 30px; display: flex; align-items: center; gap: 10px; }
+.stollen .erklaer { font-size: 18px; color: var(--tinte-hell); margin: 2px 0 14px; }
+.stationen { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.station {
+  position: relative; border: 3px solid #8a6438; border-radius: 16px; padding: 14px;
+  background: rgba(255, 255, 255, 0.45); color: var(--tinte); text-align: left;
+  display: flex; gap: 12px; align-items: center; min-height: 96px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+}
+.station:active { transform: translateY(2px); }
+.station .icon { width: 64px; height: 64px; flex: none; }
+.station .icon img, .station .icon .platzhalter { width: 100%; height: 100%; object-fit: contain; font-size: 10px; padding: 2px; }
+.station .st-name { font-family: var(--titel); font-size: 21px; line-height: 1.1; }
+.station .st-info { font-size: 15px; color: var(--tinte-hell); line-height: 1.3; }
+.station.geschafft { background: rgba(141, 176, 76, 0.35); border-color: var(--moos-dunkel); }
+.station.gesperrt { opacity: 0.55; }
+.haken {
+  position: absolute; top: -10px; right: -10px; width: 38px; height: 38px; border-radius: 50%;
+  background: var(--moos); color: #fff; display: flex; align-items: center; justify-content: center;
+  border: 3px solid #fff8e6; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+}
+.haken svg { width: 20px; height: 20px; }
+
+/* ---------- Spielbildschirm (Schmiede) ---------- */
+.spiel { position: relative; z-index: 2; flex: 1; display: flex; gap: 22px; padding: 18px 22px 22px; min-height: 0; }
+.aufgabe { flex: 1 1 58%; display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; min-height: 0; overflow-y: auto; }
+.aufgabe .frage { font-size: 19px; color: var(--tinte-hell); display: flex; align-items: center; gap: 10px; }
+.aufgabe .meinung { font-size: 26px; font-weight: 700; line-height: 1.35; }
+.optionen { display: flex; flex-direction: column; gap: 12px; }
+.option {
+  text-align: left; font-size: 22px; line-height: 1.35; color: var(--tinte);
+  background: #fffaf0; border: 3px solid #b08a5a; border-radius: 16px; padding: 14px 18px; min-height: 64px;
+  box-shadow: 0 4px 0 #b08a5a;
+  transition: transform 0.08s, background 0.2s;
+}
+.option:active { transform: translateY(3px); box-shadow: 0 1px 0 #b08a5a; }
+.option.richtig { background: #e3f0c8; border-color: var(--moos); box-shadow: 0 4px 0 var(--moos-dunkel); }
+.option.falsch { background: #f5d9cd; border-color: var(--fehler); box-shadow: 0 4px 0 #8f3a28; animation: wackeln 0.4s; }
+.option.weg { opacity: 0.35; text-decoration: line-through; pointer-events: none; }
+@keyframes wackeln { 0%, 100% { transform: none; } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+
+.rueckmeldung { display: flex; gap: 12px; align-items: flex-start; font-size: 20px; line-height: 1.4; padding: 12px 16px; border-radius: 14px; }
+.rueckmeldung.gut { background: rgba(111, 143, 58, 0.18); border: 2px solid var(--moos); }
+.rueckmeldung.schlecht { background: rgba(194, 83, 58, 0.12); border: 2px solid var(--fehler); }
+.rueckmeldung.tipp { background: rgba(232, 178, 58, 0.22); border: 2px solid var(--gold-dunkel); }
+
+.fortschritt { display: flex; gap: 6px; }
+.fortschritt span { width: 34px; height: 12px; border-radius: 6px; background: rgba(244, 230, 200, 0.25); }
+.fortschritt span.voll { background: var(--glut); }
+.fortschritt span.jetzt { background: var(--glut-hell); box-shadow: 0 0 10px var(--glut); }
+
+/* Die Bühne mit Amboss, Hammer und Meisterin */
+.buehne { flex: 1 1 42%; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-width: 300px; }
+.meisterin-blase {
+  position: relative; align-self: stretch; margin-bottom: 8px;
+  padding: 14px 18px; font-size: 19px; line-height: 1.4; min-height: 64px;
+}
+.meisterin-blase::after {
+  content: ''; position: absolute; bottom: -14px; left: 48px;
+  border-width: 14px 12px 0; border-style: solid; border-color: #8a6438 transparent transparent;
+}
+.meisterin-reihe { display: flex; align-items: flex-end; width: 100%; gap: 6px; }
+.meisterin { width: 40%; max-width: 190px; flex: none; animation: atmen 3.2s infinite ease-in-out; transform-origin: bottom center; }
+.meisterin img { width: 100%; display: block; filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.45)); }
+@keyframes atmen { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.015, 0.99); } }
+.amboss-platz { position: relative; flex: 1; display: flex; justify-content: center; align-items: flex-end; height: 300px; }
+.amboss { position: absolute; bottom: 0; width: 82%; max-width: 300px; }
+.amboss img, .amboss .platzhalter { width: 100%; display: block; filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.5)); }
+.werkstueck { position: absolute; bottom: 52%; width: 50%; max-width: 180px; transition: transform 0.3s; z-index: 2; }
+.werkstueck img, .werkstueck .platzhalter { width: 100%; display: block; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.5)); }
+.werkstueck.neu { animation: aufploppen 0.5s ease-out; }
+@keyframes aufploppen { 0% { transform: scale(0.4); filter: brightness(3); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+.hammer {
+  position: absolute; right: 2%; bottom: 52%; width: 46%; max-width: 170px; z-index: 3;
+  transform-origin: 85% 85%; transform: rotate(-35deg) translate(10px, -40px);
+  transition: transform 0.25s;
+}
+.hammer img, .hammer .platzhalter { width: 100%; display: block; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.5)); transform: scaleX(-1); }
+.hammer.schlag { animation: schlag 0.45s cubic-bezier(.5, -0.4, .6, 1.4); }
+@keyframes schlag {
+  0% { transform: rotate(-35deg) translate(10px, -40px); }
+  45% { transform: rotate(-70deg) translate(20px, -70px); }
+  70% { transform: rotate(8deg) translate(-20px, 10px); }
+  100% { transform: rotate(-35deg) translate(10px, -40px); }
+}
+.funke {
+  position: absolute; width: 8px; height: 8px; border-radius: 50%; z-index: 4;
+  background: radial-gradient(circle, #fff7d6, var(--glut-hell) 40%, var(--glut) 70%, transparent 72%);
+  pointer-events: none;
+  animation: funkeflug 0.8s ease-out forwards;
+}
+@keyframes funkeflug { to { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; } }
+.blitz { position: absolute; inset: 0; background: radial-gradient(circle at 50% 70%, rgba(255, 220, 140, 0.6), transparent 60%); animation: blitz 0.5s forwards; pointer-events: none; z-index: 5; }
+@keyframes blitz { from { opacity: 1; } to { opacity: 0; } }
+
+/* Weil-Denn-Amboss: Runenplatten */
+.satzzeile { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; min-height: 70px; }
+.platte {
+  position: relative; border: none; padding: 10px 18px 14px; min-height: 58px; min-width: 70px;
+  font-size: 23px; font-weight: 700; color: #fdf6e3; border-radius: 10px;
+  background: linear-gradient(180deg, #8a8f99, #5b6069);
+  box-shadow: inset 0 0 0 3px #3a3d44, inset 0 -6px 0 #3a3d44, 0 4px 0 rgba(0, 0, 0, 0.35);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+}
+.platte.fest { background: linear-gradient(180deg, #7a5236, #57381f); box-shadow: inset 0 0 0 3px #3a2417, inset 0 -6px 0 #3a2417; }
+.platte.bindewort { background: linear-gradient(180deg, #ffd56e, var(--gold)); color: var(--tinte); text-shadow: none; box-shadow: inset 0 0 0 3px var(--gold-dunkel), inset 0 -6px 0 var(--gold-dunkel); }
+.platte.leer { background: rgba(58, 38, 23, 0.08); box-shadow: inset 0 0 0 3px rgba(58, 38, 23, 0.25); min-width: 90px; }
+.platte.verb-markiert { box-shadow: inset 0 0 0 4px var(--glut), inset 0 -6px 0 #3a3d44, 0 0 14px var(--glut); }
+.vorrat { display: flex; flex-wrap: wrap; gap: 12px; padding: 14px; border-radius: 14px; background: rgba(58, 38, 23, 0.08); min-height: 86px; }
+
+/* Erz oder Schlacke */
+.erz-karte { font-size: 23px; line-height: 1.35; padding: 18px 20px; background: #fffaf0; border: 3px solid #b08a5a; border-radius: 16px; animation: einblenden 0.3s; }
+.erz-karte.weg-erz { animation: wegErz 0.5s forwards; }
+.erz-karte.weg-schlacke { animation: wegSchlacke 0.5s forwards; }
+@keyframes wegErz { to { transform: translate(-120px, 60px) scale(0.3) rotate(-20deg); opacity: 0; } }
+@keyframes wegSchlacke { to { transform: translate(120px, 60px) scale(0.3) rotate(20deg); opacity: 0; } }
+.erz-knoepfe { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.erz-knoepfe .knopf { min-height: 76px; font-size: 26px; }
+.knopf.schlacke { color: #f2ece2; background: linear-gradient(180deg, #8a8f99, #5b6069); box-shadow: inset 0 -6px 0 #3a3d44, 0 4px 0 rgba(0, 0, 0, 0.35); }
+.koerbe { display: flex; gap: 10px; flex-wrap: wrap; font-size: 16px; color: var(--tinte-hell); }
+.koerbe .marke { padding: 4px 10px; border-radius: 999px; background: rgba(232, 178, 58, 0.3); }
+.koerbe .marke.grau { background: rgba(90, 96, 105, 0.25); }
+
+/* Meisterstück */
+.themen { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.checkliste { display: flex; flex-direction: column; gap: 12px; }
+.check {
+  display: flex; align-items: center; gap: 14px; text-align: left;
+  font-size: 21px; padding: 14px 18px; min-height: 64px; color: var(--tinte);
+  background: #fffaf0; border: 3px solid #b08a5a; border-radius: 16px;
+}
+.check .kasten { width: 36px; height: 36px; flex: none; border-radius: 8px; border: 3px solid #8a6438; display: flex; align-items: center; justify-content: center; background: #fff; }
+.check.an { background: #e3f0c8; border-color: var(--moos); }
+.check.an .kasten { background: var(--moos); border-color: var(--moos-dunkel); color: #fff; }
+.check .kasten svg { width: 22px; height: 22px; }
+.sprechblase-gross { font-size: 25px; line-height: 1.5; padding: 18px 22px; background: #fffaf0; border-radius: 16px; border: 3px dashed #b08a5a; }
+
+/* ---------- Funkenregen ---------- */
+.arena { position: relative; z-index: 2; flex: 1; overflow: hidden; }
+.arena-meinung { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); z-index: 3; padding: 12px 22px; font-size: 24px; font-weight: 700; text-align: center; max-width: 92%; }
+.spark {
+  position: absolute; top: -120px; z-index: 2; border: none;
+  max-width: 270px; padding: 12px 16px 16px; border-radius: 22px;
+  font-size: 19px; font-weight: 700; line-height: 1.25; color: var(--tinte);
+  background: radial-gradient(circle at 30% 20%, #fff7d6, #ffd36e 60%, #f2a33a);
+  box-shadow: 0 0 22px rgba(255, 170, 60, 0.75), inset 0 -5px 0 rgba(185, 110, 30, 0.6);
+  animation: fallen linear forwards;
+}
+@keyframes fallen { to { transform: translateY(calc(100vh + 160px)); } }
+.spark.gefangen { animation: fangen 0.4s forwards; }
+@keyframes fangen { to { transform: scale(1.6); opacity: 0; } }
+.spark.zisch { animation: zisch 0.5s forwards; background: #8a8f99; box-shadow: none; color: #f2ece2; }
+@keyframes zisch { to { transform: translateY(40px) scale(0.5); opacity: 0; } }
+.punktstand { font-family: var(--titel); font-size: 30px; }
+
+/* ---------- Lieferung ---------- */
+.lieferung { position: relative; z-index: 2; flex: 1; display: flex; gap: 26px; align-items: center; justify-content: center; padding: 22px; flex-wrap: wrap; }
+.qr-feld { background: #fff; padding: 18px; border-radius: 18px; box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35); }
+.qr-feld svg, .qr-feld img { width: min(46vh, 360px); height: auto; display: block; }
+.pass-karte { padding: 22px 26px; max-width: 520px; display: flex; flex-direction: column; gap: 14px; }
+.pass-code { font-family: 'Courier New', monospace; font-weight: 700; font-size: clamp(34px, 5vw, 48px); letter-spacing: 4px; text-align: center; padding: 10px; background: #fffaf0; border-radius: 12px; border: 3px solid #8a6438; }
+.schritte { margin: 0; padding-left: 26px; font-size: 20px; }
+
+.eingabe {
+  width: 100%; font-family: 'Courier New', monospace; font-weight: 700;
+  font-size: 40px; letter-spacing: 6px; text-align: center; text-transform: uppercase;
+  padding: 12px; border-radius: 14px; border: 3px solid #8a6438; background: #fffaf0; color: var(--tinte);
+  -webkit-user-select: text; user-select: text;
+}
+
+/* ---------- Belohnung / Fenster ---------- */
+.schleier { position: fixed; inset: 0; z-index: 50; background: rgba(15, 9, 6, 0.75); display: flex; align-items: center; justify-content: center; padding: 20px; animation: einblenden 0.25s; }
+.fenster { max-width: 620px; width: 100%; padding: 26px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; max-height: 92vh; overflow-y: auto; }
+.fenster h2 { font-size: 34px; }
+.fenster .gross-bild { width: min(60%, 260px); }
+.fenster .gross-bild img { width: 100%; display: block; filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.35)); animation: aufploppen 0.6s ease-out; }
+.strahlen { position: relative; }
+.strahlen::before {
+  content: ''; position: absolute; inset: -20%; z-index: -1;
+  background: repeating-conic-gradient(from 0deg, rgba(232, 178, 58, 0.35) 0 10deg, transparent 10deg 20deg);
+  border-radius: 50%; animation: drehen 12s linear infinite;
+  -webkit-mask: radial-gradient(circle, #000 30%, transparent 70%); mask: radial-gradient(circle, #000 30%, transparent 70%);
+}
+@keyframes drehen { to { transform: rotate(360deg); } }
+.knopf-reihe { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+.meldung {
+  position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 60;
+  padding: 12px 22px; font-size: 20px; max-width: 90vw; text-align: center;
+  animation: einblenden 0.3s;
+}
+
+/* ---------- Hochformat ---------- */
+@media (orientation: portrait), (max-width: 860px) {
+  .spiel { flex-direction: column; overflow-y: auto; }
+  .aufgabe { flex: none; overflow: visible; }
+  .buehne { flex: none; min-height: 340px; }
+  .amboss-platz { height: 240px; }
+}
+@media (max-height: 720px) and (orientation: landscape) {
+  .amboss-platz { height: 220px; }
+  .aufgabe .meinung { font-size: 23px; }
+  .option { font-size: 20px; padding: 10px 16px; min-height: 54px; }
+}
