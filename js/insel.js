@@ -4,7 +4,7 @@
   const { h, bild, icon, speicher } = ZI;
   const KEY = 'zi-insel';
 
-  const leer = () => ({ klassengroesse: 27, kapitel: 0, zwerge: {}, gebaut: [], schmuck: 0, rat: {}, gefeiert: [] });
+  const leer = () => ({ klassengroesse: 27, kapitel: 0, zwerge: {}, gebaut: [], schmuck: 0, rat: {}, gefeiert: [], geschenke: 0, auftrag: null, sonder: 0, nacht: false });
   function aufbereiten(roh) {
     const i = Object.assign(leer(), roh || {});
     if (typeof i.rat === 'string') i.rat = { 0: i.rat };          // ältere Speicherstände
@@ -63,16 +63,38 @@
   grund.appendChild(grundBild);
   buehne.appendChild(grund);
   const bauEls = {};
+  /* Wo Rauch aufsteigt (Position im Gebäudebild in Prozent) */
+  const RAUCH = { lagerfeuer: [50, 30], huette1: [74, 8], huette2: [62, 10], huette3: [55, 12], werkstatt: [70, 6], festhalle: [50, 6] };
   ZI.GEBAEUDE.forEach((g) => {
     const el = h('div', { class: 'bau', style: { left: g.x + '%', top: g.y + '%', width: g.w + '%' } },
       h('div', { class: 'ruine' }, bild(g.id + '-ruine', g.name + ' (Ruine)')),
-      h('div', { class: 'fertig', style: { display: 'none' } }, bild(g.id, g.name)));
+      h('div', { class: 'fertig', style: { display: 'none' } }, bild(g.id, g.name)),
+      RAUCH[g.id] ? h('div', { class: 'rauch', style: { left: RAUCH[g.id][0] + '%', top: RAUCH[g.id][1] + '%' }, 'aria-hidden': 'true' }, h('span'), h('span'), h('span')) : null);
     bauEls[g.id] = el;
     buehne.appendChild(el);
   });
   const zwergSchicht = h('div');
   const schmuckSchicht = h('div');
-  buehne.append(schmuckSchicht, zwergSchicht);
+  const sonderSchicht = h('div');
+  /* Lebendige Insel: Wolken, Möwen und Nacht */
+  const wolken = h('div', { class: 'wolken', 'aria-hidden': 'true' }, h('span'), h('span'), h('span'));
+  const moewen = h('div', { class: 'moewen', 'aria-hidden': 'true' }, moeweSvg(), moeweSvg(), moeweSvg());
+  const nachtSchicht = h('div', { class: 'nacht-schicht', 'aria-hidden': 'true' });
+  buehne.append(schmuckSchicht, sonderSchicht, zwergSchicht, moewen, wolken, nachtSchicht);
+  function moeweSvg(geschenk) {
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', '0 0 60 40'); s.setAttribute('class', 'moewe');
+    s.innerHTML = '<path d="M2 18 Q15 4 30 18 Q45 4 58 18" fill="none" stroke="#fffaf0" stroke-width="4" stroke-linecap="round"/>' +
+      '<path d="M2 18 Q15 4 30 18 Q45 4 58 18" fill="none" stroke="#3a2617" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>' +
+      (geschenk ? '<line x1="30" y1="18" x2="30" y2="26" stroke="#3a2617" stroke-width="1.5"/><rect x="23" y="26" width="14" height="12" rx="2" fill="#c2533a" stroke="#3a2617" stroke-width="1.5"/><rect x="28.5" y="26" width="3" height="12" fill="#ffd56e"/>' : '');
+    return s;
+  }
+  function moeweMitGeschenk(behaelter) {
+    const m = h('div', { class: 'moewe-flug', 'aria-hidden': 'true' }, moeweSvg(true));
+    (behaelter || buehne).appendChild(m);
+    setTimeout(() => { ZI.ton.plopp(); }, 2600);
+    setTimeout(() => m.remove(), 4200);
+  }
 
   const tafel = h('div', { class: 'tafel pergament auf-pergament' });
   const unterTitel = h('div', { class: 'unter' });
@@ -81,6 +103,9 @@
     h('button', { class: 'knopf', onclick: oeffneScanner }, icon.kamera(), 'Lieferung scannen'),
     h('button', { class: 'knopf holz', onclick: oeffneCodeEingabe }, icon.tastatur(), 'Code eintippen'),
     h('button', { class: 'knopf holz', onclick: oeffneRat }, 'Zwergenrat'),
+    h('button', { class: 'knopf holz', onclick: oeffneRaetsel }, 'Inselrätsel'),
+    h('button', { class: 'knopf holz', onclick: oeffneAuftrag }, 'Auftrag'),
+    h('button', { class: 'rund', 'aria-label': 'Tag oder Nacht', onclick: () => { insel.nacht = !insel.nacht; sichern(); zeigeNacht(); } }, icon.mond()),
     h('button', { class: 'rund', 'aria-label': 'Einstellungen', onclick: oeffneEinstellungen }, icon.zahnrad()));
   screen.append(buehne, titel, tafel, knoepfe);
   document.getElementById('app').appendChild(screen);
@@ -94,6 +119,7 @@
       el.classList.toggle('gebaut', ist);
       el.querySelector('.fertig').style.display = ist ? '' : 'none';
       el.classList.toggle('gesperrt', g.kapitel > kap() + 1);
+      el.classList.toggle('mit-rauch', ist);
     });
     if (!animiert) { insel.gebaut = soll.slice(); sichern(); return; }
     neu.forEach((id, i) => setTimeout(() => baue(id), 900 * i + 300));
@@ -121,15 +147,18 @@
       el.classList.add('gebaut');
       el.querySelector('.fertig').style.display = '';
       el.classList.remove('wird-gebaut'); void el.offsetWidth; el.classList.add('wird-gebaut');
+      el.classList.add('mit-rauch');
       ZI.ton.fanfare();
       ZI.meldung(g.name + ' ist fertig gebaut!', 3200);
     }, 450);
   }
 
   function zeigeSchmuck(animiert) {
-    const anzahl = Math.min(ZI.SCHMUCK.length, Math.floor(edelsteine() / ZI.SCHMUCK_PRO));
+    const anzahl = Math.min(ZI.SCHMUCK.length, Math.floor((edelsteine() + (insel.geschenke || 0) * 5) / ZI.SCHMUCK_PRO));
+    ZI.setze(sonderSchicht, ...ZI.SONDERSCHMUCK.slice(0, insel.sonder || 0).map((s) =>
+      h('div', { class: 'schmuck sonder' + (/laterne/.test(s.id) ? ' lampe' : ''), style: { left: s.x + '%', top: s.y + '%', width: s.w + '%', animation: 'none' } }, bild(s.id, s.name))));
     ZI.setze(schmuckSchicht, ...ZI.SCHMUCK.slice(0, anzahl).map((s, i) => {
-      const el = h('div', { class: 'schmuck', style: { left: s.x + '%', top: s.y + '%', width: s.w + '%' } }, bild(s.id, s.name));
+      const el = h('div', { class: 'schmuck' + (/laterne/.test(s.id) ? ' lampe' : ''), style: { left: s.x + '%', top: s.y + '%', width: s.w + '%' } }, bild(s.id, s.name));
       if (!animiert || i < insel.schmuck) el.style.animation = 'none';
       return el;
     }));
@@ -173,7 +202,8 @@
       h('div', null, h('span', { class: 'zahl' }, String(m)), h('span', { style: { fontSize: '22px' } }, ' von ' + zl)),
       h('div', { class: 'balken', role: 'progressbar', 'aria-valuenow': String(anteil), 'aria-valuemin': '0', 'aria-valuemax': '100' }, h('div', { style: { width: anteil + '%' } })),
       status,
-      h('div', { class: 'zeile' }, bild('edelstein', 'Edelsteine'), gems + ' Edelsteine · ' + insel.schmuck + ' Schmuckstücke'),
+      auftragAnzeige(),
+      h('div', { class: 'zeile' }, bild('edelstein', 'Edelsteine'), gems + ' Edelsteine · ' + insel.schmuck + ' Schmuckstücke' + (insel.geschenke ? ' · ' + insel.geschenke + ' Möwengeschenke' : '')),
       h('div', { class: 'zeile' }, bild('zwerg-01-brumm', 'Zwerge'), Object.keys(insel.zwerge).length + ' von ' + insel.klassengroesse + ' Zwergen haben geliefert'),
       m === 0 ? h('div', { class: 'klein' }, 'Jede geschaffte Station im Hauptstollen ' + (k > 0 ? 'von Kapitel ' + ZI.KAPITEL[k].nr + ' ' : '') + 'bringt 1 Material. Am Ende der Stunde scannt ihr die Lieferungen.') : null);
   }
@@ -190,7 +220,118 @@
     zeigeGebaeude(animiert);
     zeigeSchmuck(animiert);
     zeigeZwerge(neueIds);
+    pruefeAuftrag(animiert);
     zeigeTafel();
+    zeigeNacht();
+  }
+  function zeigeNacht() { screen.classList.toggle('nacht', !!insel.nacht); }
+
+  /* ---------- Auftrag des Tages ---------- */
+  const heute = () => new Date().toISOString().slice(0, 10);
+  function auftragWert(a) {
+    const def = ZI.AUFTRAEGE.find((d) => d.id === a.typ);
+    if (!def) return 0;
+    if (def.liefernZaehlen) return Object.values(insel.zwerge).filter((e) => e.zeit >= a.start).length;
+    return def.wert(staende()) - a.basis;
+  }
+  function auftragAnzeige() {
+    const a = insel.auftrag;
+    if (!a || a.tag !== heute()) return null;
+    const def = ZI.AUFTRAEGE.find((d) => d.id === a.typ);
+    const w = Math.min(a.ziel, Math.max(0, auftragWert(a)));
+    return h('div', { class: 'auftrag-box' + (a.erledigt ? ' erledigt' : '') },
+      h('div', { class: 'auftrag-titel' }, a.erledigt ? 'Auftrag erfüllt!' : 'Auftrag des Tages'),
+      h('div', { class: 'klein' }, def.text(a.ziel)),
+      h('div', { class: 'balken' }, h('div', { style: { width: (w / a.ziel) * 100 + '%' } })),
+      h('div', { class: 'klein' }, w + ' von ' + a.ziel + ' ' + def.einheit));
+  }
+  function pruefeAuftrag(animiert) {
+    const a = insel.auftrag;
+    if (!a || a.erledigt || a.tag !== heute()) return;
+    if (auftragWert(a) >= a.ziel) {
+      a.erledigt = true;
+      insel.sonder = Math.min(ZI.SONDERSCHMUCK.length, (insel.sonder || 0) + 1);
+      sichern();
+      zeigeSchmuck(false);
+      if (animiert) setTimeout(() => {
+        ZI.feuerwerk(7000); ZI.ton.fanfare();
+        const sonder = ZI.SONDERSCHMUCK[insel.sonder - 1];
+        ZI.meldung('Auftrag erfüllt! Als Belohnung steht jetzt ' + (sonder ? sonder.name : 'etwas Besonderes') + ' im Dorf.', 5000);
+      }, 1500);
+    }
+  }
+  function oeffneAuftrag() {
+    const n = insel.klassengroesse;
+    const a = insel.auftrag;
+    const laeuft = a && a.tag === heute();
+    const vorschlaege = ZI.mischen(ZI.AUFTRAEGE).slice(0, 3);
+    const f = ZI.fenster([
+      h('h2', null, 'Auftrag des Tages'),
+      laeuft ? h('div', { style: { alignSelf: 'stretch' } }, auftragAnzeige()) : null,
+      h('p', { style: { margin: 0 } }, laeuft ? 'Ihr könnt den Auftrag auch tauschen:' : 'Wählt ein gemeinsames Ziel für heute. Schafft es die Klasse, gibt es ein Feuerwerk und ein besonderes Stück fürs Dorf.'),
+      h('div', { class: 'auftrag-wahl' }, vorschlaege.map((d) => {
+        const ziel = d.ziel(n);
+        return h('button', { class: 'option', onclick: () => {
+          insel.auftrag = { typ: d.id, ziel, tag: heute(), start: Date.now(), basis: d.wert ? d.wert(staende()) : 0, erledigt: false };
+          sichern(); f.schliessen(); ZI.ton.fanfare(); allesZeigen(false); ZI.meldung('Neuer Auftrag: ' + d.text(ziel), 4000);
+        } }, d.text(ziel));
+      })),
+      h('button', { class: 'knopf holz', onclick: () => f.schliessen() }, 'Schließen'),
+    ], { schliessbar: true });
+    f.el.classList.add('breit');
+  }
+
+  /* ---------- Inselrätsel zum Stundenbeginn ---------- */
+  function oeffneRaetsel() {
+    const fragen = ZI.raetselFragen(kap(), 5);
+    let nr = 0; let treffer = 0;
+    const buchst = ['A', 'B', 'C', 'D'];
+    const inhalt = h('div', { class: 'raetsel-inhalt' });
+    const zaehlerEl = h('div', { class: 'uhr' });
+    const ui = h('div', { class: 'rat raetsel' },
+      ZI.hintergrund('titel-hintergrund', 'hg-ersatz-titel', 'rgba(20,12,8,0.45)'),
+      h('div', { class: 'leiste' },
+        h('button', { class: 'rund', 'aria-label': 'Zurück zur Insel', onclick: () => ui.remove() }, icon.zurueck()),
+        h('div', { class: 'titel' }, 'Inselrätsel'),
+        h('div', { class: 'spacer' }), zaehlerEl),
+      inhalt);
+    document.body.appendChild(ui);
+
+    function frage() {
+      const f = fragen[nr];
+      zaehlerEl.textContent = 'Frage ' + (nr + 1) + ' von ' + fragen.length;
+      const opts = f.optionen.map((o, i) => h('div', { class: 'raetsel-option' }, h('span', { class: 'buchstabe' }, buchst[i]), h('span', null, o.text)));
+      const loesen = h('button', { class: 'knopf' }, 'Auflösen');
+      const unten = h('div', { class: 'knopf-reihe' }, loesen);
+      loesen.addEventListener('click', () => {
+        f.optionen.forEach((o, i) => opts[i].classList.add(o.ok ? 'richtig' : 'weg'));
+        ZI.ton.richtig();
+        ZI.setze(unten,
+          h('div', { class: 'rueckmeldung tipp', style: { flexBasis: '100%' } }, f.info || ''),
+          h('button', { class: 'knopf moos', onclick: () => { treffer++; insel.geschenke = (insel.geschenke || 0) + 1; sichern(); moewe(); weiter(); } }, 'Die meisten hatten recht'),
+          h('button', { class: 'knopf holz', onclick: weiter }, 'Noch nicht ganz'));
+      });
+      ZI.setze(inhalt,
+        h('div', { class: 'raetsel-karte pergament auf-pergament' },
+          h('div', { class: 'frage', style: { fontSize: '26px', color: 'var(--tinte-hell)' } },
+            h('button', { class: 'rund', 'aria-label': 'Vorlesen', onclick: () => ZI.vorlesen(f.frage + ' ' + (f.kopf || '') + ' ' + f.optionen.map((o, i) => buchst[i] + ': ' + o.text).join('. ')) }, icon.vorlesen()),
+            h('span', null, f.frage)),
+          f.kopf ? h('div', { class: 'meinung', style: { fontSize: 'clamp(24px, 2.4vw, 38px)', whiteSpace: 'pre-line' } }, f.kopf) : null,
+          h('div', { class: 'raetsel-optionen' }, opts),
+          h('p', { class: 'klein', style: { margin: 0, fontSize: '18px', color: 'var(--tinte-hell)' } }, 'Zeigt mit den Fingern: 1 Finger für A, 2 für B, 3 für C.'),
+          unten));
+    }
+    function moewe() { moeweMitGeschenk(ui); ZI.meldung('Eine Möwe bringt ein Geschenk zur Insel!', 2200); }
+    function weiter() {
+      nr++;
+      if (nr < fragen.length) { setTimeout(frage, 300); return; }
+      ZI.ton.fanfare(); if (treffer >= 4) ZI.konfetti(120);
+      ZI.setze(inhalt, h('div', { class: 'raetsel-karte pergament auf-pergament', style: { alignItems: 'center', textAlign: 'center' } },
+        h('h2', { style: { fontSize: '44px' } }, treffer + ' von ' + fragen.length + ' richtig!'),
+        h('p', { style: { margin: 0, fontSize: '24px' } }, treffer ? 'Die Möwen haben ' + treffer + ' Geschenk' + (treffer === 1 ? '' : 'e') + ' zur Insel gebracht. Jedes Geschenk hilft beim Schmücken des Dorfs.' : 'Nächstes Mal bringen die Möwen bestimmt Geschenke!'),
+        h('button', { class: 'knopf', onclick: () => { ui.remove(); allesZeigen(true); } }, 'Zur Insel')));
+    }
+    frage();
   }
 
   /* ---------- Lieferung annehmen ---------- */
@@ -276,13 +417,11 @@
 
   /* ---------- Code eintippen ---------- */
   function oeffneCodeEingabe() {
-    const eingabe = h('input', { class: 'eingabe', maxlength: '11', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'XXXXX-XXXXX', 'aria-label': 'Zwergenpass-Code' });
+    const eingabe = h('input', { class: 'eingabe', maxlength: '14', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'XXXX-XXXX-XXXX', 'aria-label': 'Zwergenpass-Code' });
     const rueck = h('div');
     const neueIds = [];
     eingabe.addEventListener('input', () => {
-      let v = eingabe.value.toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 10);
-      if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5);
-      eingabe.value = v;
+      eingabe.value = ZI.formatiereCode(eingabe.value);
     });
     const ok = () => {
       const a = annehmen(eingabe.value);
@@ -364,6 +503,8 @@
   function feiern() {
     const k = kap();
     ZI.ton.fanfare();
+    ZI.feuerwerk(8000);
+    if (!ZI.KAPITEL[k + 1] && bauEls.schiff) { bauEls.schiff.classList.remove('segelt'); void bauEls.schiff.offsetWidth; bauEls.schiff.classList.add('segelt'); }
     const nk = ZI.KAPITEL[k + 1];
     const f = ZI.fenster([
       h('div', { style: { width: '100%', borderRadius: '14px', overflow: 'hidden' } }, bild('fest-szene', 'Fest im Zwergendorf')),

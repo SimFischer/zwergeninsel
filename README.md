@@ -6,7 +6,7 @@ Ein Lernspiel zum **mündlichen Argumentieren** für die 5. Klasse. Die Kinder s
 - **Insel** (Lehrer-iPad oder PC am Smartboard): `insel.html`
 - **Zwergenpass-Karten** zum Ausdrucken: `karten.html`
 
-Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden keine Namen und keine Daten übertragen. Der Spielstand jedes Kindes steckt in einem 10-stelligen Code, dem **Zwergenpass**.
+Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden keine Namen und keine Daten übertragen. Der Spielstand jedes Kindes steckt in einem 12-stelligen Code (XXXX-XXXX-XXXX), dem **Zwergenpass**. Ältere 10-stellige Codes funktionieren weiterhin.
 
 ## Ablauf einer Stunde (45 Minuten)
 
@@ -79,6 +79,20 @@ Auf der Insel: Leuchtturm, Festhalle und Schiff. Danach feiert die Klasse das fe
 - **Zwergen-Wissensbuch:** Jede geschaffte Station schaltet einen Merksatz mit Beispiel frei (18 Seiten). Das Buch-Symbol in der Halle öffnet es jederzeit, jede Seite lässt sich vorlesen.
 - **Abwechslung:** Jede Station zieht zufällig aus einem größeren Aufgabenpool. Nachbarn haben deshalb meist andere Aufgaben, und erneutes Spielen bleibt spannend.
 
+## Spielelemente
+
+**In der Schmiede**
+- **Ränge:** vom Lehrling bis zur Großmeisterin. Punkte gibt es für jede Station, jeden Tiefen Stollen, jeden Bonusstern und jede goldene Krone.
+- **Abzeichen-Album:** 18 Abzeichen in Bronze, Silber und Gold, zum Beispiel „Kobold-Bezwinger“, „Zuhör-Profi“ oder „Bücherwurm“.
+- **Goldene Kronen:** Wer eine Station im Hauptstollen ganz ohne Fehler schafft, bekommt eine Krone auf das Stations-Symbol.
+- **Kombo:** Mehrere richtige Antworten hintereinander lassen die Esse heller glühen.
+- **Effekte:** Konfetti, hüpfende Zwerge und eine ruhige Schmiede-Melodie (Noten-Knopf, standardmäßig aus).
+
+**Auf der Insel**
+- **Inselrätsel:** 5 Wiederholungsfragen für den Stundenbeginn. Die Klasse zeigt per Finger A, B oder C, die Lehrkraft löst auf. Für jede Runde, in der die Mehrheit richtig lag, bringt eine Möwe ein Geschenk, das beim Schmücken des Dorfs hilft.
+- **Auftrag des Tages:** ein gemeinsames Klassenziel, zum Beispiel „Heute zeigen wir 7 Meisterstücke“. Ist es erreicht, gibt es ein Feuerwerk und ein Sonderstück im Dorf.
+- **Lebendige Insel:** Wolken, Möwen, Rauch aus den Schornsteinen und ein Nachtmodus (Mond-Knopf) mit leuchtenden Laternen. Am Ende von Kapitel 3 segelt das Schiff los.
+
 ## Gerechtigkeit zwischen schnellen und langsameren Kindern
 
 - Das Dorf wird nur aus dem **Hauptstollen** gebaut. Jedes Kind zählt gleich viel, egal wie schnell es ist.
@@ -94,7 +108,7 @@ Auf der Insel: Leuchtturm, Festhalle und Schiff. Danach feiert die Klasse das fe
 
 ## Inhalte anpassen
 
-Alle Aufgaben, Themen und Texte stehen in `js/data.js` (Kapitel 1), `js/data-k2.js`, `js/data-k3.js` und `js/data-mehr.js` (zusätzliche Aufgaben, Vormach-Beispiele, Wissensbuch). Neue Themen für das Meisterstück oder andere Beispielsätze lassen sich dort einfach ergänzen.
+Alle Aufgaben, Themen und Texte stehen in `js/data.js` (Kapitel 1), `js/data-k2.js`, `js/data-k3.js`, `js/data-mehr.js` (zusätzliche Aufgaben, Vormach-Beispiele, Wissensbuch) und `js/data-spiel.js` (Ränge, Abzeichen, Inselrätsel, Aufträge). Neue Themen für das Meisterstück oder andere Beispielsätze lassen sich dort einfach ergänzen.
 
 ## Bilder
 

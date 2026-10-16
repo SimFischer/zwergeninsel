@@ -7,6 +7,26 @@
   let stand = null;                 // aktueller Spielstand (ZI.Stand)
   let testmodus = sessionStorage.getItem('zi-test') === '1';
   let K = 0;                        // aktuelles Kapitel (0 = Kapitel 1)
+  let aktStation = null;            // { k, art: 'kern' | 'tief' | 'bonus', i }
+  let fehlerZaehler = 0;            // Fehler in der laufenden Station (0 = goldene Krone)
+  let kombo = 0;                    // richtige Antworten hintereinander
+  /* Jede richtige oder falsche Antwort läuft über diese Klänge – so zählen wir Kombo und Fehler mit */
+  const tonRichtig = ZI.ton.richtig.bind(ZI.ton);
+  const tonFalsch = ZI.ton.falsch.bind(ZI.ton);
+  ZI.ton.richtig = () => { kombo++; zeigeKombo(); tonRichtig(); };
+  ZI.ton.falsch = () => { fehlerZaehler++; kombo = 0; zeigeKombo(); tonFalsch(); };
+  function zeigeKombo() {
+    const el = document.querySelector('.kombo');
+    const glut = document.querySelector('.glut-flackern');
+    if (glut) glut.style.setProperty('--glut', String(Math.min(1, kombo / 6)));
+    if (!el) return;
+    if (kombo >= 3) {
+      el.hidden = false;
+      el.textContent = 'Kombo ×' + kombo;
+      el.classList.remove('puls'); void el.offsetWidth; el.classList.add('puls');
+      if (kombo % 5 === 0) { ZI.konfetti(40); ZI.meldung('Unglaublich! ' + kombo + ' richtig hintereinander!'); }
+    } else el.hidden = true;
+  }
   const AKTIV_KEY = 'zi-aktiv';
   const MAX_ALTER = 4 * 60 * 60 * 1000; // nach 4 Stunden wird der Stand nicht mehr angeboten
 
@@ -35,11 +55,16 @@
   function fortschritt(aenderung, danach) {
     const vorher = stand.freieZwerge();
     const seitenVorher = wissenFrei(stand);
+    const abzeichenVorher = abzeichenFrei(stand);
+    const rangVorher = ZI.rang(stand);
     aenderung(stand);
     speichern();
     const neu = stand.freieZwerge().filter((n) => !vorher.includes(n));
     const neueSeiten = wissenFrei(stand).filter((w) => !seitenVorher.includes(w));
-    zeigeNeueSeiten(neueSeiten, () => zeigeFreischaltungen(neu, danach));
+    const neueAbzeichen = abzeichenFrei(stand).filter((a) => !abzeichenVorher.includes(a));
+    const rangNeu = ZI.rang(stand);
+    zeigeNeueSeiten(neueSeiten, () => zeigeErfolge(rangNeu.nr > rangVorher.nr ? rangNeu : null, neueAbzeichen,
+      () => zeigeFreischaltungen(neu, danach)));
   }
 
   /* ---------- Zwergen-Wissensbuch ---------- */
@@ -138,7 +163,7 @@
   function zeigeFreischaltungen(liste, danach) {
     if (!liste.length) { danach && danach(); return; }
     const z = ZI.ZWERGE.find((d) => d.nr === liste[0]);
-    ZI.ton.fanfare();
+    ZI.ton.fanfare(); ZI.konfetti();
     const f = ZI.fenster([
       h('div', { style: { width: '120px' } }, bild('truhe-offen', 'Offene Schatztruhe')),
       h('h2', null, 'Neuer Zwerg freigeschaltet!'),
@@ -168,9 +193,9 @@
   function zaehler(datei, name, wert) {
     return h('div', { class: 'zaehler', 'aria-label': name + ': ' + wert }, bild(datei, name), String(wert));
   }
-  function avatar(nr) {
+  function avatar(nr, huepfen) {
     const z = ZI.ZWERGE.find((d) => d.nr === nr);
-    return h('div', { class: 'avatar' }, bild(z.datei, z.name));
+    return h('div', { class: 'avatar' + (huepfen ? ' huepfen' : '') }, bild(z.datei, z.name));
   }
   function bestaetigen(text, jaText, ja) {
     const f = ZI.fenster([
@@ -279,12 +304,10 @@
      ZWERGENPASS EINGEBEN
      ========================================================= */
   function zeigePassEingabe() {
-    const eingabe = h('input', { class: 'eingabe', maxlength: '11', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', inputmode: 'text', placeholder: 'XXXXX-XXXXX', 'aria-label': 'Zwergenpass-Code' });
+    const eingabe = h('input', { class: 'eingabe', maxlength: '14', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', inputmode: 'text', placeholder: 'XXXX-XXXX-XXXX', 'aria-label': 'Zwergenpass-Code' });
     const hinweis = h('div', { class: 'rueckmeldung tipp', style: { display: 'none' } });
     eingabe.addEventListener('input', () => {
-      let v = eingabe.value.toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 10);
-      if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5);
-      eingabe.value = v;
+      eingabe.value = ZI.formatiereCode(eingabe.value);
       hinweis.style.display = 'none';
     });
     const pruefen = () => {
@@ -385,8 +408,10 @@
     const reiter = h('div', { class: 'reiter', role: 'tablist' });
     const kapitelBox = h('div', { style: { display: 'flex', flexDirection: 'column', gap: '18px' } });
 
-    function stationKarte(def, k, geschafft, gesperrt, sperrText, i, rohstoff) {
-      const b = h('button', { class: 'station' + (geschafft ? ' geschafft' : '') + (gesperrt ? ' gesperrt' : '') },
+    function stationKarte(def, k, geschafft, gesperrt, sperrText, i, rohstoff, art, idx) {
+      const krone = art === 'kern' && stand.hatKrone(k, idx);
+      const b = h('button', { class: 'station' + (geschafft ? ' geschafft' : '') + (gesperrt ? ' gesperrt' : '') + (krone ? ' gekroent' : '') },
+        krone ? h('div', { class: 'krone-marke', 'aria-label': 'Goldene Krone: fehlerfrei geschafft' }, icon.krone()) : null,
         h('div', { class: 'icon' }, bild(def.icon, def.name)),
         h('div', null,
           h('div', { class: 'st-name' }, (i !== undefined ? i + 1 + '. ' : '') + def.name),
@@ -396,7 +421,7 @@
         gesperrt ? h('div', { class: 'schloss', style: { top: '8px', right: '8px', width: '28px', height: '28px' } }, icon.schloss()) : null);
       b.addEventListener('click', () => {
         if (gesperrt) { ZI.meldung(sperrText); ZI.ton.falsch(); return; }
-        K = k; letzterReiter = k;
+        K = k; letzterReiter = k; aktStation = { k, art, i: idx };
         if (def.vor && ZI.VORMACHEN[def.vor]) zeigeVormachen(ZI.VORMACHEN[def.vor], def.spiel); else def.spiel();
       });
       return b;
@@ -410,15 +435,15 @@
         h('section', { class: 'pergament stollen auf-pergament' },
           h('h2', null, 'Hauptstollen'),
           h('p', { class: 'erklaer' }, 'Diese drei Stationen schafft jede und jeder. Jede bringt Baumaterial für unser Dorf.'),
-          h('div', { class: 'stationen' }, inh.kern.map((d, i) => stationKarte(d, k, stand.hatKern(k, i), false, '', i, ROHSTOFF[i].name)))),
+          h('div', { class: 'stationen' }, inh.kern.map((d, i) => stationKarte(d, k, stand.hatKern(k, i), false, '', i, ROHSTOFF[i].name, 'kern', i)))),
         h('section', { class: 'pergament stollen auf-pergament' },
           h('h2', null, 'Tiefe Stollen'),
           h('p', { class: 'erklaer' }, 'Für Meisterschmiede: Jeder Stollen bringt ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine. Daraus wird Schmuck für unser Dorf.'),
-          h('div', { class: 'stationen' }, inh.tief.map((d, i) => stationKarte(d, k, stand.hatTief(k, i), !tiefOffen, 'Schaffe zuerst den Hauptstollen.')))),
+          h('div', { class: 'stationen' }, inh.tief.map((d, i) => stationKarte(d, k, stand.hatTief(k, i), !tiefOffen, 'Schaffe zuerst den Hauptstollen.', undefined, null, 'tief', i)))),
         h('section', { class: 'pergament stollen auf-pergament' },
           h('h2', null, 'Bonusinsel'),
           h('div', { class: 'stationen' },
-            stationKarte(inh.bonus, k, sterne > 0, !tiefOffen, 'Schaffe zuerst den Hauptstollen.'),
+            stationKarte(inh.bonus, k, sterne > 0, !tiefOffen, 'Schaffe zuerst den Hauptstollen.', undefined, null, 'bonus', 0),
             h('div', { class: 'st-info', style: { alignSelf: 'center', fontSize: '18px' } }, 'Deine Sterne: ' + '★'.repeat(sterne) + '☆'.repeat(3 - sterne)))),
       ];
     }
@@ -456,19 +481,24 @@
     zeichneReiter();
     inhalt.append(reiter, kapitelBox);
 
+    const rang = ZI.rang(stand);
     const rohstoffe = ROHSTOFF.map((r, i) => zaehler(r.datei, r.name, [0, 1, 2].filter((k) => stand.hatKern(k, i)).length));
 
     zeige(h('div', { class: 'screen' },
       ZI.hintergrund('stollen-hintergrund', 'hg-ersatz-stollen', 'rgba(20,12,8,0.35)'),
       h('div', { class: 'leiste' },
-        h('button', { class: 'rund', style: { width: '64px', height: '64px', padding: 0, background: 'none', boxShadow: 'none' }, 'aria-label': 'Zwergen-Sammlung öffnen', onclick: () => zeigeWahl(false) }, avatar(stand.zwerg)),
-        h('div', null,
+        h('button', { class: 'rund', style: { width: '64px', height: '64px', padding: 0, background: 'none', boxShadow: 'none' }, 'aria-label': 'Zwergen-Sammlung öffnen', onclick: () => zeigeWahl(false) }, avatar(stand.zwerg, true)),
+        h('div', { class: 'rang-box' },
           h('div', { class: 'titel' }, z.name),
-          h('div', { class: 'untertitel' }, testmodus ? 'Testmodus · Sammlung: Bild antippen' : 'Sammlung: Bild antippen')),
+          h('div', { class: 'untertitel' }, (testmodus ? 'Testmodus · ' : '') + rang.name),
+          h('div', { class: 'rang-balken', 'aria-label': rang.naechsterName ? 'Noch ' + (rang.naechsterAb - rang.punkte) + ' Punkte bis ' + rang.naechsterName : 'Höchster Rang erreicht' },
+            h('div', { style: { width: (rang.naechsterAb ? ((rang.punkte - rang.ab) / (rang.naechsterAb - rang.ab)) * 100 : 100) + '%' } }))),
         h('div', { class: 'spacer' }),
         ...rohstoffe,
         zaehler('edelstein', 'Edelsteine', stand.gems()),
         h('button', { class: 'rund', 'aria-label': 'Zwergen-Wissensbuch öffnen', onclick: zeigeWissensbuch }, icon.buch()),
+        h('button', { class: 'rund', 'aria-label': 'Abzeichen-Album öffnen', onclick: zeigeAlbum }, icon.album()),
+        musikKnopf(),
         tonKnopf(),
         h('button', { class: 'knopf', onclick: zeigeLieferung }, 'Lieferung')),
       h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2 } }, inhalt)));
@@ -535,6 +565,7 @@
   }
 
   function spielRahmen({ titel, anzahl, aufgabe, bue }) {
+    fehlerZaehler = 0; kombo = 0;
     const pips = h('div', { class: 'fortschritt', 'aria-hidden': 'true' });
     const setze = (fertig) => {
       ZI.setze(pips, ...Array.from({ length: anzahl }, (_, i) => h('span', { class: i < fertig ? 'voll' : i === fertig ? 'jetzt' : '' })));
@@ -547,6 +578,7 @@
         h('button', { class: 'rund', 'aria-label': 'Zurück zur Halle', onclick: () => bestaetigen('Station verlassen?', 'Ja, verlassen', () => zeigeHalle()) }, icon.zurueck()),
         h('div', null, h('div', { class: 'titel' }, titel), pips),
         h('div', { class: 'spacer' }),
+        h('div', { class: 'kombo', hidden: true, 'aria-live': 'polite' }),
         tonKnopf()),
       h('div', { class: 'spiel' }, aufgabe, bue.el));
     zeige(screen);
@@ -563,12 +595,71 @@
   /* Station oder Stollen geschafft */
   function geschafft({ titel, text, datei, alt, eintragen }) {
     ZI.ton.fanfare();
+    ZI.konfetti();
+    const st = aktStation;
+    const krone = st && st.art === 'kern' && fehlerZaehler === 0;
+    const schonKrone = krone && stand.hatKrone(st.k, st.i);
+    const z = aktuellerZwerg();
     const f = ZI.fenster([
-      h('div', { class: 'gross-bild strahlen' }, bild(datei, alt)),
+      h('div', { class: 'geschafft-reihe' },
+        h('div', { class: 'gross-bild strahlen' }, bild(datei, alt)),
+        h('div', { class: 'huepf-zwerg' }, bild(z.datei, z.name))),
       h('h2', null, titel),
       h('p', { style: { margin: 0, fontSize: '21px' } }, text),
-      h('button', { class: 'knopf', onclick: () => { f.schliessen(); fortschritt(eintragen, () => zeigeHalle()); } }, 'Zurück zur Halle'),
+      krone ? h('div', { class: 'krone-info' }, icon.krone(), h('span', null, schonKrone ? 'Wieder fehlerfrei – deine goldene Krone glänzt!' : 'Ganz ohne Fehler! Dafür bekommst du eine goldene Krone.')) : null,
+      h('button', { class: 'knopf', onclick: () => { f.schliessen(); fortschritt((s) => { eintragen(s); if (krone) s.setzeKrone(st.k, st.i); }, () => zeigeHalle()); } }, 'Zurück zur Halle'),
     ]);
+  }
+
+  /* ---------- Ränge und Abzeichen ---------- */
+  function abzeichenFrei(s) {
+    const x = { wissen: wissenFrei(s).length };
+    return ZI.ABZEICHEN.filter((a) => a.test(s, x));
+  }
+  function medaille(a, frei) {
+    return h('div', { class: 'medaille ' + a.stufe + (frei ? '' : ' gesperrt') },
+      h('div', { class: 'medaille-rund' }, frei ? icon[a.symbol]() : h('span', null, '?')),
+      h('div', { class: 'medaille-name' }, frei ? a.name : '???'),
+      h('div', { class: 'medaille-text' }, a.text));
+  }
+  function zeigeErfolge(neuerRang, abzeichen, danach) {
+    if (!neuerRang && !abzeichen.length) { danach && danach(); return; }
+    ZI.ton.fanfare(); ZI.konfetti(120);
+    const f = ZI.fenster([
+      neuerRang ? h('div', { class: 'rang-neu' },
+        h('div', { style: { fontSize: '18px', color: 'var(--tinte-hell)' } }, 'Neuer Rang!'),
+        h('h2', null, neuerRang.name),
+        h('div', { class: 'huepf-zwerg gross' }, bild(aktuellerZwerg().datei, aktuellerZwerg().name))) : null,
+      abzeichen.length ? h('h2', { style: { fontSize: '28px' } }, abzeichen.length === 1 ? 'Neues Abzeichen!' : abzeichen.length + ' neue Abzeichen!') : null,
+      abzeichen.length ? h('div', { class: 'medaillen' }, abzeichen.map((a) => medaille(a, true))) : null,
+      h('button', { class: 'knopf', onclick: () => { f.schliessen(); danach && danach(); } }, 'Weiter'),
+    ]);
+  }
+  function zeigeAlbum() {
+    const frei = abzeichenFrei(stand);
+    const rang = ZI.rang(stand);
+    zeige(h('div', { class: 'screen' },
+      ZI.hintergrund('stollen-hintergrund', 'hg-ersatz-stollen', 'rgba(20,12,8,0.45)'),
+      h('div', { class: 'leiste' },
+        h('button', { class: 'rund', 'aria-label': 'Zurück zur Halle', onclick: () => zeigeHalle() }, icon.zurueck()),
+        h('div', null,
+          h('div', { class: 'titel' }, 'Abzeichen-Album'),
+          h('div', { class: 'untertitel' }, frei.length + ' von ' + ZI.ABZEICHEN.length + ' Abzeichen · Rang: ' + rang.name))),
+      h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2 } },
+        h('div', { class: 'halle-inhalt' },
+          h('section', { class: 'pergament auf-pergament stollen' },
+            h('h2', null, 'Dein Rang: ' + rang.name),
+            h('p', { class: 'erklaer' }, rang.naechsterName ? 'Noch ' + (rang.naechsterAb - rang.punkte) + ' Punkte bis „' + rang.naechsterName + '“. Punkte gibt es für jede Station, jeden Tiefen Stollen, jeden Bonusstern und jede goldene Krone.' : 'Du hast den höchsten Rang erreicht!'),
+            h('div', { class: 'rang-leiter' }, ZI.RAENGE.map((r, i) => h('div', { class: 'stufe' + (i <= rang.nr ? ' erreicht' : '') + (i === rang.nr ? ' jetzt' : '') },
+              h('span', { class: 'stufe-punkte' }, String(r.ab)), h('span', null, aktuellerZwerg().w ? r.w : r.m))))),
+          h('section', { class: 'pergament auf-pergament stollen' },
+            h('h2', null, 'Abzeichen'),
+            h('div', { class: 'medaillen' }, ZI.ABZEICHEN.map((a) => medaille(a, frei.includes(a)))))))));
+  }
+  function musikKnopf() {
+    const b = h('button', { class: 'rund' + (ZI.musik.an ? ' gold' : ''), 'aria-label': 'Musik an oder aus', 'aria-pressed': String(ZI.musik.an) }, icon.musik());
+    b.addEventListener('click', () => { const an = ZI.musik.umschalten(); b.classList.toggle('gold', an); b.setAttribute('aria-pressed', String(an)); });
+    return b;
   }
 
   /* =========================================================
@@ -1470,7 +1561,7 @@
     let qrEl;
     try {
       const qr = window.qrcode(0, 'M');
-      qr.addData(ZI.QR_PREFIX + code.replace('-', ''));
+      qr.addData(ZI.QR_PREFIX + code.replace(/-/g, ''));
       qr.make();
       qrEl = h('div', { class: 'qr-feld', html: qr.createSvgTag({ cellSize: 8, margin: 2, scalable: true, alt: 'QR-Code für die Lieferung' }) });
     } catch (e) {
