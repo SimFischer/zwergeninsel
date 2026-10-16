@@ -44,7 +44,7 @@ ZI.GEMS_PRO_STOLLEN = 5;
 
 /* ---------- Kapitel ---------- */
 ZI.KAPITEL = [
-  { nr: 1, titel: 'Gestrandet', runenwort: 'FUNKE', fertig: true },
+  { nr: 1, titel: 'Gestrandet', runenwort: null, fertig: true },           // Runenwort = Wort, das dieses Kapitel öffnet
   { nr: 2, titel: 'Das Dorf wächst', runenwort: 'AMBOSS', fertig: false },
   { nr: 3, titel: 'Das Inselfest', runenwort: 'LEUCHTTURM', fertig: false },
 ];
@@ -380,8 +380,8 @@ ZI.SATZANFAENGE = [
   'Ja, aber ich denke, dass …',
 ];
 
-/* Schmuck: alle 5 Edelsteine der Klasse kommt ein Stück dazu */
-ZI.SCHMUCK_PRO = 5;
+/* Schmuck: alle 15 Edelsteine der Klasse kommt ein Stück dazu */
+ZI.SCHMUCK_PRO = 15;
 ZI.SCHMUCK = [
   { id: 'fahne', name: 'Fahne', x: 44, y: 46, w: 4 },
   { id: 'laterne', name: 'Laterne', x: 56, y: 66, w: 3.5 },

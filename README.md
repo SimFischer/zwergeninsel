@@ -33,6 +33,26 @@ Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden ke
 
 **Bonusinsel:** *Funkenregen* – scharfe Begründungen fangen, bis zu 3 Sterne
 
+## Kapitel 2 – Das Dorf wächst
+
+Öffnet sich in der Schmiede mit dem Runenwort, das die Insel zeigt, sobald Kapitel 1 geschafft ist.
+
+**Hauptstollen**
+
+1. *Argument-Puzzle* – These, Begründung und Beispiel zusammensetzen (Farben wie im Arbeitsblatt: rot, gelb, grün)
+2. *Motor oder Bremse?* – Beiträge aus Klassengesprächen sortieren: Gesprächsmotor oder Gesprächsbremse
+3. *Hör-Stollen* – das iPad liest ein Argument vor, ohne Text; danach Fragen zu Meinung, Begründung und Beispiel
+
+**Tiefe Stollen**
+
+1. *Kobold-Kampf* – gemischte Aufgaben aus Kapitel 1 und 2 als Bosskampf
+2. *Argument-Kette* – Stützen von neuen Argumenten unterscheiden (Reihe und Kette)
+3. *Meisterstück II* – laut argumentieren mit These, Begründung und Beispiel, Partner-Check mit vier Punkten
+
+**Bonusinsel:** *Beispiel-Regen* – passende Beispiele fangen
+
+Auf der Insel: Ratsplatz, Bibliothek, Brunnen und Mühle. Über das Zahnrad lässt sich das Kapitel der Insel auch von Hand umstellen.
+
 ## Gerechtigkeit zwischen schnellen und langsameren Kindern
 
 - Das Dorf wird nur aus dem **Hauptstollen** gebaut. Jedes Kind zählt gleich viel, egal wie schnell es ist.
@@ -44,7 +64,7 @@ Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden ke
 - **Testmodus:** Auf dem Startbildschirm unten „Für Lehrkräfte: Testmodus“. Dann sind alle Stollen sofort offen.
 - **Klassengröße:** Insel → Zahnrad. Das Dorf ist fertig, wenn alle Kinder ihren Hauptstollen geschafft haben.
 - **Sichern:** Insel → Zahnrad → „Insel sichern“. Der Inselstand liegt nur auf dem Gerät, auf dem die Insel läuft. Bitte immer dasselbe Gerät benutzen oder vorher sichern.
-- **Runenwort:** Ist das Dorf fertig, zeigt die Insel ein Runenwort. Damit öffnen die Kinder Kapitel 2.
+- **Runenwort:** Ist ein Kapitel geschafft, zeigt die Insel ein Runenwort. Damit öffnen die Kinder das nächste Kapitel in der Schmiede.
 
 ## Inhalte anpassen
 

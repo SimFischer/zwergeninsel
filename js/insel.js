@@ -3,37 +3,48 @@
   const ZI = window.ZI;
   const { h, bild, icon, speicher } = ZI;
   const KEY = 'zi-insel';
-  const KAP = 0;
 
-  const leer = () => ({ klassengroesse: 27, zwerge: {}, gebaut: [], schmuck: 0, rat: null, gefeiert: false });
-  let insel = Object.assign(leer(), speicher.lesen(KEY, {}));
+  const leer = () => ({ klassengroesse: 27, kapitel: 0, zwerge: {}, gebaut: [], schmuck: 0, rat: {}, gefeiert: [] });
+  function aufbereiten(roh) {
+    const i = Object.assign(leer(), roh || {});
+    if (typeof i.rat === 'string') i.rat = { 0: i.rat };          // ältere Speicherstände
+    if (!i.rat || typeof i.rat !== 'object') i.rat = {};
+    if (i.gefeiert === true) i.gefeiert = [0];
+    if (!Array.isArray(i.gefeiert)) i.gefeiert = [];
+    return i;
+  }
+  let insel = aufbereiten(speicher.lesen(KEY, {}));
   const sichern = () => speicher.schreiben(KEY, insel);
+  const kap = () => Math.min(insel.kapitel || 0, ZI.BAUPLAN.length - 1);
 
   /* ---------- Berechnungen ---------- */
   function staende() {
     return Object.values(insel.zwerge).map((e) => ZI.Stand.ausCode(e.code)).filter(Boolean);
   }
-  function material() { return staende().reduce((a, s) => a + s.coreCount(KAP), 0); }
+  function material(k = kap()) { return staende().reduce((a, s) => a + s.coreCount(k), 0); }
   function ziel() { return Math.max(1, insel.klassengroesse * 3); }
   function edelsteine() { return staende().reduce((a, s) => a + s.gems(), 0); }
 
   /* Bauplan auflösen: Ratsentscheidung bestimmt die Reihenfolge */
-  function bauplan() {
+  function bauplan(k = kap()) {
     let ratNr = 0;
-    return ZI.BAUPLAN_K1.map((schritt) => {
+    return ZI.BAUPLAN[k].map((schritt) => {
       if (!schritt.rat) return { anteil: schritt.anteil, gebaeude: schritt.gebaeude };
       const [a, b] = schritt.rat;
-      const erst = insel.rat || a;
+      const erst = insel.rat[k] || a;
       const zweit = erst === a ? b : a;
       return { anteil: schritt.anteil, gebaeude: ratNr++ === 0 ? erst : zweit };
     });
   }
   function sollGebaut() {
+    const liste = [];
+    for (let k = 0; k < kap(); k++) liste.push(...bauplan(k).map((s) => s.gebaeude)); // frühere Kapitel: alles steht
     const m = material();
-    if (m === 0) return [];
-    const anteil = m / ziel();
-    return bauplan().filter((s) => anteil >= s.anteil - 1e-9).map((s) => s.gebaeude);
+    if (m > 0) liste.push(...bauplan().filter((s) => m / ziel() >= s.anteil - 1e-9).map((s) => s.gebaeude));
+    return liste;
   }
+  function kapitelFertig() { return material() / ziel() >= 1 - 1e-9; }
+  function naechstesKapitelBereit() { const n = kap() + 1; return !!ZI.BAUPLAN[n] && ZI.KAPITEL[n] && ZI.KAPITEL[n].fertig; }
   function naechstes() {
     const m = material(); const anteil = m / ziel();
     const plan = bauplan();
@@ -64,7 +75,8 @@
   buehne.append(schmuckSchicht, zwergSchicht);
 
   const tafel = h('div', { class: 'tafel pergament auf-pergament' });
-  const titel = h('div', { class: 'insel-titel' }, h('h1', null, 'Die Zwergeninsel'), h('div', { class: 'unter' }, 'Kapitel 1 · Gestrandet'));
+  const unterTitel = h('div', { class: 'unter' });
+  const titel = h('div', { class: 'insel-titel' }, h('h1', null, 'Die Zwergeninsel'), unterTitel);
   const knoepfe = h('div', { class: 'insel-knoepfe' },
     h('button', { class: 'knopf', onclick: oeffneScanner }, icon.kamera(), 'Lieferung scannen'),
     h('button', { class: 'knopf holz', onclick: oeffneCodeEingabe }, icon.tastatur(), 'Code eintippen'),
@@ -81,10 +93,14 @@
       const ist = insel.gebaut.includes(g.id) || (!animiert && soll.includes(g.id));
       el.classList.toggle('gebaut', ist);
       el.querySelector('.fertig').style.display = ist ? '' : 'none';
-      el.classList.toggle('gesperrt', g.kapitel > 1);
+      el.classList.toggle('gesperrt', g.kapitel > kap() + 1);
     });
     if (!animiert) { insel.gebaut = soll.slice(); sichern(); return; }
     neu.forEach((id, i) => setTimeout(() => baue(id), 900 * i + 300));
+    if (kapitelFertig() && !insel.gefeiert.includes(kap())) {
+      insel.gefeiert.push(kap());
+      setTimeout(feiern, 900 * neu.length + 2200);
+    }
     insel.gebaut = Array.from(new Set([...insel.gebaut, ...soll]));
     sichern();
   }
@@ -107,7 +123,6 @@
       el.classList.remove('wird-gebaut'); void el.offsetWidth; el.classList.add('wird-gebaut');
       ZI.ton.fanfare();
       ZI.meldung(g.name + ' ist fertig gebaut!', 3200);
-      if (sollGebaut().length === ZI.BAUPLAN_K1.length && !insel.gefeiert) setTimeout(feiern, 2500);
     }, 450);
   }
 
@@ -141,19 +156,34 @@
   }
 
   function zeigeTafel() {
+    const k = kap();
     const m = material(); const zl = ziel();
     const n = naechstes();
     const gems = edelsteine();
     const anteil = Math.min(100, Math.round((m / zl) * 100));
-    ZI.setze(tafel, 
+    const nk = ZI.KAPITEL[k + 1];
+    unterTitel.textContent = 'Kapitel ' + ZI.KAPITEL[k].nr + ' · ' + ZI.KAPITEL[k].titel;
+    let status;
+    if (n) status = h('div', { class: 'klein' }, 'Als Nächstes: ', h('b', null, n.gebaeude.name), ' – noch ' + n.bedarf + ' Lieferung' + (n.bedarf === 1 ? '' : 'en') + '.');
+    else if (nk) status = h('div', { class: 'klein' }, h('b', null, 'Kapitel ' + ZI.KAPITEL[k].nr + ' geschafft! '), 'Runenwort für Kapitel ' + nk.nr + ': ', h('b', null, nk.runenwort),
+      naechstesKapitelBereit() ? h('div', { style: { marginTop: '8px' } }, h('button', { class: 'knopf klein', onclick: kapitelWeiter }, 'Kapitel ' + nk.nr + ' beginnen')) : null);
+    else status = h('div', { class: 'klein' }, h('b', null, 'Das ganze Dorf steht!'));
+    ZI.setze(tafel,
       h('h2', { style: { fontSize: '26px' } }, 'Baumaterial'),
       h('div', null, h('span', { class: 'zahl' }, String(m)), h('span', { style: { fontSize: '22px' } }, ' von ' + zl)),
       h('div', { class: 'balken', role: 'progressbar', 'aria-valuenow': String(anteil), 'aria-valuemin': '0', 'aria-valuemax': '100' }, h('div', { style: { width: anteil + '%' } })),
-      n ? h('div', { class: 'klein' }, 'Als Nächstes: ', h('b', null, n.gebaeude.name), ' – noch ' + n.bedarf + ' Lieferung' + (n.bedarf === 1 ? '' : 'en') + '.')
-        : h('div', { class: 'klein' }, h('b', null, 'Kapitel 1 geschafft! '), 'Runenwort für Kapitel 2: ', h('b', null, ZI.KAPITEL[1].runenwort)),
+      status,
       h('div', { class: 'zeile' }, bild('edelstein', 'Edelsteine'), gems + ' Edelsteine · ' + insel.schmuck + ' Schmuckstücke'),
       h('div', { class: 'zeile' }, bild('zwerg-01-brumm', 'Zwerge'), Object.keys(insel.zwerge).length + ' von ' + insel.klassengroesse + ' Zwergen haben geliefert'),
-      m === 0 ? h('div', { class: 'klein' }, 'Jede geschaffte Station im Hauptstollen bringt 1 Material. Am Ende der Stunde scannt ihr die Lieferungen.') : null);
+      m === 0 ? h('div', { class: 'klein' }, 'Jede geschaffte Station im Hauptstollen ' + (k > 0 ? 'von Kapitel ' + ZI.KAPITEL[k].nr + ' ' : '') + 'bringt 1 Material. Am Ende der Stunde scannt ihr die Lieferungen.') : null);
+  }
+
+  function kapitelWeiter() {
+    if (!naechstesKapitelBereit()) return;
+    insel.kapitel = kap() + 1; sichern();
+    ZI.ton.fanfare();
+    ZI.meldung('Kapitel ' + ZI.KAPITEL[kap()].nr + ' beginnt: ' + ZI.KAPITEL[kap()].titel + '!', 3500);
+    allesZeigen(false);
   }
 
   function allesZeigen(animiert, neueIds) {
@@ -173,8 +203,8 @@
     const alt = insel.zwerge[id];
     const altStand = alt ? ZI.Stand.ausCode(alt.code) : null;
     // Ein älterer Code (weniger Fortschritt) überschreibt nie einen neueren
-    const fortschrittAlt = altStand ? altStand.coreCount(KAP) * 100 + altStand.gems() : -1;
-    const fortschrittNeu = s.coreCount(KAP) * 100 + s.gems();
+    const fortschrittAlt = altStand ? altStand.coreCount(kap()) * 100 + altStand.gems() : -1;
+    const fortschrittNeu = s.coreCount(kap()) * 100 + s.gems();
     if (!alt || fortschrittNeu >= fortschrittAlt) insel.zwerge[id] = { code: s.code(), erst: alt ? alt.erst : Date.now(), zeit: Date.now() };
     sichern();
     return { id, stand: s, neu: !alt };
@@ -224,7 +254,7 @@
             ZI.ton.richtig();
             if (liste.firstChild && liste.firstChild.classList && liste.firstChild.classList.contains('klein')) ZI.setze(liste, );
             liste.prepend(h('div', { class: 'scan-eintrag' }, bild(z.datei, z.name),
-              h('div', null, h('b', null, z.name), ' · ' + a.stand.coreCount(KAP) + ' Material, ' + a.stand.gems() + ' Edelsteine')));
+              h('div', null, h('b', null, z.name), ' · ' + a.stand.coreCount(kap()) + ' Material, ' + a.stand.gems() + ' Edelsteine')));
           } else {
             ZI.ton.falsch(); ZI.meldung('Dieser QR-Code gehört nicht zur Zwergeninsel.');
           }
@@ -260,7 +290,7 @@
       ZI.ton.richtig();
       if (!neueIds.includes(a.id)) neueIds.push(a.id);
       const z = ZI.ZWERGE.find((d) => d.nr === a.stand.zwerg);
-      ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, z.name + ' hat geliefert: ' + a.stand.coreCount(KAP) + ' Material, ' + a.stand.gems() + ' Edelsteine.'));
+      ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, z.name + ' hat geliefert: ' + a.stand.coreCount(kap()) + ' Material, ' + a.stand.gems() + ' Edelsteine.'));
       eingabe.value = ''; eingabe.focus();
     };
     eingabe.addEventListener('keydown', (e) => { if (e.key === 'Enter') ok(); });
@@ -277,7 +307,8 @@
 
   /* ---------- Zwergenrat ---------- */
   function oeffneRat() {
-    const [a, b] = ZI.RATSFRAGE_K1.optionen.map((id) => ZI.GEBAEUDE.find((g) => g.id === id));
+    const RF = ZI.RATSFRAGE[kap()];
+    const [a, b] = RF.optionen.map((id) => ZI.GEBAEUDE.find((g) => g.id === id));
     const stimmen = { [a.id]: 0, [b.id]: 0 };
     let sek = 5 * 60; let uhrTimer = null;
     const uhr = h('div', { class: 'uhr' }, '5:00');
@@ -309,36 +340,39 @@
         h('div', { class: 'titel' }, 'Der Zwergenrat tagt'),
         h('div', { class: 'spacer' }), uhr, uhrKnopf),
       h('div', { class: 'rat-inhalt' },
-        h('div', { class: 'rat-frage pergament' }, ZI.RATSFRAGE_K1.frage),
+        h('div', { class: 'rat-frage pergament' }, RF.frage),
         optionKarte(a), optionKarte(b),
         h('div', { class: 'rat-regeln pergament auf-pergament' },
           h('h3', null, 'Ratsregeln'),
           h('ul', null, ZI.RATSREGELN.map((r) => h('li', null, r))),
           h('h3', null, 'So kannst du anfangen'),
           h('ul', null, ZI.SATZANFAENGE.map((r) => h('li', null, r))),
-          insel.rat ? h('p', { style: { margin: 0 } }, h('b', null, 'Bisherige Entscheidung: '), ZI.GEBAEUDE.find((g) => g.id === insel.rat).name) : null)));
+          insel.rat[kap()] ? h('p', { style: { margin: 0 } }, h('b', null, 'Bisherige Entscheidung: '), ZI.GEBAEUDE.find((g) => g.id === insel.rat[kap()]).name) : null)));
     document.body.appendChild(rat);
 
     function entscheiden(g) {
-      insel.rat = g.id; sichern();
+      insel.rat[kap()] = g.id; sichern();
       clearInterval(uhrTimer);
       rat.remove();
       ZI.ton.fanfare();
-      ZI.meldung('Der Zwergenrat hat entschieden: Zuerst wird ' + (g.id === 'werkstatt' ? 'die Werkstatt' : 'die Hügelhütte') + ' gebaut.', 4000);
+      ZI.meldung('Der Zwergenrat hat entschieden: Zuerst wird ' + g.name + ' gebaut.', 4000);
       allesZeigen(false);
     }
   }
 
   /* ---------- Kapitel geschafft ---------- */
   function feiern() {
-    insel.gefeiert = true; sichern();
+    const k = kap();
     ZI.ton.fanfare();
+    const nk = ZI.KAPITEL[k + 1];
     const f = ZI.fenster([
       h('div', { style: { width: '100%', borderRadius: '14px', overflow: 'hidden' } }, bild('fest-szene', 'Fest im Zwergendorf')),
-      h('h2', null, 'Kapitel 1 geschafft!'),
-      h('p', { style: { margin: 0, fontSize: '22px' } }, 'Euer Dorf steht! Mit diesem Runenwort öffnet ihr in der Schmiede das nächste Kapitel:'),
-      h('div', { class: 'runenwort' }, ZI.KAPITEL[1].runenwort),
-      h('button', { class: 'knopf', onclick: () => f.schliessen() }, 'Hurra!'),
+      h('h2', null, 'Kapitel ' + ZI.KAPITEL[k].nr + ' geschafft!'),
+      nk ? h('p', { style: { margin: 0, fontSize: '22px' } }, 'Euer Dorf wächst! Mit diesem Runenwort öffnet ihr in der Schmiede Kapitel ' + nk.nr + ':') : h('p', { style: { margin: 0, fontSize: '22px' } }, 'Das ganze Dorf steht. Was für eine Leistung, 5a!'),
+      nk ? h('div', { class: 'runenwort' }, nk.runenwort) : null,
+      h('div', { class: 'knopf-reihe' },
+        h('button', { class: 'knopf holz', onclick: () => f.schliessen() }, 'Hurra!'),
+        naechstesKapitelBereit() ? h('button', { class: 'knopf', onclick: () => { f.schliessen(); kapitelWeiter(); } }, 'Kapitel ' + nk.nr + ' beginnen') : null),
     ]);
     f.el.classList.add('breit');
   }
@@ -353,7 +387,7 @@
         const z = ZI.ZWERGE.find((d) => d.nr === s.zwerg);
         return h('tr', null,
           h('td', null, bild(z.datei, z.name), ' ', z.name),
-          h('td', null, s.coreCount(KAP) + ' / 3'),
+          h('td', null, s.coreCount(kap()) + ' / 3'),
           h('td', null, String(s.gems())),
           h('td', null, new Date(e.zeit).toLocaleDateString('de-DE') + ' ' + new Date(e.zeit).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })),
           h('td', null, h('button', { class: 'knopf holz klein', onclick: () => { delete insel.zwerge[id]; sichern(); f.schliessen(); allesZeigen(false); oeffneEinstellungen(); } }, 'Entfernen')));
@@ -370,7 +404,10 @@
       h('h2', null, 'Einstellungen'),
       h('div', { class: 'einstellung' }, 'Kinder in der Klasse:', zahl,
         h('button', { class: 'knopf klein', onclick: () => { const n = parseInt(zahl.value, 10); if (n > 0 && n <= 40) { insel.klassengroesse = n; sichern(); allesZeigen(true); ZI.meldung('Gespeichert.'); } } }, 'Übernehmen')),
-      h('p', { style: { margin: 0, fontSize: '16px', color: 'var(--tinte-hell)' } }, 'Das Dorf ist fertig, wenn jedes Kind den Hauptstollen geschafft hat (3 Material pro Kind). Fehlen Kinder länger, die Zahl einfach verkleinern.'),
+      h('p', { style: { margin: 0, fontSize: '16px', color: 'var(--tinte-hell)' } }, 'Ein Kapitel ist geschafft, wenn jedes Kind den Hauptstollen geschafft hat (3 Material pro Kind). Fehlen Kinder länger, die Zahl einfach verkleinern.'),
+      h('div', { class: 'einstellung' }, 'Kapitel auf der Insel:',
+        ZI.BAUPLAN.map((_, k) => h('button', { class: 'knopf klein' + (k === kap() ? '' : ' holz'), 'aria-pressed': String(k === kap()),
+          onclick: () => { insel.kapitel = k; sichern(); f.schliessen(); allesZeigen(false); ZI.meldung('Die Insel zeigt jetzt Kapitel ' + (k + 1) + '.'); } }, 'Kapitel ' + (k + 1)))),
       h('h3', { style: { fontSize: '24px', alignSelf: 'flex-start' } }, 'Lieferungen (' + Object.keys(insel.zwerge).length + ')'),
       Object.keys(insel.zwerge).length ? tabelle : h('p', { style: { margin: 0 } }, 'Noch keine Lieferungen.'),
       h('div', { class: 'knopf-reihe' },

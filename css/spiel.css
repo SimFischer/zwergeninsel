@@ -418,3 +418,23 @@ h1, h2, h3 { font-family: var(--titel); font-weight: 400; margin: 0; letter-spac
   .aufgabe .meinung { font-size: 23px; }
   .option { font-size: 20px; padding: 10px 16px; min-height: 54px; }
 }
+
+/* ---------- Kapitel 2 ---------- */
+/* Farben wie im Unterrichtsmaterial: These rot, Begründung gelb, Beispiel grün */
+.teile { display: flex; flex-direction: column; gap: 8px; }
+.teil { display: flex; gap: 12px; align-items: baseline; padding: 10px 14px; border-radius: 12px; border: 3px solid; font-size: 21px; line-height: 1.35; animation: einblenden 0.3s; }
+.teil-name { flex: none; font-family: var(--titel); font-size: 16px; text-transform: uppercase; letter-spacing: 0.6px; padding: 2px 8px; border-radius: 6px; color: #fff; }
+.teil-these { background: #f8ddd5; border-color: #c2533a; }
+.teil-these .teil-name { background: #b0472f; }
+.teil-begruendung { background: #fbefc2; border-color: #c9971f; }
+.teil-begruendung .teil-name { background: #9c7414; }
+.teil-beispiel { background: #e3efcc; border-color: #6f8f3a; }
+.teil-beispiel .teil-name { background: #4f6a26; }
+.boss-leiste { display: flex; align-items: center; gap: 12px; font-family: var(--titel); font-size: 20px; }
+.boss-leiste .balken { flex: 1; height: 22px; border-radius: 11px; border: 3px solid #5a2a1e; background: #fffaf0; overflow: hidden; }
+.boss-leiste .balken div { height: 100%; background: linear-gradient(180deg, #e0683f, #a8381f); transition: width 0.6s ease-out; }
+.knopf.gross-hoeren { min-height: 76px; font-size: 28px; padding-inline: 34px; }
+.knopf.gross-hoeren svg { width: 36px; height: 36px; }
+.knopf.gross-hoeren.gehoert { background: linear-gradient(180deg, #8db04c, var(--moos)); box-shadow: inset 0 -6px 0 var(--moos-dunkel), 0 4px 0 rgba(0, 0, 0, 0.35); color: #fff8e6; }
+.stollen h2 svg { width: 30px; height: 30px; flex: none; }
+.reiter button svg { width: 18px; height: 18px; vertical-align: -2px; margin-right: 6px; }
