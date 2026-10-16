@@ -53,6 +53,26 @@ Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden ke
 
 Auf der Insel: Ratsplatz, Bibliothek, Brunnen und Mühle. Über das Zahnrad lässt sich das Kapitel der Insel auch von Hand umstellen.
 
+## Kapitel 3 – Das Inselfest
+
+Öffnet sich mit dem Runenwort, das die Insel nach Kapitel 2 zeigt.
+
+**Hauptstollen**
+
+1. *Ja, und – ja, aber?* – erkennen, ob jemand zustimmt und ergänzt, widerspricht oder das Thema wechselt
+2. *Wer hört zu?* – die Antwort finden, die richtig anknüpft („Du sagst, dass …“), statt zu verdrehen oder abzulenken
+3. *Überzeug den Inselrat* – Einwände von Grimbart und Amara entkräften, mit Überzeugungsbalken
+
+**Tiefe Stollen**
+
+1. *Gegenargument-Schmiede* – echte Gegenargumente von Stützen und Ablenkungen unterscheiden
+2. *Wer überzeugt wen?* – das Argument wählen, das zur Person und ihrer Sorge passt (Situationskarten: Hund, Sommercamp, Taschengeld)
+3. *Streitgespräch* – zu zweit: A begründet, B knüpft an und widerspricht, gemeinsamer Check
+
+**Bonusinsel:** *Sprecherwechsel* – im richtigen Moment einsteigen, ohne zu unterbrechen
+
+Auf der Insel: Leuchtturm, Festhalle und Schiff. Danach feiert die Klasse das fertige Dorf.
+
 ## Gerechtigkeit zwischen schnellen und langsameren Kindern
 
 - Das Dorf wird nur aus dem **Hauptstollen** gebaut. Jedes Kind zählt gleich viel, egal wie schnell es ist.
@@ -68,7 +88,7 @@ Auf der Insel: Ratsplatz, Bibliothek, Brunnen und Mühle. Über das Zahnrad läs
 
 ## Inhalte anpassen
 
-Alle Aufgaben, Themen und Texte stehen in `js/data.js`. Neue Themen für das Meisterstück oder andere Beispielsätze lassen sich dort einfach ergänzen.
+Alle Aufgaben, Themen und Texte stehen in `js/data.js` (Kapitel 1), `js/data-k2.js` und `js/data-k3.js`. Neue Themen für das Meisterstück oder andere Beispielsätze lassen sich dort einfach ergänzen.
 
 ## Bilder
 

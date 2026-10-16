@@ -438,3 +438,19 @@ h1, h2, h3 { font-family: var(--titel); font-weight: 400; margin: 0; letter-spac
 .knopf.gross-hoeren.gehoert { background: linear-gradient(180deg, #8db04c, var(--moos)); box-shadow: inset 0 -6px 0 var(--moos-dunkel), 0 4px 0 rgba(0, 0, 0, 0.35); color: #fff8e6; }
 .stollen h2 svg { width: 30px; height: 30px; flex: none; }
 .reiter button svg { width: 18px; height: 18px; vertical-align: -2px; margin-right: 6px; }
+
+/* ---------- Kapitel 3 ---------- */
+.zitat { font-size: 21px; line-height: 1.4; padding: 12px 16px; border-left: 0; border-radius: 12px; background: rgba(58, 38, 23, 0.07); font-style: italic; }
+.boss-leiste .balken.ueberzeugung div { background: linear-gradient(180deg, #8db04c, var(--moos)); }
+.sw-buehne { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 20px; }
+.sw-reihe { display: flex; align-items: flex-end; gap: 20px; width: min(900px, 100%); }
+.sw-sprecher { width: 200px; flex: none; text-align: center; }
+.sw-sprecher img, .sw-sprecher .platzhalter { width: 100%; display: block; filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.4)); }
+.sw-name { font-family: var(--titel); font-size: 22px; margin-top: 4px; }
+.sw-blase { flex: 1; min-height: 140px; padding: 22px 26px; font-size: 28px; line-height: 1.45; font-weight: 700; }
+.sw-blase.fertig { box-shadow: 0 0 0 5px var(--moos), 0 6px 0 rgba(0, 0, 0, 0.35); }
+.sw-ergebnis { min-height: 64px; width: min(900px, 100%); }
+.knopf.sw-knopf { min-height: 96px; font-size: 34px; padding-inline: 48px; }
+@media (max-width: 700px) { .sw-reihe { flex-direction: column; align-items: center; } .sw-sprecher { width: 140px; } }
+.amboss-platz.person .amboss, .amboss-platz.person .hammer { display: none; }
+.amboss-platz.person .werkstueck { bottom: 0; width: 78%; max-width: 250px; }
