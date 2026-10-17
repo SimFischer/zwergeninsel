@@ -113,7 +113,7 @@
   const RAUCH = { lagerfeuer: [50, 30], huette1: [74, 8], huette2: [62, 10], huette3: [55, 12], werkstatt: [70, 6], festhalle: [50, 6] };
   ZI.GEBAEUDE.slice().sort((a, b) => a.y - b.y).forEach((g) => {
     const el = h('div', { class: 'bau', style: { left: g.x + '%', top: g.y + '%', width: g.w + '%' } },
-      h('div', { class: 'ruine' }, ZI.bildOder(g.id + '-ruine', g.name + ' (Ruine)', null)),
+      h('div', { class: 'ruine' }, g.id === 'schiff' ? null : ZI.bildOder(g.id + '-ruine', g.name + ' (Ruine)', null)),
       h('div', { class: 'fertig', style: { display: 'none' } }, bild(g.id, g.name)),
       RAUCH[g.id] ? h('div', { class: 'rauch', style: { left: RAUCH[g.id][0] + '%', top: RAUCH[g.id][1] + '%' }, 'aria-hidden': 'true' }, h('span'), h('span'), h('span')) : null);
     bauEls[g.id] = el;

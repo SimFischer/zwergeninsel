@@ -1,6 +1,6 @@
 # Noch fehlende Bilder
 
-Stand: 17.10.2026. Alle Dateien gehören nach `bilder/` (PNG, freigestellt). Fehlt ein Bild, zeigt die App einen Ersatz – nichts geht kaputt.
+Stand: 18.10.2026. Alle Dateien gehören nach `bilder/` (PNG, freigestellt). Fehlt ein Bild, zeigt die App einen Ersatz – nichts geht kaputt.
 
 ## Prompt 3 – die letzten 18 Bilder (Text: BILDER-PROMPT-3.md)
 
@@ -16,16 +16,9 @@ Stand: 17.10.2026. Alle Dateien gehören nach `bilder/` (PNG, freigestellt). Feh
 
 Bewusst gestrichen, weil die App sie selbst zeichnet: pergament, holzschild, steinrahmen, schloss. Ebenso schiff-ruine: Das Wrack ist schon im Inselbild gemalt.
 
-## Aus der zweiten Bilderserie (Prompt 2 – in ChatGPT fertig, noch nicht eingebaut)
+## Zweite Bilderserie (Prompt 2)
 
-- Tiere: moewe-unten, moewe-geschenk, krabbe, delfin, huhn, hase, schildkroete, schmetterling (moewe-oben ist schon da)
-- Wolken: wolke-1, wolke-2, wolke-3
-- Sonderstücke: sonder-amboss-denkmal, sonder-pavillon, sonder-blumenbogen, sonder-baumhaus, sonder-festbaum, sonder-aussichtsturm
-- Kleinteile: krone, geschenk, auftrag-rolle, buch-offen, flamme
-- Rang-Embleme: rang-1 bis rang-7
-- Abzeichen: abzeichen-funke, -k1, -k2, -k3, -fehler, -kobold, -rede, -ohr, -rat, -krone1, -krone5, -krone9, -stern3, -stern9, -gems, -buch, -freunde, -clan
-- Stations-Symbole: icon-stumpf-scharf, icon-erz-schlacke, icon-weil-denn, icon-fehlerjagd, icon-beispiel, icon-meisterstueck, icon-funkenregen, icon-puzzle, icon-motor-bremse, icon-hoeren, icon-kobold-kampf, icon-kette, icon-meisterstueck2, icon-beispielregen, icon-ja-und, icon-zuhoeren, icon-inselrat, icon-gegenargument, icon-situation, icon-streitgespraech, icon-sprecherwechsel
-- Optional: Jubel-Posen zwerg-01-brumm-jubel … zwerg-12-rubina-jubel
+Alle 81 Bilder sind eingebaut (18.10.2026).
 
 ## Nach dem Einbau
 

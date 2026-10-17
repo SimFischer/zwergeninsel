@@ -18,7 +18,7 @@ ZI.ALLE_BILDER = [
   'huette3', 'huette3-ruine', 'werkstatt', 'werkstatt-ruine', 'steg', 'steg-ruine',
   'bibliothek', 'bibliothek-ruine', 'ratsplatz', 'ratsplatz-ruine', 'brunnen', 'brunnen-ruine',
   'muehle', 'muehle-ruine', 'leuchtturm', 'leuchtturm-ruine', 'festhalle', 'festhalle-ruine',
-  'schiff', 'schiff-ruine', 'fahne', 'laterne', 'kristall-laterne', 'blumenbeet',
+  'schiff', 'fahne', 'laterne', 'kristall-laterne', 'blumenbeet',
   'bank', 'faesser', 'statue', 'wegweiser', 'gemuesegarten', 'ziegen',
   'holz', 'stein', 'eisen', 'edelstein', 'stern',
   'zwergenpass-karte',
@@ -28,6 +28,7 @@ ZI.ALLE_BILDER = [
   'rang-1', 'rang-2', 'rang-3', 'rang-4', 'rang-5', 'rang-6', 'rang-7',
   ...['funke', 'k1', 'k2', 'k3', 'fehler', 'kobold', 'rede', 'ohr', 'rat', 'krone1', 'krone5', 'krone9', 'stern3', 'stern9', 'gems', 'buch', 'freunde', 'clan'].map((a) => 'abzeichen-' + a),
   'icon-beispiel', 'icon-beispielregen', 'icon-erz-schlacke', 'icon-fehlerjagd', 'icon-funkenregen', 'icon-gegenargument', 'icon-hoeren', 'icon-inselrat', 'icon-ja-und', 'icon-kette', 'icon-kobold-kampf', 'icon-meisterstueck', 'icon-meisterstueck2', 'icon-motor-bremse', 'icon-puzzle', 'icon-situation', 'icon-sprecherwechsel', 'icon-streitgespraech', 'icon-stumpf-scharf', 'icon-weil-denn', 'icon-zuhoeren',
+  ...['01-brumm', '02-hilda', '03-tarek', '04-lina', '05-kira', '06-ole', '07-fenno', '08-mira', '09-bodo', '10-amara', '11-grimbart', '12-rubina'].map((z) => 'zwerg-' + z + '-jubel'),
 ];
 /* Nur das Board braucht diese; die iPads laden sie nicht */
 ZI.NUR_BOARD = (n) => /-ruine$|^(insel-grund|fest-szene|schiff|fahne|laterne|kristall-laterne|blumenbeet|bank|faesser|statue|wegweiser|gemuesegarten|ziegen|moewe-|krabbe|delfin|huhn|hase|schildkroete|schmetterling|wolke-|sonder-)/.test(n);
