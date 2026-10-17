@@ -143,6 +143,10 @@ Die Schmiede läuft im normalen Browser-Tab, es wird nichts installiert. Alles, 
 
 **Zwei Welten, eine Brücke:** Schulfragen sprechen Kinder mit normalen Namen (keine Namen aus der Klasse), Inselfragen der Zwergenclan. Der Inselrat (Grimbart und Amara) prüft Inselvorhaben: Hängebrücke zum Leuchtturm, Strandfest, Ziegen im Dorf. Meisterin Hammerlind schlägt in der Begrüßung die Brücke: Gute Argumente funktionieren überall. In den Stammesräten ist jedes Thema mit „Aus eurer Klasse“ oder „Für die Insel“ gekennzeichnet.
 
+## Mehr Abwechslung
+
+`js/data-vielfalt.js` ergänzt alle Stationen um weitere Aufgaben (rund 90 neue), damit Kinder beim zweiten und dritten Durchgang Neues sehen: u. a. Inselrat 8 Vorhaben, Motor/Bremse 7 Gespräche, Sprecherwechsel 3 Ratsgespräche, jeder Gebäude-Stollen 8–10 Aufgaben. Neue Themen: Leseecke, Fahrrad, Klassenrat, Wasserspender, Unterricht draußen.
+
 ## Inhalte anpassen
 
 Alle Aufgaben, Themen und Texte stehen in `js/data.js` (Kapitel 1), `js/data-k2.js`, `js/data-k3.js`, `js/data-mehr.js` (zusätzliche Aufgaben, Vormach-Beispiele, Wissensbuch) und `js/data-spiel.js` (Ränge, Abzeichen, Inselrätsel, Aufträge). Neue Themen für das Meisterstück oder andere Beispielsätze lassen sich dort einfach ergänzen.

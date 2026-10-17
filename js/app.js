@@ -1412,7 +1412,7 @@
 
   /* BONUS Kapitel 3: Sprecherwechsel – im richtigen Moment einsteigen */
   function spielSprecherwechsel() {
-    const saetze = ZI.SPRECHERWECHSEL.slice();
+    const saetze = (ZI.SPRECHERWECHSEL_RUNDEN ? ZI.zufall(ZI.SPRECHERWECHSEL_RUNDEN) : ZI.SPRECHERWECHSEL).slice();
     const sprecher = ZI.mischen(ZI.ZWERGE.slice(0, 8));
     let nr = 0; let treffer = 0; let laeuft = false;
     let zustand = 'warten'; // spricht | fenster | vorbei
