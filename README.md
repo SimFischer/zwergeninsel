@@ -90,7 +90,7 @@ Jede Gebäude-Übung bringt einen Rangpunkt und eine Seite im Wissensbuch (insge
 
 **Inselbotschaft:** Das Board zeigt in der Materialtafel immer ein Wort aus drei Silben (z. B. „LA DI LO“). Es enthält das offene Kapitel und alle gebauten Gebäude. Die Kinder tippen es zu Stundenbeginn einmal in der Schmiede ein – danach sind die passenden Gebäude-Stollen und Kapitel offen. Die Botschaft gilt auf einem iPad einen Schultag lang. Die alten Runenwörter AMBOSS und LEUCHTTURM funktionieren weiterhin.
 
-**Rollen und Redeliste:** Im Zwergenrat lassen sich vier Rollen auslosen (Ratsleitung, Zusammenfassung, Regelwache, Zeitwache) – wer schon eine Rolle hatte, kommt erst wieder dran, wenn alle einmal dran waren. Die Redeliste zeigt, wer schon etwas beigetragen hat, und schlägt Kinder vor, die noch nicht dran waren.
+**Stammesräte:** Vor dem großen Rat beraten die Kinder in Stämmen zu 3–4 Zwergen – auch Leise kommen so im geschützten Rahmen zu Wort. Das Board teilt die Stämme zufällig ein, vergibt Rollen (Älteste, Bote, Gedächtnis, Wache) und zeigt einen Stammescode. Mit dem Code sieht jedes Kind in der Schmiede seine Rollenkarte mit Aufgabe, Satzanfängen und dem Thema. Danach tippt die Lehrkraft die Entscheidung jedes Stammes an; im großen Rat berichten nur die Boten mit einem Satz. Neben den Ratsfragen gibt es freie Streitfragen zum Üben. Im großen Rat zeigt die Redeliste, wer schon gesprochen hat.
 
 ## Rückblick, Überblick, Urkunden
 

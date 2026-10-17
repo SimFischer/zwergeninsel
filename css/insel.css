@@ -316,3 +316,24 @@ body.insel-seite .meldungen { top: calc(3vh * var(--ui, 1)); bottom: auto; flex-
 .ue-karte .karten-kopf img, .ue-karte .karten-kopf-leer { width: 32px; height: 32px; }
 .ue-karte .karten-kopf b { font-size: 20px; }
 @media (max-width: 900px) { .ue-spalten { grid-template-columns: 1fr; } }
+
+/* ---------- Stammesräte ---------- */
+.stamm-inhalt { position: relative; z-index: 2; flex: 1; min-height: 0; overflow-y: auto; padding: 1.4vw 2vw 2vw; display: flex; flex-direction: column; gap: 1.2vw; }
+.stamm-kopf { display: grid; grid-template-columns: 1fr auto; gap: 1.2vw; }
+.stamm-thema, .stamm-code { padding: 12px 18px; }
+.stamm-frage { font-family: var(--titel); font-size: clamp(24px, 2.2vw, 44px); line-height: 1.15; }
+.stamm-code { text-align: center; display: flex; flex-direction: column; justify-content: center; max-width: 360px; }
+.stamm-code b { font-family: var(--titel); font-weight: 400; font-size: clamp(36px, 3.2vw, 64px); letter-spacing: 4px; color: #8a4b1c; white-space: nowrap; }
+.stamm-raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(220px, 15vw, 320px), 1fr)); gap: 1vw; }
+.stamm-karte { padding: 10px 14px 12px; border-top: 8px solid; display: flex; flex-direction: column; gap: 6px; }
+.stamm-karte h3 { margin: 0; font-size: clamp(20px, 1.5vw, 30px); }
+.stamm-mitglieder { display: flex; flex-direction: column; gap: 4px; }
+.stamm-mitglied { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: clamp(15px, 1vw, 21px); }
+.stamm-mitglied .karten-kopf img, .stamm-mitglied .karten-kopf-leer { width: 34px; height: 34px; }
+.stamm-mitglied .karten-kopf b { font-size: clamp(20px, 1.4vw, 28px); }
+.stamm-rolle { color: var(--tinte-hell); white-space: nowrap; }
+.stamm-wahl { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.stamm-wahl .knopf { flex: 1; padding-left: 8px; padding-right: 8px; }
+.stamm-unten { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 10px 16px; border-radius: 14px; background: rgba(255, 250, 240, 0.94); color: var(--tinte); font-size: clamp(17px, 1.3vw, 26px); }
+@media (max-width: 900px) { .stamm-kopf { grid-template-columns: 1fr; } }
+.stamm-kopf { align-items: start; }

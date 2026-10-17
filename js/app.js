@@ -1648,7 +1648,8 @@
       h('div', { class: 'botschaft-text' },
         b ? h('span', null, 'Inselbotschaft ', h('b', null, b.wort), ' · ' + (anzahl === 1 ? '1 Gebäude-Stollen offen' : anzahl + ' Gebäude-Stollen offen'))
           : h('span', null, h('b', null, 'Inselbotschaft: '), 'Tippe das Silbenwort vom Board ein. Dann öffnen sich die Gebäude-Stollen.')),
-      h('button', { class: 'knopf klein' + (b ? ' holz' : ''), onclick: () => botschaftEingeben(() => zeigeHalle()) }, b ? 'Neue Botschaft' : 'Eintippen'));
+      h('button', { class: 'knopf klein' + (b ? ' holz' : ''), onclick: () => botschaftEingeben(() => zeigeHalle()) }, b ? 'Neue Botschaft' : 'Eintippen'),
+      h('button', { class: 'knopf holz klein', onclick: stammesratEingeben }, 'Stammesrat'));
   }
   function botschaftEingeben(danach) {
     const eingabe = h('input', { class: 'eingabe botschaft-eingabe', maxlength: '12', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'z. B. BOKAMI', 'aria-label': 'Inselbotschaft' });
@@ -1687,6 +1688,80 @@
         h('button', { class: 'knopf', onclick: pruefen }, 'Prüfen')),
     ]);
     setTimeout(() => eingabe.focus(), 150);
+  }
+
+  /* ---------- Stammesrat: Rolle im kleinen Rat ---------- */
+  function stammesratEingeben() {
+    const alt = speicher.lesen('zi-stamm', null);
+    if (alt && Date.now() - alt.zeit < 90 * 60 * 1000) { zeigeStammesrat(alt); return; }
+    const eingabe = h('input', { class: 'eingabe botschaft-eingabe', maxlength: '12', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'z. B. KOMIDA', 'aria-label': 'Stammescode' });
+    const hinweis = h('div');
+    const pruefen = () => {
+      const roh = eingabe.value.trim().toUpperCase().replace(/[^A-Z]/g, '');
+      const c = ZI.stammescode.lese(roh);
+      if (!c) { ZI.ton.falsch(); ZI.setze(hinweis, h('div', { class: 'rueckmeldung schlecht' }, 'Dieser Stammescode stimmt nicht. Er steht am Board bei den Stammesräten.')); return; }
+      if (!stand.karte || stand.karte > c.n) { ZI.ton.falsch(); ZI.setze(hinweis, h('div', { class: 'rueckmeldung schlecht' }, 'Deine Kartennummer kommt in diesem Rat nicht vor. Frag deine Lehrkraft.')); return; }
+      const daten = { wort: roh, ...c, zeit: Date.now() };
+      speicher.schreiben('zi-stamm', daten);
+      f.schliessen(); ZI.ton.fanfare();
+      zeigeStammesrat(daten);
+    };
+    eingabe.addEventListener('keydown', (e) => { if (e.key === 'Enter') pruefen(); });
+    const f = ZI.fenster([
+      h('h2', null, 'Stammesrat'),
+      h('p', { style: { margin: 0 } }, 'Am Board steht der Stammescode aus drei Silben. Damit erfährst du, in welchem Stamm du bist und welche Rolle du hast.'),
+      eingabe, hinweis,
+      h('div', { class: 'knopf-reihe' },
+        h('button', { class: 'knopf holz', onclick: () => f.schliessen() }, 'Abbrechen'),
+        h('button', { class: 'knopf', onclick: pruefen }, 'Prüfen')),
+    ]);
+    setTimeout(() => eingabe.focus(), 150);
+  }
+  function zeigeStammesrat(c) {
+    const staemme = ZI.stammesEinteilung(c.n, c.seed);
+    const g = staemme.find((x) => x.mitglieder.some((m) => m.karte === stand.karte));
+    if (!g) { speicher.loeschen('zi-stamm'); stammesratEingeben(); return; }
+    const ich = g.mitglieder.find((m) => m.karte === stand.karte);
+    const rolle = ich.rolle;
+    const t = ZI.STAMMES_THEMEN[c.thema];
+    const rf = t.frage ? ZI.ratsfrageNach(t.frage) : null;
+    const dreier = g.mitglieder.length < 4;
+    zeige(h('div', { class: 'screen' },
+      ZI.hintergrund('zwergenrat-hintergrund', 'hg-ersatz-stollen', 'rgba(20,12,8,0.45)'),
+      h('div', { class: 'leiste' },
+        h('button', { class: 'rund', 'aria-label': 'Zurück zur Halle', onclick: () => zeigeHalle() }, icon.zurueck()),
+        h('div', null, h('div', { class: 'titel' }, 'Stammesrat der ' + g.name), h('div', { class: 'untertitel' }, 'Stammescode ' + c.wort.match(/../g).join(' '))),
+        h('div', { class: 'spacer' }),
+        h('button', { class: 'knopf holz klein', onclick: () => { speicher.loeschen('zi-stamm'); stammesratEingeben(); } }, 'Neuer Code')),
+      h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2 } },
+        h('div', { class: 'stammesrat-ipad' },
+          h('div', { class: 'rollenkarte pergament auf-pergament', style: { borderColor: g.farbe } },
+            h('div', { class: 'rollenkarte-zeichen', 'aria-hidden': 'true' }, rolle.zeichen),
+            h('div', null,
+              h('div', { class: 'klein' }, 'Deine Rolle'),
+              h('h2', { style: { margin: 0, color: g.farbe } }, rolle.name),
+              h('p', { style: { margin: '4px 0 0', fontSize: '20px' } }, rolle.aufgabe + (dreier && rolle.id === 'aelteste' ? ' Ihr seid nur drei – achte auch auf die Zeit.' : '')),
+              h('button', { class: 'knopf-link', onclick: () => ZI.vorlesen(rolle.name + '. ' + rolle.aufgabe) }, 'Vorlesen'))),
+          h('div', { class: 'pergament auf-pergament stamm-box' },
+            h('h3', null, 'Euer Thema'),
+            h('div', { class: 'meinung' }, ZI.themaText(t)),
+            rf ? h('div', { class: 'stamm-optionen' }, rf.optionen.map((id) => {
+              const geb = ZI.GEBAEUDE.find((x) => x.id === id); const u = ZI.bauUebung(id);
+              return h('div', { class: 'stamm-option' }, h('div', { class: 'stamm-option-bild' }, bild(id, geb.name)),
+                h('div', null, h('b', null, geb.name), u ? h('div', { class: 'klein' }, 'schaltet frei: „' + u.name + '“') : null));
+            })) : null),
+          h('div', { class: 'stamm-spalten' },
+            h('div', { class: 'pergament auf-pergament stamm-box' },
+              h('h3', null, 'Deine Sätze als ' + rolle.name),
+              h('ul', { class: 'saetze' }, rolle.saetze.map((x) => h('li', null, x)))),
+            h('div', { class: 'pergament auf-pergament stamm-box' },
+              h('h3', null, 'Für alle im Stamm'),
+              h('ul', { class: 'saetze' }, ZI.ALLE_SAETZE.map((x) => h('li', null, x))))),
+          h('div', { class: 'pergament auf-pergament stamm-box' },
+            h('h3', null, 'Dein Stamm'),
+            h('div', { class: 'stamm-liste' }, g.mitglieder.map((m) => h('div', { class: 'stamm-person' + (m.karte === stand.karte ? ' ich' : '') },
+              h('b', null, 'Karte ' + m.karte), h('span', null, m.rolle.zeichen + ' ' + m.rolle.name + (m.karte === stand.karte ? ' (du)' : ''))))),
+            h('p', { class: 'klein', style: { margin: '8px 0 0' } }, 'Setzt euch zusammen. Jeder sagt mindestens einmal seine Meinung mit Begründung.'))))));
   }
 
   /* ---------- Gebäude-Übung spielen ---------- */

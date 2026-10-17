@@ -168,7 +168,8 @@
   const titel = h('div', { class: 'insel-titel' }, h('h1', null, 'Die Zwergeninsel'), unterTitel);
   const knoepfe = h('div', { class: 'insel-knoepfe' },
     h('button', { class: 'knopf', onclick: oeffneLieferungen }, icon.tastatur(), 'Lieferungen'),
-    h('button', { class: 'knopf holz', onclick: oeffneRat }, 'Zwergenrat'),
+    h('button', { class: 'knopf holz', onclick: oeffneStammesraete }, 'Stammesräte'),
+    h('button', { class: 'knopf holz', onclick: () => oeffneRat() }, 'Zwergenrat'),
     h('button', { class: 'knopf holz', onclick: oeffneRaetsel }, 'Inselrätsel'),
     h('button', { class: 'knopf holz', onclick: oeffneAuftrag }, 'Auftrag'),
     h('button', { class: 'rund', 'aria-label': 'Tag oder Nacht', onclick: () => { insel.nacht = !insel.nacht; sichern(); zeigeNacht(); } }, icon.mond()),
@@ -273,7 +274,9 @@
     if (rfFaellig) status = h('div', { class: 'rat-wartet' },
       h('b', null, 'Der Zwergenrat muss entscheiden!'),
       h('div', null, rf.frage),
-      h('button', { class: 'knopf klein', onclick: () => oeffneRat(rf.id) }, 'Zum Zwergenrat'));
+      h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-start', gap: '6px' } },
+        h('button', { class: 'knopf klein', onclick: () => { insel.stamm = Object.assign(insel.stamm || {}, { thema: ZI.STAMMES_THEMEN.findIndex((t) => t.frage === rf.id), stimmen: {} }); oeffneStammesraete(); } }, 'Stammesräte'),
+        h('button', { class: 'knopf holz klein', onclick: () => oeffneRat(rf.id) }, 'Großer Rat')));
     else if (n) status = h('div', { class: 'klein' }, 'Als Nächstes: ', h('b', null, n.gebaeude.name), ' – noch ' + n.bedarf + ' Lieferung' + (n.bedarf === 1 ? '' : 'en') + '.',
       rf ? h('div', { style: { marginTop: '4px' } }, 'Bald fragt der Zwergenrat: ' + rf.frage) : null);
     else if (nk) status = h('div', { class: 'klein' }, h('b', null, 'Kapitel ' + ZI.KAPITEL[k].nr + ' geschafft! '), 'Mit der Inselbotschaft öffnet sich in der Schmiede Kapitel ' + nk.nr + '.',
@@ -599,48 +602,75 @@
     return h('div', { class: 'karten-kopf' }, z ? bild(z.datei, z.name) : h('div', { class: 'karten-kopf-leer' }), h('b', null, String(n)));
   }
 
-  /* ---------- Rollen im Zwergenrat ---------- */
-  function rollenLeiste() {
-    const r = insel.rollen || {};
-    if (!ZI.RATSROLLEN.some((x) => r[x.id])) return h('div', { class: 'rollen-leiste leer' });
-    return h('div', { class: 'rollen-leiste' }, ZI.RATSROLLEN.map((x) => r[x.id] ? h('div', { class: 'rolle-chip' },
-      h('span', { class: 'rolle-zeichen', 'aria-hidden': 'true' }, x.zeichen), h('span', null, x.name + ': '), h('b', null, 'Karte ' + r[x.id]),
-      zwergDerKarte(r[x.id]) ? h('span', null, ' · ' + zwergDerKarte(r[x.id]).name) : null) : null));
+  /* ---------- Stammesräte: kleine Gruppen mit Rollen ---------- */
+  function themaFuerJetzt() {
+    const rf = wartetAufRat() || (ZI.RATSFRAGEN[kap()] || []).find((f) => !insel.rat[f.id]);
+    const i = rf ? ZI.STAMMES_THEMEN.findIndex((t) => t.frage === rf.id) : -1;
+    return i >= 0 ? i : 5;
   }
-  function oeffneRollen(danach) {
-    insel.rollen = insel.rollen || {};
-    insel.hatteRolle = insel.hatteRolle || [];
-    const liste = h('div', { class: 'rollen-karten' });
-    function lose(rid) {
-      const vergeben = ZI.RATSROLLEN.filter((x) => x.id !== rid).map((x) => insel.rollen[x.id]);
-      let pool = kartenNummern().filter((n) => !vergeben.includes(n));
-      const neu = pool.filter((n) => !insel.hatteRolle.includes(n)); // wer noch nie eine Rolle hatte, kommt zuerst dran
-      if (neu.length) pool = neu;
-      const n = ZI.zufall(pool);
-      insel.rollen[rid] = n;
-      if (!insel.hatteRolle.includes(n)) insel.hatteRolle.push(n);
-    }
+  function oeffneStammesraete() {
+    const st = insel.stamm = insel.stamm || {};
+    if (st.seed === undefined) st.seed = Math.floor(Math.random() * 8);
+    if (st.thema === undefined || !ZI.STAMMES_THEMEN[st.thema]) st.thema = themaFuerJetzt();
+    st.stimmen = st.stimmen || {};
+    let sek = 6 * 60; let uhrTimer = null;
+    const uhr = h('div', { class: 'uhr' }, '6:00');
+    const uhrKnopf = h('button', { class: 'knopf holz klein' }, 'Redezeit starten');
+    const formatiere = () => { uhr.textContent = Math.floor(sek / 60) + ':' + String(sek % 60).padStart(2, '0'); };
+    uhrKnopf.addEventListener('click', () => {
+      if (uhrTimer) { clearInterval(uhrTimer); uhrTimer = null; uhrKnopf.textContent = 'Weiter'; return; }
+      uhrKnopf.textContent = 'Pause';
+      uhrTimer = setInterval(() => { sek = Math.max(0, sek - 1); formatiere(); if (sek === 60) ZI.meldung('Noch eine Minute – jetzt entscheiden!', 3000); if (!sek) { clearInterval(uhrTimer); uhrTimer = null; ZI.ton.fanfare(); uhrKnopf.textContent = 'Zeit ist um'; } }, 1000);
+    });
+    const kopf = h('div', { class: 'stamm-kopf' });
+    const raster = h('div', { class: 'stamm-raster' });
+    const unten = h('div', { class: 'stamm-unten' });
     function zeichne() {
-      ZI.setze(liste, ...ZI.RATSROLLEN.map((x) => {
-        const n = insel.rollen[x.id];
-        return h('div', { class: 'rollen-karte pergament auf-pergament' },
-          h('div', { class: 'rollen-zeichen', 'aria-hidden': 'true' }, x.zeichen),
-          h('h3', null, x.name),
-          h('p', null, x.text),
-          n ? kartenKopf(n) : h('div', { class: 'klein' }, 'noch frei'),
-          h('button', { class: 'knopf holz klein', onclick: () => { lose(x.id); sichern(); ZI.ton.plopp(); zeichne(); } }, n ? 'Andere Karte' : 'Auslosen'));
-      }));
+      const n = kartenNummern().length;
+      const t = ZI.STAMMES_THEMEN[st.thema];
+      const rf = t.frage ? ZI.ratsfrageNach(t.frage) : null;
+      const code = ZI.stammescode.kodiere(n, st.seed, st.thema);
+      const staemme = ZI.stammesEinteilung(n, st.seed);
+      ZI.setze(kopf,
+        h('div', { class: 'stamm-thema pergament' },
+          h('div', { class: 'klein' }, 'Darüber beratet ihr in eurem Stamm:'),
+          h('div', { class: 'stamm-frage' }, ZI.themaText(t)),
+          h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-start', marginTop: '6px' } },
+            h('button', { class: 'knopf holz klein', onclick: () => { st.thema = (st.thema + 1) % ZI.STAMMES_THEMEN.length; st.stimmen = {}; sichern(); zeichne(); } }, 'Anderes Thema'))),
+        h('div', { class: 'stamm-code pergament' },
+          h('div', { class: 'klein' }, 'Stammescode für die iPads'),
+          h('b', null, silbig(code)),
+          h('div', { class: 'klein' }, 'Schmiede → „Stammesrat“ → Code eintippen. Dort steht deine Rolle.')));
+      ZI.setze(raster, ...staemme.map((g) => h('div', { class: 'stamm-karte pergament auf-pergament', style: { borderTopColor: g.farbe } },
+        h('h3', { style: { color: g.farbe } }, g.name),
+        h('div', { class: 'stamm-mitglieder' }, g.mitglieder.map((m) => h('div', { class: 'stamm-mitglied' },
+          kartenKopf(m.karte), h('span', { class: 'stamm-rolle' }, m.rolle ? m.rolle.zeichen + ' ' + m.rolle.name : '')))),
+        rf ? h('div', { class: 'stamm-wahl' }, rf.optionen.map((id) => {
+          const geb = ZI.GEBAEUDE.find((x) => x.id === id);
+          return h('button', { class: 'knopf klein' + (st.stimmen[g.nr] === id ? '' : ' holz'), 'aria-pressed': String(st.stimmen[g.nr] === id),
+            onclick: () => { st.stimmen[g.nr] = st.stimmen[g.nr] === id ? undefined : id; sichern(); ZI.ton.plopp(); zeichne(); } }, geb.name);
+        })) : null)));
+      if (rf) {
+        const zaehl = {}; rf.optionen.forEach((id) => { zaehl[id] = Object.values(st.stimmen).filter((v) => v === id).length; });
+        ZI.setze(unten,
+          h('div', null, 'Stämme: ', ...rf.optionen.map((id, i) => h('span', null, i ? ' · ' : '', h('b', null, ZI.GEBAEUDE.find((x) => x.id === id).name + ' ' + zaehl[id])))),
+          h('button', { class: 'knopf', onclick: () => { clearInterval(uhrTimer); ui.remove(); oeffneRat(rf.id, zaehl); } }, 'Zum großen Rat – die Boten berichten'));
+      } else {
+        ZI.setze(unten, h('div', null, 'Freies Thema: Die Boten berichten danach kurz, wofür sich ihr Stamm entschieden hat – und warum.'),
+          h('button', { class: 'knopf', onclick: () => { clearInterval(uhrTimer); ui.remove(); oeffneRedeliste('stamm-' + st.thema); } }, 'Boten berichten'));
+      }
     }
-    zeichne();
-    const f = ZI.fenster([
-      h('h2', null, 'Rollen im Zwergenrat'),
-      h('p', { style: { margin: 0 } }, 'Jede Rolle hilft, dass das Gespräch gut läuft. Wer schon einmal eine Rolle hatte, wird erst wieder gelost, wenn alle dran waren.'),
-      liste,
-      h('div', { class: 'knopf-reihe' },
-        h('button', { class: 'knopf holz', onclick: () => { ZI.RATSROLLEN.forEach((x) => lose(x.id)); sichern(); ZI.ton.fanfare(); zeichne(); } }, 'Alle Rollen auslosen'),
-        h('button', { class: 'knopf', onclick: () => { f.schliessen(); danach && danach(); } }, 'Fertig')),
-    ]);
-    f.el.classList.add('breit');
+    const ui = h('div', { class: 'rat stammesrat' },
+      ZI.hintergrund('zwergenrat-hintergrund', 'hg-ersatz-stollen', 'rgba(20,12,8,0.45)'),
+      h('div', { class: 'leiste' },
+        h('button', { class: 'rund', 'aria-label': 'Zurück zur Insel', onclick: () => { clearInterval(uhrTimer); ui.remove(); } }, icon.zurueck()),
+        h('div', { class: 'titel' }, 'Stammesräte'),
+        h('div', { class: 'spacer' }),
+        h('button', { class: 'knopf holz klein', onclick: () => { st.seed = (st.seed + 1 + Math.floor(Math.random() * 6)) % 8; st.stimmen = {}; sichern(); ZI.ton.plopp(); zeichne(); } }, 'Neu mischen'),
+        uhr, uhrKnopf),
+      h('div', { class: 'stamm-inhalt' }, kopf, raster, unten));
+    document.body.appendChild(ui);
+    sichern(); zeichne();
   }
 
   /* ---------- Redeliste: wer hat schon gesprochen? ---------- */
@@ -683,14 +713,14 @@
     f.el.classList.add('breit', 'rede-dialog');
   }
 
-  function oeffneRat(frageId) {
+  function oeffneRat(frageId, vorStimmen) {
     const fragen = ZI.RATSFRAGEN[kap()] || [];
     if (!fragen.length) { ZI.meldung('In diesem Kapitel gibt es keine Ratsfrage mehr.'); return; }
     const offen = fragen.filter((f) => !insel.rat[f.id]);
     const RF = fragen.find((f) => f.id === frageId) || offen[0] || fragen[fragen.length - 1];
     const nr = fragen.indexOf(RF);
     const [a, b] = RF.optionen.map((id) => ZI.GEBAEUDE.find((g) => g.id === id));
-    const stimmen = { [a.id]: 0, [b.id]: 0 };
+    const stimmen = { [a.id]: (vorStimmen && vorStimmen[a.id]) || 0, [b.id]: (vorStimmen && vorStimmen[b.id]) || 0 };
     let sek = 5 * 60; let uhrTimer = null;
     const uhr = h('div', { class: 'uhr' }, '5:00');
     const uhrKnopf = h('button', { class: 'knopf holz klein' }, 'Redezeit starten');
@@ -703,7 +733,7 @@
     const schonGebaut = RF.optionen.some((id) => insel.gebaut.includes(id));
 
     function optionKarte(g) {
-      const zahl = h('span', null, '0');
+      const zahl = h('span', null, String(stimmen[g.id]));
       const u = ZI.bauUebung(g.id);
       const aendern = (d) => { stimmen[g.id] = Math.max(0, stimmen[g.id] + d); zahl.textContent = String(stimmen[g.id]); ZI.ton.plopp(); };
       const gewaehlt = insel.rat[RF.id] === g.id;
@@ -731,12 +761,11 @@
           class: 'knopf klein' + (f === RF ? '' : ' holz'), 'aria-pressed': String(f === RF),
           onclick: () => { if (f === RF) return; clearInterval(uhrTimer); rat.remove(); oeffneRat(f.id); } }, 'Frage ' + (i + 1) + (insel.rat[f.id] ? ' ✓' : '')))) : null,
         h('div', { class: 'spacer' }),
-        h('button', { class: 'knopf holz klein', onclick: () => oeffneRollen(() => rat.querySelector('.rollen-leiste').replaceWith(rollenLeiste())) }, 'Rollen'),
+        h('button', { class: 'knopf holz klein', onclick: () => { clearInterval(uhrTimer); rat.remove(); insel.stamm = Object.assign(insel.stamm || {}, { thema: ZI.STAMMES_THEMEN.findIndex((t) => t.frage === RF.id), stimmen: {} }); oeffneStammesraete(); } }, 'Erst in Stämmen beraten'),
         h('button', { class: 'knopf holz klein', onclick: () => oeffneRedeliste(RF.id) }, 'Redeliste'),
         uhr, uhrKnopf),
       h('div', { class: 'rat-inhalt' },
         h('div', { class: 'rat-frage pergament' }, (fragen.length > 1 ? 'Frage ' + (nr + 1) + ' von ' + fragen.length + ': ' : '') + RF.frage),
-        rollenLeiste(),
         optionKarte(a), optionKarte(b),
         h('div', { class: 'rat-regeln pergament auf-pergament' },
           h('h3', null, 'Worüber wir abwägen'),

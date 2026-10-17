@@ -279,6 +279,29 @@
     },
   };
 
+  /* STAMMESCODE – drei Silben: Klassengröße 5 | Mischung 3 | Thema 3 | Prüfung 4 */
+  const sPruef = (d) => ((d & 15) * 7 + ((d >> 4) & 15) * 11 + ((d >> 8) & 7) * 13 + 9) & 15;
+  ZI.stammescode = {
+    kodiere(n, seed, thema) {
+      const d = (((n - 1) & 31) << 6) | ((seed & 7) << 3) | (thema & 7);
+      let v = ((d << 4) | sPruef(d)) & 0x7fff;
+      v = Math.imul(v ^ 0x1A77, B_MUL) & 0x7fff;
+      return SILBEN[(v >> 10) & 31] + SILBEN[(v >> 5) & 31] + SILBEN[v & 31];
+    },
+    lese(text) {
+      const t = String(text || '').toUpperCase().replace(/[^A-Z]/g, '');
+      if (t.length !== 6) return null;
+      let v = 0;
+      for (let i = 0; i < 6; i += 2) { const n = SILBEN.indexOf(t.slice(i, i + 2)); if (n < 0) return null; v = (v << 5) | n; }
+      v = (Math.imul(v, B_INV) & 0x7fff) ^ 0x1A77;
+      const d = v >> 4;
+      if (sPruef(d) !== (v & 15)) return null;
+      const n = (d >> 6) + 1;
+      if (n < 2) return null;
+      return { n, seed: (d >> 3) & 7, thema: d & 7 };
+    },
+  };
+
   /* Eingabefeld formatieren: 10 Zeichen als XXXXX-XXXXX, sonst XXXX-XXXX-XXXX */
   ZI.formatiereCode = function (roh) {
     const v = String(roh || '').toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 12);

@@ -366,13 +366,52 @@
     },
   ];
 
-  /* Rollen im Zwergenrat – damit nicht immer dieselben reden */
-  ZI.RATSROLLEN = [
-    { id: 'leitung', name: 'Ratsleitung', text: 'Erteilt das Wort und achtet darauf, dass alle drankommen.', zeichen: '🔔' },
-    { id: 'zusammen', name: 'Zusammenfassung', text: 'Fasst am Ende die wichtigsten Gründe beider Seiten zusammen.', zeichen: '📜' },
-    { id: 'regeln', name: 'Regelwache', text: 'Achtet auf die Ratsregeln und erinnert freundlich daran.', zeichen: '🛡️' },
-    { id: 'zeit', name: 'Zeitwache', text: 'Behält die Redezeit im Blick und sagt Bescheid, wenn die Zeit fast um ist.', zeichen: '⏳' },
+  /* ---------- Stammesräte: kleine Gruppen mit Rollen ---------- */
+  ZI.STAEMME = [
+    { name: 'Eisenhämmer', farbe: '#8a4b1c' }, { name: 'Funkenschläger', farbe: '#d9732f' },
+    { name: 'Kristallgräber', farbe: '#3b7fa6' }, { name: 'Moosbärte', farbe: '#55812a' },
+    { name: 'Felsenfäuste', farbe: '#6b5d52' }, { name: 'Goldadern', farbe: '#c89a2a' },
+    { name: 'Wellenreiter', farbe: '#2c8f8a' }, { name: 'Glutherzen', farbe: '#b03a3a' },
+    { name: 'Sternenschmiede', farbe: '#6a4fa0' },
   ];
+  /* Reihenfolge = Vergabe im Stamm. Bei drei Zwergen fällt die Wache weg (die Älteste übernimmt sie). */
+  ZI.STAMMES_ROLLEN = [
+    { id: 'aelteste', name: 'Älteste', zeichen: '🔔', aufgabe: 'Du leitest das Gespräch. Achte darauf, dass jeder einmal spricht – auch die Leisen.',
+      saetze: ['Wer möchte anfangen?', 'Was meinst du dazu, …?', 'Hat jeder schon etwas gesagt?', 'Lasst uns jetzt entscheiden.'] },
+    { id: 'bote', name: 'Bote', zeichen: '📜', aufgabe: 'Du merkst dir das Ergebnis. Im großen Rat sagst du es in einem Satz für deinen Stamm.',
+      saetze: ['Unser Stamm ist für …, weil …', 'Unser stärkster Grund ist …', 'Wir waren uns nicht einig, aber die meisten finden …'] },
+    { id: 'gedaechtnis', name: 'Gedächtnis', zeichen: '🧠', aufgabe: 'Du hörst genau zu und fasst zwischendurch zusammen, was gesagt wurde.',
+      saetze: ['Bis jetzt haben wir gesagt, dass …', 'Dafür spricht …, dagegen spricht …', 'Habe ich das richtig verstanden?'] },
+    { id: 'wache', name: 'Wache', zeichen: '⏳', aufgabe: 'Du achtest auf die Zeit und auf die Ratsregeln. Erinnere freundlich daran.',
+      saetze: ['Wir haben noch … Minuten.', 'Lass sie bitte ausreden.', 'Kannst du das noch begründen?'] },
+  ];
+  ZI.ALLE_SAETZE = ['Ich finde, dass …, weil …', 'Ich stimme dir zu, denn …', 'Du sagst, dass … Aber …', 'Ja, und außerdem …'];
+  /* Themen: die Ratsfragen (mit Gebäuden) und freie Streitfragen zum Üben */
+  ZI.STAMMES_THEMEN = [
+    { frage: 'k1a' }, { frage: 'k1b' }, { frage: 'k2a' }, { frage: 'k2b' }, { frage: 'k3a' },
+    { text: 'Sollte es an unserer Schule einen Kuscheltiertag geben?' },
+    { text: 'Sollten Handys in der Pause erlaubt sein?' },
+    { text: 'Sollten wir einen Klassenausflug in den Wald oder in den Zoo machen?' },
+  ];
+  ZI.ratsfrageNach = (id) => { for (const l of ZI.RATSFRAGEN) for (const f of l) if (f.id === id) return f; return null; };
+  ZI.themaText = (t) => (t.frage ? ZI.ratsfrageNach(t.frage).frage : t.text);
+  /* Stämme bilden: gleiche Eingabe → gleiche Einteilung, auf dem Board und auf jedem iPad */
+  ZI.stammesEinteilung = function (n, seed) {
+    let x = (seed * 2654435761 + n * 97 + 12345) >>> 0;
+    const zufall = () => { x = (x + 0x6D2B79F5) >>> 0; let t = x; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    const karten = Array.from({ length: n }, (_, i) => i + 1);
+    for (let i = karten.length - 1; i > 0; i--) { const j = Math.floor(zufall() * (i + 1)); [karten[i], karten[j]] = [karten[j], karten[i]]; }
+    const anzahl = Math.max(1, Math.ceil(n / 4));
+    const staemme = [];
+    let pos = 0;
+    for (let g = 0; g < anzahl; g++) {
+      const groesse = Math.floor(n / anzahl) + (g < n % anzahl ? 1 : 0);
+      const mitglieder = karten.slice(pos, pos + groesse); pos += groesse;
+      staemme.push({ nr: g, ...ZI.STAEMME[g % ZI.STAEMME.length],
+        mitglieder: mitglieder.map((karte, i) => ({ karte, rolle: ZI.STAMMES_ROLLEN[i] || null })) });
+    }
+    return staemme;
+  };
 
   /* Rückblick: „Ich kann …“ pro Kapitel. uebung zeigt, wo man nachüben kann. */
   ZI.ICH_KANN = [
