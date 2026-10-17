@@ -1,7 +1,7 @@
 /* Zwergeninsel – Offline-Speicher
    Beim Start wird alles Wichtige zwischengespeichert. Danach läuft die App auch ohne WLAN.
    Nach jeder Änderung an der App die Versionsnummer erhöhen. */
-const VERSION = 'zwergeninsel-v9';
+const VERSION = 'zwergeninsel-v10';
 const KERN = [
   './', 'index.html', 'insel.html', 'manifest.webmanifest',
   'css/spiel.css', 'css/insel.css',
@@ -23,8 +23,8 @@ const BILDER = [
   'muehle', 'muehle-ruine', 'leuchtturm', 'leuchtturm-ruine', 'festhalle', 'festhalle-ruine',
   'schiff', 'schiff-ruine', 'fahne', 'laterne', 'kristall-laterne', 'blumenbeet',
   'bank', 'faesser', 'statue', 'wegweiser', 'gemuesegarten', 'ziegen',
-  'holz', 'stein', 'eisen', 'edelstein', 'stern', 'schloss',
-  'pergament', 'holzschild', 'steinrahmen', 'zwergenpass-karte',
+  'holz', 'stein', 'eisen', 'edelstein', 'stern',
+  'zwergenpass-karte',
   'moewe-oben', 'moewe-unten', 'moewe-geschenk', 'krabbe', 'delfin', 'huhn', 'hase', 'schildkroete', 'schmetterling',
   'wolke-1', 'wolke-2', 'wolke-3', 'sonder-pavillon', 'sonder-blumenbogen', 'sonder-amboss-denkmal', 'sonder-aussichtsturm',
   'sonder-baumhaus', 'sonder-festbaum', 'krone', 'geschenk', 'auftrag-rolle', 'buch-offen', 'flamme',
