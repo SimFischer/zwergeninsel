@@ -9,7 +9,7 @@
   /* =========================================================
      RÄNGE
      Punkte: jede geschaffte Station, jeder Tiefe Stollen, jeder Bonusstern
-     und jede goldene Krone zählt 1 Punkt (höchstens 36).
+     jede goldene Krone und jeder Gebäude-Stollen zählt 1 Punkt (höchstens 46).
      ========================================================= */
   ZI.RAENGE = [
     { ab: 0, m: 'Lehrling', w: 'Lehrling' },
@@ -20,7 +20,7 @@
     { ab: 25, m: 'Meisterschmied', w: 'Meisterschmiedin' },
     { ab: 32, m: 'Großmeister', w: 'Großmeisterin' },
   ];
-  ZI.rangPunkte = (s) => s.coreTotal() + s.deepTotal() + s.bonusTotal() + s.kronenTotal();
+  ZI.rangPunkte = (s) => s.coreTotal() + s.deepTotal() + s.bonusTotal() + s.kronenTotal() + (s.bauTotal ? s.bauTotal() : 0);
   ZI.rang = function (s) {
     const p = ZI.rangPunkte(s);
     let nr = 0;

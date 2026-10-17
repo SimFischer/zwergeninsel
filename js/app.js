@@ -69,11 +69,11 @@
 
   /* ---------- Zwergen-Wissensbuch ---------- */
   function wissenFrei(s) {
-    return ZI.WISSEN.filter((w) => (w.art === 'kern' ? s.hatKern(w.k, w.i) : s.hatTief(w.k, w.i)));
+    return ZI.WISSEN.filter((w) => (w.art === 'bau' ? s.hatBau(w.bit) : w.art === 'kern' ? s.hatKern(w.k, w.i) : s.hatTief(w.k, w.i)));
   }
   function seitenKarte(w, frei) {
     if (!frei) {
-      const st = INHALT[w.k] && INHALT[w.k][w.art][w.i];
+      const st = w.art === 'bau' ? ZI.bauUebung(w.bau) : INHALT[w.k] && INHALT[w.k][w.art][w.i];
       return h('div', { class: 'seite gesperrt' },
         h('div', { class: 'seite-kopf' }, icon.schloss(), h('span', null, '???')),
         h('p', null, 'Schaffe „' + (st ? st.name : '…') + '“, dann erscheint hier ein Merksatz.'));
@@ -391,6 +391,10 @@
   let letzterReiter = null;
 
   function zeigeHalle(begruessen) {
+    if (!stand.karte) { // alte Pässe ohne Kartennummer: einmal nachfragen
+      waehleKarte(null, (n) => { stand.id = n; speichern(); zeigeHalle(begruessen); }, () => zeigeStart());
+      return;
+    }
     const z = aktuellerZwerg();
     if (letzterReiter === null || !kapitelOffen(letzterReiter)) {
       letzterReiter = 0;
@@ -434,12 +438,29 @@
           h('h2', null, 'Tiefe Stollen'),
           h('p', { class: 'erklaer' }, 'Für Meisterschmiede: Jeder Stollen bringt ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine. Daraus wird Schmuck für unser Dorf.'),
           h('div', { class: 'stationen' }, inh.tief.map((d, i) => stationKarte(d, k, stand.hatTief(k, i), !tiefOffen, 'Schaffe zuerst den Hauptstollen.', undefined, null, 'tief', i)))),
+        gebaeudeStollen(k),
         h('section', { class: 'pergament stollen auf-pergament' },
           h('h2', null, 'Bonusinsel'),
           h('div', { class: 'stationen' },
             stationKarte(inh.bonus, k, sterne > 0, !tiefOffen, 'Schaffe zuerst den Hauptstollen.', undefined, null, 'bonus', 0),
             h('div', { class: 'st-info', style: { alignSelf: 'center', fontSize: '18px' } }, 'Deine Sterne: ' + '★'.repeat(sterne) + '☆'.repeat(3 - sterne)))),
       ];
+    }
+
+    function gebaeudeStollen(k) {
+      const liste = ZI.BAU_UEBUNGEN.filter((u) => u.kapitel === k);
+      if (!liste.length) return null;
+      const steht = gebauteGebaeude();
+      return h('section', { class: 'pergament stollen auf-pergament' },
+        h('h2', null, 'Gebäude-Stollen'),
+        h('p', { class: 'erklaer' }, 'Jedes Gebäude, das eure Klasse baut, öffnet hier eine neue Übung. Was zuerst gebaut wird, entscheidet der Zwergenrat.'),
+        h('div', { class: 'stationen' }, liste.map((u) => {
+          const g = ZI.GEBAEUDE.find((x) => x.id === u.id);
+          const frei = testmodus || steht.includes(u.id) || stand.hatBau(u.bit);
+          const def = { name: u.name, info: u.schwerpunkt, icon: [u.id, u.id + '-ruine'], spiel: () => spielBau(u) };
+          return stationKarte(def, k, stand.hatBau(u.bit), !frei,
+            'Öffnet sich mit: ' + (g ? g.name : u.id), undefined, null, 'bau', u.bit);
+        })));
     }
 
     function kapitelGesperrt(k) {
@@ -449,18 +470,10 @@
           h('h2', null, 'Kapitel ' + kap.nr + ': ' + kap.titel),
           h('p', { class: 'erklaer' }, 'Dieses Kapitel wird gerade noch geschmiedet. Bald geht es hier weiter!'));
       }
-      const eingabe = h('input', { class: 'eingabe', style: { fontSize: '30px' }, autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', 'aria-label': 'Runenwort' });
-      const pruefen = () => {
-        if (eingabe.value.trim().toUpperCase() === kap.runenwort) {
-          fortschritt((s) => { s.offen = Math.max(s.offen, k); }, () => { ZI.ton.fanfare(); letzterReiter = k; zeigeHalle(); ZI.meldung('Kapitel ' + kap.nr + ' ist offen!'); });
-        } else { ZI.ton.falsch(); ZI.meldung('Das ist nicht das richtige Runenwort.'); }
-      };
-      eingabe.addEventListener('keydown', (e) => { if (e.key === 'Enter') pruefen(); });
       return h('section', { class: 'pergament stollen auf-pergament' },
         h('h2', null, icon.schloss(), 'Kapitel ' + kap.nr + ': ' + kap.titel),
-        h('p', { class: 'erklaer' }, 'Dieses Kapitel öffnet sich, wenn eure Klasse auf der Insel genug gebaut hat. Dann zeigt euch die Insel ein Runenwort.'),
-        eingabe,
-        h('button', { class: 'knopf', style: { marginTop: '12px' }, onclick: pruefen }, 'Runenwort prüfen'));
+        h('p', { class: 'erklaer' }, 'Dieses Kapitel öffnet sich, wenn eure Klasse auf der Insel genug gebaut hat. Dann zeigt das Board eine neue Inselbotschaft.'),
+        h('button', { class: 'knopf', style: { marginTop: '6px' }, onclick: () => botschaftEingeben(() => zeigeHalle()) }, 'Inselbotschaft eintippen'));
     }
 
     function zeichneReiter() {
@@ -473,7 +486,7 @@
       ZI.setze(kapitelBox, ...(kapitelOffen(aktiverReiter) ? kapitelInhalt(aktiverReiter) : [kapitelGesperrt(aktiverReiter)]));
     }
     zeichneReiter();
-    inhalt.append(reiter, kapitelBox);
+    inhalt.append(botschaftLeiste(), reiter, kapitelBox);
 
     const rang = ZI.rang(stand);
     const rohstoffe = ROHSTOFF.map((r, i) => zaehler(r.datei, r.name, [0, 1, 2].filter((k) => stand.hatKern(k, i)).length));
@@ -1560,6 +1573,90 @@
   /* =========================================================
      LIEFERUNG & ZWERGENPASS
      ========================================================= */
+  /* =========================================================
+     INSELBOTSCHAFT – vom Board, sagt der Schmiede, was gebaut ist
+     ========================================================= */
+  const BOTSCHAFT_GILT = 8 * 60 * 60 * 1000; // gilt einen Schultag lang – nicht für die nächste Klasse am nächsten Tag
+  function botschaftJetzt() {
+    const b = speicher.lesen('zi-botschaft', null);
+    if (!b || !b.zeit || Date.now() - b.zeit > BOTSCHAFT_GILT) return null;
+    return b;
+  }
+  function gebauteGebaeude() {
+    const b = botschaftJetzt();
+    if (!b) return [];
+    return ZI.BAU_UEBUNGEN.filter((u) => b.bau & (1 << u.bit)).map((u) => u.id);
+  }
+  function botschaftLeiste() {
+    const b = botschaftJetzt();
+    const anzahl = b ? ZI.BAU_UEBUNGEN.filter((u) => b.bau & (1 << u.bit)).length : 0;
+    return h('div', { class: 'botschaft-leiste pergament auf-pergament' + (b ? ' ok' : '') },
+      h('div', { class: 'botschaft-text' },
+        b ? h('span', null, 'Inselbotschaft ', h('b', null, b.wort), ' · ' + (anzahl === 1 ? '1 Gebäude-Stollen offen' : anzahl + ' Gebäude-Stollen offen'))
+          : h('span', null, h('b', null, 'Inselbotschaft: '), 'Tippe das Silbenwort vom Board ein. Dann öffnen sich die Gebäude-Stollen.')),
+      h('button', { class: 'knopf klein' + (b ? ' holz' : ''), onclick: () => botschaftEingeben(() => zeigeHalle()) }, b ? 'Neue Botschaft' : 'Eintippen'));
+  }
+  function botschaftEingeben(danach) {
+    const eingabe = h('input', { class: 'eingabe botschaft-eingabe', maxlength: '12', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'z. B. BOKAMI', 'aria-label': 'Inselbotschaft' });
+    const hinweis = h('div');
+    const pruefen = () => {
+      const roh = eingabe.value.trim().toUpperCase().replace(/[^A-Z]/g, '');
+      // alte Runenwörter öffnen weiterhin ihr Kapitel
+      const alt = ZI.KAPITEL.findIndex((kap) => kap.runenwort && kap.runenwort === roh);
+      const b = ZI.botschaft.lese(roh);
+      if (!b && alt < 0) {
+        ZI.ton.falsch();
+        ZI.setze(hinweis, h('div', { class: 'rueckmeldung schlecht' }, 'Diese Botschaft stimmt nicht. Schau genau aufs Board: drei Silben, zum Beispiel „BO KA MI“.'));
+        return;
+      }
+      const kapitel = b ? b.kapitel : alt;
+      if (b) speicher.schreiben('zi-botschaft', { wort: roh, kapitel: b.kapitel, bau: b.bau, zeit: Date.now() });
+      f.schliessen();
+      const neuKapitel = kapitel > stand.offen && ZI.KAPITEL[kapitel] && ZI.KAPITEL[kapitel].fertig;
+      ZI.ton.fanfare();
+      const gebaut = b ? ZI.BAU_UEBUNGEN.filter((u) => b.bau & (1 << u.bit)) : [];
+      const fertig = () => {
+        if (neuKapitel) { letzterReiter = kapitel; ZI.meldung('Kapitel ' + ZI.KAPITEL[kapitel].nr + ' ist offen!', 3500); }
+        else if (gebaut.length) ZI.meldung('Die Botschaft ist angekommen! ' + gebaut.length + (gebaut.length === 1 ? ' Gebäude-Stollen ist' : ' Gebäude-Stollen sind') + ' offen.', 3500);
+        else ZI.meldung('Die Botschaft ist angekommen!', 2500);
+        danach && danach();
+      };
+      if (neuKapitel) fortschritt((s) => { s.offen = Math.max(s.offen, kapitel); }, fertig); else fertig();
+    };
+    eingabe.addEventListener('keydown', (e) => { if (e.key === 'Enter') pruefen(); });
+    const f = ZI.fenster([
+      h('h2', null, 'Inselbotschaft'),
+      h('p', { style: { margin: 0 } }, 'Auf dem Board steht ein Wort aus drei Silben. Es verrät der Schmiede, was eure Klasse schon gebaut hat.'),
+      eingabe, hinweis,
+      h('div', { class: 'knopf-reihe' },
+        h('button', { class: 'knopf holz', onclick: () => f.schliessen() }, 'Abbrechen'),
+        h('button', { class: 'knopf', onclick: pruefen }, 'Prüfen')),
+    ]);
+    setTimeout(() => eingabe.focus(), 150);
+  }
+
+  /* ---------- Gebäude-Übung spielen ---------- */
+  function spielBau(u) {
+    const g = ZI.GEBAEUDE.find((x) => x.id === u.id);
+    const ende = () => geschafft({ titel: 'Gebäude-Stollen geschafft!', text: 'Du hast „' + u.name + '“ gemeistert. Dafür gibt es einen Rangpunkt und eine neue Seite im Wissensbuch.',
+      datei: u.id, alt: g ? g.name : u.name, eintragen: (s) => s.setzeBau(u.bit) });
+    if (u.typ === 'sortier') {
+      sortierSpiel({
+        titel: u.name, frageText: u.frage, tipp: u.tipp, start: u.start,
+        runden: mischen(u.runden).slice(0, 2).map((rd) => ({ kopf: rd.kopf, karten: rd.karten })),
+        jaText: u.jaText, neinText: u.neinText,
+        wsVorher: 'eisen-roh', wsNachher: 'eisen-gluehend',
+        rundeFertig: u.rundeFertig, falschJa: u.falschJa, falschNein: u.falschNein, ende,
+      });
+      return;
+    }
+    auswahlSpiel({
+      titel: u.name, frageText: u.frage, tipp: u.tipp, start: u.start,
+      items: mischen(u.items).slice(0, 5).map((it) => ({ kopf: it.kopf, optionen: it.optionen })),
+      wsVorher: 'eisen-roh', wsNachher: 'eisen-gluehend', ende,
+    });
+  }
+
   /* ---------- Kartennummer wählen (steht auf der Zwergenpass-Karte) ---------- */
   function waehleKarte(aktuell, fertig, zurueck) {
     const knoepfe = [];

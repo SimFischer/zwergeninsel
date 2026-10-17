@@ -21,6 +21,7 @@
       this.bonus = o.bonus ?? [0, 0, 0];    // je Kapitel beste Sterne im Bonusspiel (0–3)
       this.offen = o.offen ?? 0;            // höchstes freigeschaltetes Kapitel (0 = Kapitel 1)
       this.kronen = o.kronen ?? [0, 0, 0];  // je Kapitel: Hauptstollen-Stationen fehlerfrei geschafft
+      this.bau = o.bau ?? 0;                // Bitmaske der geschafften Gebäude-Übungen (10 Bit)
     }
     static bits(m) { let n = 0; for (let i = 0; i < 3; i++) if (m & (1 << i)) n++; return n; }
     coreCount(k) { return Stand.bits(this.kern[k]); }
@@ -37,6 +38,9 @@
     setzeKern(k, i) { this.kern[k] |= (1 << i); }
     setzeTief(k, i) { this.tief[k] |= (1 << i); }
     setzeKrone(k, i) { this.kronen[k] |= (1 << i); }
+    hatBau(bit) { return !!(this.bau & (1 << bit)); }
+    setzeBau(bit) { this.bau |= (1 << bit); }
+    bauTotal() { let n = 0; for (let i = 0; i < 11; i++) if (this.bau & (1 << i)) n++; return n; }
     zwergFrei(nr) {
       const z = ZI.ZWERGE.find((d) => d.nr === nr);
       return !!z && (z.start || (z.unlock && z.unlock(this)));
@@ -77,6 +81,7 @@
       return (id << unten) | ((all & LOW) ^ h);
     }
     code() {
+      if (this.id >= 1 && this.id <= 32) return this.codeV2();
       let v = this.kernBits();
       for (let k = 0; k < 3; k++) v = (v << 3n) | BigInt(this.kronen[k] & 7);   // 54 Bit
       let all = (v << 5n) | Stand.pruef(v);                                      // 59 Bit
@@ -84,6 +89,71 @@
       let s = '';
       for (let i = 0; i < 12; i++) { s = ALPHA[Number(all & 31n)] + s; all >>= 5n; }
       return s.slice(0, 4) + '-' + s.slice(4, 8) + '-' + s.slice(8);
+    }
+    /* Version 2 (oberstes Bit = 1): Kartennummer statt Zufalls-id, dafür Platz für 11 Gebäude-Bits.
+       karte 5 | zwerg 4 | kern 3x3 | tief 3x3 | bonus 3x2 | offen 2 | kronen 3x3 | bau 11 | prüfsumme 4 */
+    datenV2() {
+      let v = BigInt((this.id - 1) & 31);
+      v = (v << 4n) | BigInt((this.zwerg - 1) & 15);
+      for (let k = 0; k < 3; k++) v = (v << 3n) | BigInt(this.kern[k] & 7);
+      for (let k = 0; k < 3; k++) v = (v << 3n) | BigInt(this.tief[k] & 7);
+      for (let k = 0; k < 3; k++) v = (v << 2n) | BigInt(this.bonus[k] & 3);
+      v = (v << 2n) | BigInt(this.offen & 3);
+      for (let k = 0; k < 3; k++) v = (v << 3n) | BigInt(this.kronen[k] & 7);
+      v = (v << 11n) | BigInt(this.bau & 0x7ff);
+      return v; // 55 Bit
+    }
+    static pruefV2(v) {
+      let h = 11n; let x = v;
+      for (let i = 0; i < 14; i++) { h = (h * 37n + (x & 15n)) % 32719n; x >>= 4n; }
+      return h & 15n;
+    }
+    codeV2() {
+      const d = this.datenV2();
+      const all59 = (d << 4n) | Stand.pruefV2(d);
+      const x = Stand.verschluesseln(all59);
+      let all = (1n << 59n) | x;
+      let s = '';
+      for (let i = 0; i < 12; i++) { s = ALPHA[Number(all & 31n)] + s; all >>= 5n; }
+      return s.slice(0, 4) + '-' + s.slice(4, 8) + '-' + s.slice(8);
+    }
+    /* einfache umkehrbare 59-Bit-Verwürfelung: Multiplikation mit ungerader Zahl, XOR, Rotation */
+    static verschluesseln(v) {
+      const M = (1n << 59n) - 1n;
+      v = (v * 0x5DEECE66Dn) & M;
+      v ^= 0x2A5F3C91B7E4D1n & M;
+      v = ((v << 17n) | (v >> 42n)) & M;
+      v = (v * 0x9E3779B1n) & M;
+      return v;
+    }
+    static entschluesseln(v) {
+      const M = (1n << 59n) - 1n;
+      v = (v * Stand.inverse(0x9E3779B1n)) & M;
+      v = ((v >> 17n) | (v << 42n)) & M;
+      v ^= 0x2A5F3C91B7E4D1n & M;
+      v = (v * Stand.inverse(0x5DEECE66Dn)) & M;
+      return v;
+    }
+    static inverse(a) { // Inverses von a modulo 2^59 (Newton)
+      const M = (1n << 59n) - 1n;
+      let x = a;
+      for (let i = 0; i < 7; i++) x = (x * (2n - a * x)) & M;
+      return x;
+    }
+    static ausV2(all, s) {
+      const x = Stand.entschluesseln(all & ((1n << 59n) - 1n));
+      const p = x & 15n; let v = x >> 4n;
+      if (Stand.pruefV2(v) !== p) return null;
+      s.bau = Number(v & 0x7ffn); v >>= 11n;
+      for (let k = 2; k >= 0; k--) { s.kronen[k] = Number(v & 7n); v >>= 3n; }
+      s.offen = Number(v & 3n); v >>= 2n;
+      for (let k = 2; k >= 0; k--) { s.bonus[k] = Number(v & 3n); v >>= 2n; }
+      for (let k = 2; k >= 0; k--) { s.tief[k] = Number(v & 7n); v >>= 3n; }
+      for (let k = 2; k >= 0; k--) { s.kern[k] = Number(v & 7n); v >>= 3n; }
+      s.zwerg = Number(v & 15n) + 1; v >>= 4n;
+      s.id = Number(v & 31n) + 1;
+      if (s.offen > 2) return null;
+      return s;
     }
     static ausCode(text) {
       const clean = String(text || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
@@ -101,12 +171,14 @@
         if (Stand.pruefAlt(v) !== p) return null;
         Stand.ausKernBits(v, s);
       } else {
-        if (all >> 59n) return null;                   // das freie oberste Bit muss 0 sein
+        if (all >> 59n) { if (!Stand.ausV2(all, s)) return null; }   // Version 2
+        else {
         all = Stand.misch(all ^ MASK12, 59);
         const p = all & 31n; let v = all >> 5n;
         if (Stand.pruef(v) !== p) return null;
         for (let k = 2; k >= 0; k--) { s.kronen[k] = Number(v & 7n); v >>= 3n; }
         Stand.ausKernBits(v, s);
+        }
       }
       if (s.zwerg < 1 || s.zwerg > 12) return null;
       return s;
@@ -175,6 +247,36 @@
     const karte = (v & 31) + 1;
     if (zwerg > 12 || kapitel > 2) return null;
     return { karte, zwerg, kapitel, kern, tief, bonus };
+  };
+
+  /* =========================================================
+     INSELBOTSCHAFT – drei Silben, die das Board zeigt (z. B. „BOKAMI“).
+     Sie sagt der Schmiede, welches Kapitel offen ist und welche Gebäude stehen.
+     kapitel 2 | gebäude 10 | prüfbits 3  = 15 Bit = 3 Silben à 5 Bit
+     ========================================================= */
+  const SILBEN = ['BA', 'BE', 'BI', 'BO', 'BU', 'DA', 'DE', 'DI', 'DO', 'DU', 'FA', 'FE', 'FI', 'FO', 'FU', 'GA',
+    'GO', 'GU', 'KA', 'KE', 'KI', 'KO', 'KU', 'LA', 'LE', 'LI', 'LO', 'LU', 'MA', 'MI', 'MO', 'MU'];
+  const B_MUL = 0x5A3B; const B_INV = (() => { let x = B_MUL; for (let i = 0; i < 5; i++) x = (x * (2 - B_MUL * x)) & 0x7fff; return x & 0x7fff; })();
+  const bPruef = (d) => ((d & 7) * 3 + ((d >> 3) & 7) * 5 + ((d >> 6) & 7) * 7 + ((d >> 9) & 7) + 5) & 7;
+  ZI.botschaft = {
+    kodiere(kapitel, bau) {
+      const d = ((kapitel & 3) << 10) | (bau & 0x3ff);
+      let v = ((d << 3) | bPruef(d)) & 0x7fff;
+      v = Math.imul(v ^ 0x2D4B, B_MUL) & 0x7fff;
+      return SILBEN[(v >> 10) & 31] + SILBEN[(v >> 5) & 31] + SILBEN[v & 31];
+    },
+    lese(text) {
+      const t = String(text || '').toUpperCase().replace(/[^A-Z]/g, '');
+      if (t.length !== 6) return null;
+      let v = 0;
+      for (let i = 0; i < 6; i += 2) { const n = SILBEN.indexOf(t.slice(i, i + 2)); if (n < 0) return null; v = (v << 5) | n; }
+      v = (Math.imul(v, B_INV) & 0x7fff) ^ 0x2D4B;
+      const d = v >> 3;
+      if (bPruef(d) !== (v & 7)) return null;
+      const kapitel = d >> 10;
+      if (kapitel > 2) return null;
+      return { kapitel, bau: d & 0x3ff };
+    },
   };
 
   /* Eingabefeld formatieren: 10 Zeichen als XXXXX-XXXXX, sonst XXXX-XXXX-XXXX */

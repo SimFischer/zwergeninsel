@@ -589,3 +589,10 @@ img.truhe-klein, .platzhalter.truhe-klein { width: 110px; height: auto; max-heig
 .fenster.erfolge-kompakt .rang-neu h2 { font-size: 30px !important; }
 .fenster.erfolge-kompakt .huepf-zwerg.gross { width: 110px; }
 .fenster.erfolge-kompakt .rang-emblem { width: 70px; height: 70px; }
+
+/* ---------- Inselbotschaft ---------- */
+.botschaft-leiste { display: flex; align-items: center; gap: 14px; padding: 12px 18px; flex-wrap: wrap; border: 3px dashed #b08a5a; }
+.botschaft-leiste.ok { border-style: solid; border-color: var(--moos, #6b9b3a); }
+.botschaft-text { flex: 1; font-size: 19px; min-width: 220px; }
+.botschaft-text b { letter-spacing: 2px; }
+.botschaft-eingabe { font-size: 34px; letter-spacing: 6px; text-align: center; text-transform: uppercase; }

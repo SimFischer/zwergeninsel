@@ -14,7 +14,7 @@ Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden ke
 | --- | --- |
 | 5 | Insel am Board zeigen: Was ist schon gebaut, was kommt als Nächstes? |
 | 25 | Schmiede auf den iPads: zuerst der Hauptstollen, danach Tiefe Stollen und Bonusinsel |
-| 10–12 | Zwergenrat am Board: diskutieren, abstimmen, entscheiden, was gebaut wird |
+| 10–12 | Zwergenrat am Board: Jedes Gebäude schaltet eine Übung frei. Die Klasse wägt ab, welche sie zuerst braucht, begründet und stimmt ab. |
 | 3 | Lieferung: Jedes Kind nennt seinen 4-stelligen Lieferschein („Karte 7: S V C U“), die Lehrkraft tippt ihn an der Insel ein – oder die Kinder tippen selbst auf der Bildschirmtastatur. Danach schreiben sie ihren Zwergenpass auf ihre Karte. |
 
 ## Kapitel 1 – Gestrandet
@@ -35,7 +35,7 @@ Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden ke
 
 ## Kapitel 2 – Das Dorf wächst
 
-Öffnet sich in der Schmiede mit dem Runenwort, das die Insel zeigt, sobald Kapitel 1 geschafft ist.
+Öffnet sich in der Schmiede mit der Inselbotschaft, die das Board zeigt, sobald Kapitel 1 geschafft ist.
 
 **Hauptstollen**
 
@@ -51,11 +51,11 @@ Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden ke
 
 **Bonusinsel:** *Beispiel-Regen* – passende Beispiele fangen
 
-Auf der Insel: Ratsplatz, Bibliothek, Brunnen und Mühle. Über das Zahnrad lässt sich das Kapitel der Insel auch von Hand umstellen.
+Auf der Insel: Bibliothek, Ratsplatz, Brunnen und Mühle. Über das Zahnrad lässt sich das Kapitel der Insel auch von Hand umstellen.
 
 ## Kapitel 3 – Das Inselfest
 
-Öffnet sich mit dem Runenwort, das die Insel nach Kapitel 2 zeigt.
+Öffnet sich mit der Inselbotschaft nach Kapitel 2.
 
 **Hauptstollen**
 
@@ -71,7 +71,23 @@ Auf der Insel: Ratsplatz, Bibliothek, Brunnen und Mühle. Über das Zahnrad läs
 
 **Bonusinsel:** *Sprecherwechsel* – im richtigen Moment einsteigen, ohne zu unterbrechen
 
-Auf der Insel: Leuchtturm, Festhalle und Schiff. Danach feiert die Klasse das fertige Dorf.
+Auf der Insel: Leuchtturm, Festhalle und zum Schluss das Schiff, das bei der Abschlussfeier lossegelt.
+
+## Zwergenrat und Gebäude-Stollen
+
+Jedes Gebäude, über das der Rat abstimmt, schaltet in der Schmiede eine eigene Übung frei. Beide Gebäude einer Ratsfrage werden irgendwann gebaut – der Rat entscheidet, was ZUERST kommt, also welche Übung die Klasse zuerst bekommt. Das Dorf wartet auf die Entscheidung: Ist eine Ratsfrage fällig, baut die Insel erst weiter, wenn der Rat getagt hat.
+
+| Kapitel | Ratsfrage | Gebäude → Übung (Schwerpunkt) |
+| --- | --- | --- |
+| 1 | Werkstatt oder Hügelhütte? | Werkstatt → *Begründungen nachschärfen* · Hügelhütte → *Meinung oder Tatsache?* |
+| 1 | Ziegelhütte oder Steg? | Ziegelhütte → *Weil, denn oder deshalb?* (Grund und Folge) · Steg → *Der Schlusssatz* |
+| 2 | Bibliothek oder Ratsplatz? | Bibliothek → *Starke Beispiele* (genau statt übertrieben) · Ratsplatz → *Der Redeplatz* (Gesprächsregeln) |
+| 2 | Brunnen oder Mühle? | Brunnen → *Satzanfänge* · Mühle → *Die Argument-Mühle* (Argumente abwägen) |
+| 3 | Leuchtturm oder Festhalle? | Leuchtturm → *Sachlich bleiben* · Festhalle → *Kompromisse finden* |
+
+Jede Gebäude-Übung bringt einen Rangpunkt und eine Seite im Wissensbuch (insgesamt jetzt 28 Seiten).
+
+**Inselbotschaft:** Das Board zeigt in der Materialtafel immer ein Wort aus drei Silben (z. B. „LA DI LO“). Es enthält das offene Kapitel und alle gebauten Gebäude. Die Kinder tippen es zu Stundenbeginn einmal in der Schmiede ein – danach sind die passenden Gebäude-Stollen und Kapitel offen. Die Botschaft gilt auf einem iPad einen Schultag lang. Die alten Runenwörter AMBOSS und LEUCHTTURM funktionieren weiterhin.
 
 ## Lernhilfen in allen Kapiteln
 
@@ -106,7 +122,7 @@ Auf der Insel: Leuchtturm, Festhalle und Schiff. Danach feiert die Klasse das fe
 - **Lieferschein:** 4 Zeichen pro Kind, nach dem 4. Zeichen wird ohne Enter geliefert. Tippfehler fallen meist sofort auf; passt der Zwerg nicht zur Karte, fragt die Insel nach. Der letzte Eintrag lässt sich rückgängig machen.
 - **Klassengröße:** Insel → Zahnrad. Das Dorf ist fertig, wenn alle Kinder ihren Hauptstollen geschafft haben.
 - **Sichern:** Insel → Zahnrad → „Insel sichern“. Der Inselstand liegt nur auf dem Gerät, auf dem die Insel läuft. Bitte immer dasselbe Gerät benutzen oder vorher sichern.
-- **Runenwort:** Ist ein Kapitel geschafft, zeigt die Insel ein Runenwort. Damit öffnen die Kinder das nächste Kapitel in der Schmiede.
+- **Inselbotschaft:** steht immer in der Materialtafel. Nach dem Rat und nach jedem Kapitel ändert sie sich – die Kinder tippen dann die neue ein.
 
 ## Inhalte anpassen
 
