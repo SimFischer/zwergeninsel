@@ -345,7 +345,7 @@
       h('div', { class: 'start-mitte' },
         h('div', { class: 'pergament pass-karte auf-pergament' },
           h('div', { style: { display: 'flex', gap: '14px', alignItems: 'center' } },
-            h('div', { style: { width: '120px', flex: 'none' } }, bild('zwergenpass-karte', 'Zwergenpass')),
+            h('div', { class: 'pass-bild' }, bild('zwergenpass-karte', 'Zwergenpass')),
             h('p', { style: { margin: 0, fontSize: '20px' } }, 'Tippe den Code von deiner Zwergenpass-Karte ein. Groß- oder Kleinschreibung ist egal.')),
           eingabe, hinweis,
           h('button', { class: 'knopf', onclick: pruefen }, 'Zwerg zurückholen')))));

@@ -651,3 +651,7 @@ img.truhe-klein, .platzhalter.truhe-klein { width: 110px; height: auto; max-heig
 
 /* iPad-Bildschirmtastatur: Fenster rutschen über die Tastatur, statt von ihr verdeckt zu werden */
 .schleier { padding-bottom: calc(20px + var(--tastatur, 0px)); transition: padding-bottom 0.2s; }
+
+/* Zwergenpass-Bild neben dem Hinweis */
+.pass-bild { width: 120px; flex: none; }
+.pass-bild img, .pass-bild .platzhalter { width: 100%; height: auto; display: block; }
