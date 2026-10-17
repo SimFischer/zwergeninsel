@@ -640,3 +640,5 @@ img.truhe-klein, .platzhalter.truhe-klein { width: 110px; height: auto; max-heig
 .hand-symbol { font-size: 44px; line-height: 1; }
 .hand-liste .check { gap: 10px; }
 .finger { flex: none; width: 30px; height: 30px; border-radius: 50%; background: #f3e6c8; border: 2px solid #b08a5a; display: flex; align-items: center; justify-content: center; font-family: var(--titel); font-size: 18px; }
+.abschied { max-width: 560px; padding: 26px 30px; display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; font-size: 20px; }
+.abschied p { margin: 0; }

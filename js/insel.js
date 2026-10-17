@@ -166,6 +166,26 @@
   const tafel = h('div', { class: 'tafel pergament auf-pergament' });
   const unterTitel = h('div', { class: 'unter' });
   const titel = h('div', { class: 'insel-titel' }, h('h1', null, 'Die Zwergeninsel'), unterTitel);
+  /* Vollbild für das Smartboard */
+  const vollbildKnopf = h('button', { class: 'rund', 'aria-label': 'Vollbild', title: 'Vollbild (Taste F)' }, icon.vollbild());
+  const imVollbild = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+  function vollbildUmschalten() {
+    const el = document.documentElement;
+    if (imVollbild()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else if (el.requestFullscreen) el.requestFullscreen().catch(() => ZI.meldung('Vollbild ist hier nicht möglich. Am Laptop hilft die Taste F11.'));
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else ZI.meldung('Vollbild ist hier nicht möglich. Am Laptop hilft die Taste F11.');
+  }
+  vollbildKnopf.addEventListener('click', vollbildUmschalten);
+  const vollbildAnzeigen = () => {
+    ZI.setze(vollbildKnopf, imVollbild() ? icon.vollbildAus() : icon.vollbild());
+    vollbildKnopf.setAttribute('aria-label', imVollbild() ? 'Vollbild beenden' : 'Vollbild');
+  };
+  document.addEventListener('fullscreenchange', vollbildAnzeigen);
+  document.addEventListener('webkitfullscreenchange', vollbildAnzeigen);
+  document.addEventListener('keydown', (e) => {
+    if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !document.querySelector('.schleier, .rat') && !/INPUT|TEXTAREA/.test((document.activeElement || {}).tagName)) vollbildUmschalten();
+  });
   const knoepfe = h('div', { class: 'insel-knoepfe' },
     h('button', { class: 'knopf', onclick: oeffneLieferungen }, icon.tastatur(), 'Lieferungen'),
     h('button', { class: 'knopf holz', onclick: oeffneStammesraete }, 'Stammesräte'),
@@ -173,6 +193,7 @@
     h('button', { class: 'knopf holz', onclick: oeffneRaetsel }, 'Inselrätsel'),
     h('button', { class: 'knopf holz', onclick: oeffneAuftrag }, 'Auftrag'),
     h('button', { class: 'rund', 'aria-label': 'Tag oder Nacht', onclick: () => { insel.nacht = !insel.nacht; sichern(); zeigeNacht(); } }, icon.mond()),
+    vollbildKnopf,
     h('button', { class: 'rund', 'aria-label': 'Einstellungen', onclick: oeffneEinstellungen }, icon.zahnrad()));
   screen.append(buehne, titel, tafel, knoepfe);
   document.getElementById('app').appendChild(screen);
@@ -955,7 +976,7 @@
       h('div', { class: 'knopf-reihe' },
         h('button', { class: 'knopf holz klein', onclick: sichernAlsDatei }, 'Insel sichern (Datei)'),
         h('button', { class: 'knopf holz klein', onclick: () => datei.click() }, 'Insel laden'),
-        h('button', { class: 'knopf holz klein', onclick: () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } }, 'Vollbild'),
+        h('button', { class: 'knopf holz klein', onclick: vollbildUmschalten }, 'Vollbild'),
         h('button', { class: 'knopf holz klein', onclick: zuruecksetzen }, 'Insel zurücksetzen')),
       datei,
       h('button', { class: 'knopf', onclick: () => f.schliessen() }, 'Schließen'),

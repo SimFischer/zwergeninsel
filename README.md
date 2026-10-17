@@ -124,6 +124,10 @@ Jede Gebäude-Übung bringt einen Rangpunkt und eine Seite im Wissensbuch (insge
 - Schnelle Kinder bekommen Edelsteine. Die machen das Dorf **schöner**, aber nicht schneller fertig.
 - Fehler kosten nichts. Nach zwei Fehlern hilft Meisterin Hammerlind. Jede Aufgabe lässt sich vorlesen.
 
+## Koffer-iPads
+
+Die Schmiede läuft im normalen Browser-Tab, es wird nichts installiert. Alles, was ein Kind auf dem iPad hinterlässt (aktiver Zwerg, Inselbotschaft, Stammescode, Rückblick), liegt nur im Speicher dieses Tabs und ist weg, sobald der Tab geschlossen wird. „Fertig für heute“ löscht es sofort und bittet darum, den Tab zu schließen. Der Spielstand steckt im Zwergenpass auf der Karte. Nur die Ton-Einstellung bleibt im Browser.
+
 ## Für die Lehrkraft
 
 - **Testmodus:** Auf dem Startbildschirm unten „Für Lehrkräfte: Testmodus“. Dann sind alle Stollen sofort offen.

@@ -95,6 +95,8 @@
     edelstein: () => svg('<path d="M7 4 H17 L21 9 L12 20 L3 9 Z"/><path d="M3 9 H21 M9 4 L12 9 L15 4"/>'),
     helm: () => svg('<path d="M4 15 Q4 6 12 6 Q20 6 20 15 Z"/><path d="M3 15 H21 M12 6 V3"/>'),
     mond: () => svg('<path d="M20 14 A8 8 0 1 1 10 4 A6.5 6.5 0 0 0 20 14 Z"/>'),
+    vollbild: () => svg('<path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/>'),
+    vollbildAus: () => svg('<path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/>'),
     musik: () => svg('<path d="M9 18 V6 L19 4 V16"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="16" r="2"/>'),
     album: () => svg('<circle cx="12" cy="9" r="5"/><path d="M9 13 L7 21 L12 18.5 L17 21 L15 13"/>'),
     buch: () => svg('<path d="M4 5 Q8 3 12 5 Q16 3 20 5 V19 Q16 17 12 19 Q8 17 4 19 Z"/><path d="M12 5 V19"/>'),
@@ -117,6 +119,13 @@
     lesen(k, ersatz) { try { const v = localStorage.getItem(k); return v === null ? ersatz : JSON.parse(v); } catch (e) { return ersatz; } },
     schreiben(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* egal */ } },
     loeschen(k) { try { localStorage.removeItem(k); } catch (e) { /* egal */ } },
+  };
+  /* Nur für diesen Tab: Koffer-iPads werden von vielen Klassen genutzt.
+     Wird der Tab geschlossen, ist alles weg – der Spielstand steckt im Zwergenpass. */
+  ZI.sitzung = {
+    lesen(k, ersatz) { try { const v = sessionStorage.getItem(k); return v === null ? ersatz : JSON.parse(v); } catch (e) { return ersatz; } },
+    schreiben(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* egal */ } },
+    loeschen(k) { try { sessionStorage.removeItem(k); } catch (e) { /* egal */ } },
   };
 
   /* ---------- Klänge (ohne Dateien, mit Web Audio erzeugt) ---------- */

@@ -1,7 +1,9 @@
 /* Zwergeninsel – Schüler-App (Schmiede) */
 (function () {
   const ZI = window.ZI;
-  const { h, bild, icon, mischen, zufall, speicher } = ZI;
+  const { h, bild, icon, mischen, zufall, speicher, sitzung } = ZI;
+  /* Alte Daten früherer Versionen vom Gerät entfernen (sie lagen dauerhaft im Browser) */
+  try { Object.keys(localStorage).filter((k) => /^zi-(aktiv|botschaft|stamm|rueckblick)/.test(k)).forEach((k) => localStorage.removeItem(k)); } catch (e) { /* egal */ }
   const app = document.getElementById('app');
 
   let stand = null;                 // aktueller Spielstand (ZI.Stand)
@@ -38,17 +40,28 @@
 
   /* ---------- Speichern ---------- */
   function speichern() {
-    if (stand) speicher.schreiben(AKTIV_KEY, { code: stand.code(), zeit: Date.now() });
+    if (stand) sitzung.schreiben(AKTIV_KEY, { code: stand.code(), zeit: Date.now() });
   }
   function gespeicherterStand() {
-    const g = speicher.lesen(AKTIV_KEY, null);
+    const g = sitzung.lesen(AKTIV_KEY, null);
     if (!g || !g.code || Date.now() - g.zeit > MAX_ALTER) return null;
     return ZI.Stand.ausCode(g.code);
   }
   function abmelden() {
-    speicher.loeschen(AKTIV_KEY);
+    try { sessionStorage.clear(); } catch (e) { /* egal */ }
+    testmodus = false;
     stand = null;
-    zeigeStart();
+    zeigeAbschied();
+  }
+  function zeigeAbschied() {
+    zeige(h('div', { class: 'screen' },
+      ZI.hintergrund('titel-hintergrund', 'hg-ersatz-titel', 'rgba(20,12,8,0.35)'),
+      h('div', { class: 'start-mitte' },
+        h('div', { class: 'pergament auf-pergament abschied' },
+          h('h2', null, 'Gut geschmiedet!'),
+          h('p', null, 'Dein Spielstand steckt in deinem Zwergenpass auf der Karte. Auf diesem iPad ist nichts mehr von dir gespeichert.'),
+          h('p', null, h('b', null, 'Schließe jetzt diesen Tab.'), ' Dann ist das iPad frei für die nächste Klasse.'),
+          h('button', { class: 'knopf holz', onclick: zeigeStart }, 'Zurück zum Start')))));
   }
 
   /* Fortschritt eintragen und neu freigeschaltete Zwerge feiern */
@@ -1593,7 +1606,7 @@
     def.spiel();
   }
   function zeigeRueckblick(k) {
-    const werte = speicher.lesen(rueckblickSpeicher(), {});
+    const werte = sitzung.lesen(rueckblickSpeicher(), {});
     const liste = ZI.ICH_KANN[k] || [];
     const box = h('div', { class: 'rueckblick-liste' });
     const ziel = h('div');
@@ -1606,7 +1619,7 @@
           h('div', { class: 'rueckblick-text' }, it.text),
           h('div', { class: 'rueckblick-wahl', role: 'radiogroup', 'aria-label': it.text },
             ZI.EINSCHAETZUNG.map((e) => h('button', { class: 'einschaetzung ' + e.klasse + (w === e.wert ? ' gewaehlt' : ''), role: 'radio', 'aria-checked': String(w === e.wert),
-              onclick: () => { werte[key] = e.wert; speicher.schreiben(rueckblickSpeicher(), werte); ZI.ton.plopp(); zeichne(); } }, e.text))),
+              onclick: () => { werte[key] = e.wert; sitzung.schreiben(rueckblickSpeicher(), werte); ZI.ton.plopp(); zeichne(); } }, e.text))),
           w && w < 3 ? h('div', { class: 'rueckblick-tipp' },
             h('span', null, w === 1 ? 'Übe noch einmal: ' : 'Zum Festigen: ', h('b', null, '„' + def.name + '“')),
             offen ? h('button', { class: 'knopf klein', onclick: () => starteUebung(k, it.uebung.art, it.uebung.i) }, 'Jetzt üben') : null) : null);
@@ -1635,7 +1648,7 @@
      ========================================================= */
   const BOTSCHAFT_GILT = 8 * 60 * 60 * 1000; // gilt einen Schultag lang – nicht für die nächste Klasse am nächsten Tag
   function botschaftJetzt() {
-    const b = speicher.lesen('zi-botschaft', null);
+    const b = sitzung.lesen('zi-botschaft', null);
     if (!b || !b.zeit || Date.now() - b.zeit > BOTSCHAFT_GILT) return null;
     return b;
   }
@@ -1668,7 +1681,7 @@
         return;
       }
       const kapitel = b ? b.kapitel : alt;
-      if (b) speicher.schreiben('zi-botschaft', { wort: roh, kapitel: b.kapitel, bau: b.bau, zeit: Date.now() });
+      if (b) sitzung.schreiben('zi-botschaft', { wort: roh, kapitel: b.kapitel, bau: b.bau, zeit: Date.now() });
       f.schliessen();
       const neuKapitel = kapitel > stand.offen && ZI.KAPITEL[kapitel] && ZI.KAPITEL[kapitel].fertig;
       ZI.ton.fanfare();
@@ -1695,7 +1708,7 @@
 
   /* ---------- Stammesrat: Rolle im kleinen Rat ---------- */
   function stammesratEingeben() {
-    const alt = speicher.lesen('zi-stamm', null);
+    const alt = sitzung.lesen('zi-stamm', null);
     if (alt && Date.now() - alt.zeit < 90 * 60 * 1000) { zeigeStammesrat(alt); return; }
     const eingabe = h('input', { class: 'eingabe botschaft-eingabe', maxlength: '12', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'z. B. KOMIDA', 'aria-label': 'Stammescode' });
     const hinweis = h('div');
@@ -1705,7 +1718,7 @@
       if (!c) { ZI.ton.falsch(); ZI.setze(hinweis, h('div', { class: 'rueckmeldung schlecht' }, 'Dieser Stammescode stimmt nicht. Er steht am Board bei den Stammesräten.')); return; }
       if (!stand.karte || stand.karte > c.n) { ZI.ton.falsch(); ZI.setze(hinweis, h('div', { class: 'rueckmeldung schlecht' }, 'Deine Kartennummer kommt in diesem Rat nicht vor. Frag deine Lehrkraft.')); return; }
       const daten = { wort: roh, ...c, zeit: Date.now() };
-      speicher.schreiben('zi-stamm', daten);
+      sitzung.schreiben('zi-stamm', daten);
       f.schliessen(); ZI.ton.fanfare();
       zeigeStammesrat(daten);
     };
@@ -1723,7 +1736,7 @@
   function zeigeStammesrat(c) {
     const staemme = ZI.stammesEinteilung(c.n, c.seed);
     const g = staemme.find((x) => x.mitglieder.some((m) => m.karte === stand.karte));
-    if (!g) { speicher.loeschen('zi-stamm'); stammesratEingeben(); return; }
+    if (!g) { sitzung.loeschen('zi-stamm'); stammesratEingeben(); return; }
     const ich = g.mitglieder.find((m) => m.karte === stand.karte);
     const rolle = ich.rolle;
     const t = ZI.STAMMES_THEMEN[c.thema];
@@ -1735,7 +1748,7 @@
         h('button', { class: 'rund', 'aria-label': 'Zurück zur Halle', onclick: () => zeigeHalle() }, icon.zurueck()),
         h('div', null, h('div', { class: 'titel' }, 'Stammesrat der ' + g.name), h('div', { class: 'untertitel' }, 'Stammescode ' + c.wort.match(/../g).join(' '))),
         h('div', { class: 'spacer' }),
-        h('button', { class: 'knopf holz klein', onclick: () => { speicher.loeschen('zi-stamm'); stammesratEingeben(); } }, 'Neuer Code')),
+        h('button', { class: 'knopf holz klein', onclick: () => { sitzung.loeschen('zi-stamm'); stammesratEingeben(); } }, 'Neuer Code')),
       h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2 } },
         h('div', { class: 'stammesrat-ipad' },
           h('div', { class: 'rollenkarte pergament auf-pergament', style: { borderColor: g.farbe } },
