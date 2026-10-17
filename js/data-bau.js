@@ -195,30 +195,30 @@
       start: 'Auf dem Ratsplatz üben wir, wie ein gutes Gespräch klappt: ausreden lassen, nachfragen, alle einbeziehen.',
       tipp: 'Gute Gesprächsregeln: andere ausreden lassen, melden, nachfragen, begründen, freundlich bleiben – und andere einbeziehen.',
       items: [
-        { kopf: 'Im Klassenrat redet Ole gerade. Dir fällt eine tolle Idee ein.', optionen: [
-          { text: 'Ich rufe meine Idee schnell dazwischen.', ok: false, info: 'Dazwischenrufen unterbricht Ole.' },
-          { text: 'Ich melde mich und warte, bis Ole fertig ist.', ok: true, info: 'Genau! So kommen alle zu Wort.' },
+        { kopf: 'Im Klassenrat redet Paul gerade. Dir fällt eine tolle Idee ein.', optionen: [
+          { text: 'Ich rufe meine Idee schnell dazwischen.', ok: false, info: 'Dazwischenrufen unterbricht Paul.' },
+          { text: 'Ich melde mich und warte, bis Paul fertig ist.', ok: true, info: 'Genau! So kommen alle zu Wort.' },
           { text: 'Ich flüstere sie meiner Nachbarin zu.', ok: false, info: 'Nebengespräche lenken alle ab.' }] },
-        { kopf: 'Mira sagt etwas, das du nicht verstanden hast.', optionen: [
-          { text: '„Mira, kannst du das noch einmal erklären?“', ok: true, info: 'Richtig! Nachfragen bringt das Gespräch weiter.' },
-          { text: '„Das versteht doch keiner!“', ok: false, info: 'Das macht Mira schlecht.' },
+        { kopf: 'Hannah sagt etwas, das du nicht verstanden hast.', optionen: [
+          { text: '„Hannah, kannst du das noch einmal erklären?“', ok: true, info: 'Richtig! Nachfragen bringt das Gespräch weiter.' },
+          { text: '„Das versteht doch keiner!“', ok: false, info: 'Das macht Hannah schlecht.' },
           { text: 'Ich sage nichts und denke an etwas anderes.', ok: false, info: 'So verpasst du das Gespräch.' }] },
-        { kopf: 'Du bist anderer Meinung als Tarek.', optionen: [
+        { kopf: 'Du bist anderer Meinung als Karim.', optionen: [
           { text: 'Ich verdrehe die Augen.', ok: false, info: 'Das ist unfreundlich und erklärt nichts.' },
-          { text: '„Tarek, das ist voll dumm.“', ok: false, info: 'Ein Angriff, kein Argument.' },
-          { text: '„Tarek, ich sehe das anders, weil …“', ok: true, info: 'Genau! Widersprechen mit Begründung.' }] },
-        { kopf: 'Lina hat in der ganzen Diskussion noch nichts gesagt.', optionen: [
-          { text: '„Lina, was denkst du darüber?“', ok: true, info: 'Super! Du beziehst Lina ein.' },
-          { text: '„Lina sagt eh nie was.“', ok: false, info: 'Das ist verletzend.' },
+          { text: '„Karim, das ist voll dumm.“', ok: false, info: 'Ein Angriff, kein Argument.' },
+          { text: '„Karim, ich sehe das anders, weil …“', ok: true, info: 'Genau! Widersprechen mit Begründung.' }] },
+        { kopf: 'Sara hat in der ganzen Diskussion noch nichts gesagt.', optionen: [
+          { text: '„Sara, was denkst du darüber?“', ok: true, info: 'Super! Du beziehst Sara ein.' },
+          { text: '„Sara sagt eh nie was.“', ok: false, info: 'Das ist verletzend.' },
           { text: 'Ich rede einfach weiter, dann geht es schneller.', ok: false, info: 'So kommen nicht alle zu Wort.' }] },
         { kopf: 'Es gibt zwei Vorschläge, und alle reden durcheinander.', optionen: [
           { text: 'Ich rede einfach lauter als die anderen.', ok: false, info: 'Dann wird es nur noch lauter.' },
           { text: '„Ich fasse mal zusammen: Es gibt zwei Vorschläge …“', ok: true, info: 'Richtig! Zusammenfassen schafft Ordnung.' },
           { text: '„Mir doch egal.“', ok: false, info: 'Damit stoppst du das Gespräch.' }] },
-        { kopf: 'Jemand lacht über Bodos Beitrag.', optionen: [
+        { kopf: 'Jemand lacht über Noahs Beitrag.', optionen: [
           { text: 'Ich lache mit.', ok: false, info: 'Auslachen ist eine Gesprächsbremse.' },
-          { text: '„Bodo, sag lieber nichts mehr.“', ok: false, info: 'Das schließt Bodo aus.' },
-          { text: '„Lasst Bodo bitte ausreden. Ich will seine Gründe hören.“', ok: true, info: 'Stark! Du hältst die Regeln ein und stärkst Bodo.' }] },
+          { text: '„Noah, sag lieber nichts mehr.“', ok: false, info: 'Das schließt Noah aus.' },
+          { text: '„Lasst Noah bitte ausreden. Ich will seine Gründe hören.“', ok: true, info: 'Stark! Du hältst die Regeln ein und stärkst Noah.' }] },
       ],
       wissen: { titel: 'Gesprächsregeln', text: 'Ein gutes Gespräch braucht Regeln: ausreden lassen, melden, nachfragen, begründen und alle einbeziehen.', beispiel: '„Lina, was denkst du darüber?“' },
     },
@@ -394,6 +394,7 @@
     { text: 'Sollten wir einen Klassenausflug in den Wald oder in den Zoo machen?' },
   ];
   ZI.ratsfrageNach = (id) => { for (const l of ZI.RATSFRAGEN) for (const f of l) if (f.id === id) return f; return null; };
+  ZI.themaHerkunft = (t) => (t.frage ? 'Für die Insel' : 'Aus eurer Klasse');
   ZI.themaText = (t) => (t.frage ? ZI.ratsfrageNach(t.frage).frage : t.text);
   /* Stämme bilden: gleiche Eingabe → gleiche Einteilung, auf dem Board und auf jedem iPad */
   ZI.stammesEinteilung = function (n, seed) {

@@ -534,10 +534,11 @@
         h('div', { class: 'gross-bild' }, bild('meisterin-erklaert', 'Meisterin Hammerlind')),
         h('h2', null, 'Willkommen, ' + z.name + '!'),
         h('p', { style: { margin: 0, fontSize: '21px' } }, 'Ich bin Meisterin Hammerlind. Unser Clan ist auf dieser Insel gestrandet. Hier in der Schmiede schmieden wir Argumente – und mit jedem Argument bekommt die Klasse Baumaterial für unser Dorf.'),
+        h('p', { style: { margin: 0, fontSize: '21px' } }, 'Gute Argumente sind wie gutes Werkzeug – sie funktionieren überall. Darum üben wir an Fragen aus eurer Schule. Was ihr hier schmiedet, nehmt ihr mit in eure Klasse.'),
         h('p', { style: { margin: 0, fontSize: '21px' } }, 'Am Ende der Stunde lieferst du dein Material ab und bekommst deinen Zwergenpass.'),
         h('button', { class: 'knopf', onclick: () => f.schliessen() }, 'Los geht’s!'),
       ]);
-      ZI.vorlesen('Willkommen! Ich bin Meisterin Hammerlind. Hier in der Schmiede schmieden wir Argumente.');
+      ZI.vorlesen('Willkommen! Ich bin Meisterin Hammerlind. Hier in der Schmiede schmieden wir Argumente. Gute Argumente sind wie gutes Werkzeug – sie funktionieren überall. Darum üben wir an Fragen aus eurer Schule.');
     }
   }
 
@@ -1759,7 +1760,7 @@
               h('p', { style: { margin: '4px 0 0', fontSize: '20px' } }, rolle.aufgabe + (dreier && rolle.id === 'aelteste' ? ' Ihr seid nur drei – achte auch auf die Zeit.' : '')),
               h('button', { class: 'knopf-link', onclick: () => ZI.vorlesen(rolle.name + '. ' + rolle.aufgabe) }, 'Vorlesen'))),
           h('div', { class: 'pergament auf-pergament stamm-box' },
-            h('h3', null, 'Euer Thema'),
+            h('h3', null, 'Euer Thema ', h('span', { class: 'herkunft' + (t.frage ? ' insel' : '') }, ZI.themaHerkunft(t))),
             h('div', { class: 'meinung' }, ZI.themaText(t)),
             rf ? h('div', { class: 'stamm-optionen' }, rf.optionen.map((id) => {
               const geb = ZI.GEBAEUDE.find((x) => x.id === id); const u = ZI.bauUebung(id);

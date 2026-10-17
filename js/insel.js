@@ -654,7 +654,7 @@
       const staemme = ZI.stammesEinteilung(n, st.seed);
       ZI.setze(kopf,
         h('div', { class: 'stamm-thema pergament' },
-          h('div', { class: 'klein' }, 'Darüber beratet ihr in eurem Stamm:'),
+          h('div', { class: 'klein' }, 'Darüber beratet ihr in eurem Stamm: ', h('span', { class: 'herkunft' + (t.frage ? ' insel' : '') }, ZI.themaHerkunft(t))),
           h('div', { class: 'stamm-frage' }, ZI.themaText(t)),
           h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-start', marginTop: '6px' } },
             h('button', { class: 'knopf holz klein', onclick: () => { st.thema = (st.thema + 1) % ZI.STAMMES_THEMEN.length; st.stimmen = {}; sichern(); zeichne(); } }, 'Anderes Thema'))),

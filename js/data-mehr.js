@@ -225,57 +225,57 @@
   );
 
   ZI.JA_UND.push(
-    { vorher: 'Mira: „Wir sollten einen Waldausflug machen, weil wir dort viele Tiere sehen.“',
-      antwort: 'Bodo: „Ja, und wir könnten dort auch Blätter für ein Herbstplakat sammeln.“', art: 'Ja, und …' },
-    { vorher: 'Mira: „Wir sollten einen Waldausflug machen, weil wir dort viele Tiere sehen.“',
-      antwort: 'Ole: „Das klingt schön, aber im Herbst ist es im Wald oft sehr matschig.“', art: 'Ja, aber …' },
-    { vorher: 'Mira: „Wir sollten einen Waldausflug machen, weil wir dort viele Tiere sehen.“',
-      antwort: 'Kira: „Mein Lieblingstier ist übrigens der Delfin.“', art: 'Themenwechsel' },
+    { vorher: 'Hannah: „Wir sollten einen Waldausflug machen, weil wir dort viele Tiere sehen.“',
+      antwort: 'Noah: „Ja, und wir könnten dort auch Blätter für ein Herbstplakat sammeln.“', art: 'Ja, und …' },
+    { vorher: 'Hannah: „Wir sollten einen Waldausflug machen, weil wir dort viele Tiere sehen.“',
+      antwort: 'Paul: „Das klingt schön, aber im Herbst ist es im Wald oft sehr matschig.“', art: 'Ja, aber …' },
+    { vorher: 'Hannah: „Wir sollten einen Waldausflug machen, weil wir dort viele Tiere sehen.“',
+      antwort: 'Emma: „Mein Lieblingstier ist übrigens der Delfin.“', art: 'Themenwechsel' },
     { vorher: 'Tim: „Wir sollten einen Kreativtag machen, weil jeder zeigen kann, was er kann.“',
-      antwort: 'Lina: „Genau, und am Ende könnten wir eine Ausstellung für die Eltern machen.“', art: 'Ja, und …' },
+      antwort: 'Sara: „Genau, und am Ende könnten wir eine Ausstellung für die Eltern machen.“', art: 'Ja, und …' },
   );
 
   ZI.ZUHOEREN.push(
-    { vorher: 'Mira: „Wir sollten weniger Hausaufgaben bekommen, weil wir nachmittags auch Zeit für Hobbys brauchen.“',
+    { vorher: 'Hannah: „Wir sollten weniger Hausaufgaben bekommen, weil wir nachmittags auch Zeit für Hobbys brauchen.“',
       optionen: [
-        { text: '„Du willst also gar nicht mehr lernen?“', ok: false, info: 'Das hat Mira nicht gesagt. Ihre Aussage wird verdreht.' },
+        { text: '„Du willst also gar nicht mehr lernen?“', ok: false, info: 'Das hat Hannah nicht gesagt. Ihre Aussage wird verdreht.' },
         { text: '„Du sagst, dass wir Zeit für Hobbys brauchen. Welche Hobbys meinst du?“', ok: true, info: 'Genau! Wiederholen und nachfragen zeigt echtes Zuhören.' },
         { text: '„Ich habe gestern Klavier gespielt.“', ok: false, info: 'Das ist ein Themenwechsel.' }] },
-    { vorher: 'Bodo: „Ich möchte, dass wir in Musik mehr singen, weil Singen gute Laune macht.“',
+    { vorher: 'Noah: „Ich möchte, dass wir in Musik mehr singen, weil Singen gute Laune macht.“',
       optionen: [
-        { text: '„Du singst doch total schief!“', ok: false, info: 'Das ist ein Angriff auf Bodo und kein Argument.' },
-        { text: '„Du willst also nie mehr Instrumente spielen?“', ok: false, info: 'Das übertreibt, was Bodo gesagt hat.' },
+        { text: '„Du singst doch total schief!“', ok: false, info: 'Das ist ein Angriff auf Noah und kein Argument.' },
+        { text: '„Du willst also nie mehr Instrumente spielen?“', ok: false, info: 'Das übertreibt, was Noah gesagt hat.' },
         { text: '„Du meinst, Singen macht gute Laune. Stimmt, aber manche singen nicht gern vor anderen.“', ok: true, info: 'Richtig! Erst anknüpfen, dann ein faires Gegenargument.' }] },
-    { vorher: 'Amara: „Wir sollten die Klassenregeln gemeinsam aufschreiben, weil sich dann alle besser daran halten.“',
+    { vorher: 'Lotta: „Wir sollten die Klassenregeln gemeinsam aufschreiben, weil sich dann alle besser daran halten.“',
       optionen: [
-        { text: '„Du sagst, dass sich dann alle besser daran halten. Das ist eine gute Idee!“', ok: true, info: 'Genau! Du zeigst, dass du Amaras Grund verstanden hast.' },
-        { text: '„Regeln sind sowieso doof.“', ok: false, info: 'Das geht nicht auf Amaras Grund ein.' },
+        { text: '„Du sagst, dass sich dann alle besser daran halten. Das ist eine gute Idee!“', ok: true, info: 'Genau! Du zeigst, dass du Lottas Grund verstanden hast.' },
+        { text: '„Regeln sind sowieso doof.“', ok: false, info: 'Das geht nicht auf Lottas Grund ein.' },
         { text: '„Wann ist eigentlich Pause?“', ok: false, info: 'Das ist ein Themenwechsel.' }] },
-    { vorher: 'Grimbart: „Die Pause sollte auch bei leichtem Regen draußen sein, weil frische Luft wach macht.“',
+    { vorher: 'Milan: „Die Pause sollte auch bei leichtem Regen draußen sein, weil frische Luft wach macht.“',
       optionen: [
-        { text: '„Du willst also, dass wir bei Gewitter draußen sind?“', ok: false, info: 'Von Gewitter hat Grimbart nichts gesagt. Das übertreibt.' },
+        { text: '„Du willst also, dass wir bei Gewitter draußen sind?“', ok: false, info: 'Von Gewitter hat Milan nichts gesagt. Das übertreibt.' },
         { text: '„Du findest, frische Luft macht wach. Aber dann brauchen alle eine Regenjacke.“', ok: true, info: 'Richtig! Du knüpfst an und denkst mit.' },
-        { text: '„Ich mag keinen Regen.“', ok: false, info: 'Das geht nicht auf Grimbarts Grund ein.' }] },
+        { text: '„Ich mag keinen Regen.“', ok: false, info: 'Das geht nicht auf Milans Grund ein.' }] },
   );
 
   ZI.INSELRAT.push(
-    { meinung: 'Du möchtest: Unsere Klasse soll eine Schulübernachtung machen.',
+    { meinung: 'Du möchtest: Die Ziegen sollen frei durchs Dorf laufen dürfen.',
       einwaende: [
-        { wer: 'Grimbart', datei: 'zwerg-11-grimbart', einwand: '„In der Schule kann man doch gar nicht richtig schlafen.“',
+        { wer: 'Grimbart', datei: 'zwerg-11-grimbart', einwand: '„Die Ziegen fressen doch unsere Blumen und das Gemüse!“',
           optionen: [
-            { text: '„Wir bringen Isomatten und Schlafsäcke mit und machen um zehn Uhr das Licht aus.“', ok: true, info: 'Stark! Ein konkreter Plan entkräftet den Einwand.' },
-            { text: '„Schlafen ist doch nicht wichtig.“', ok: false, info: 'Damit machst du Grimbart nur noch mehr Sorgen.' },
-            { text: '„Doch, kann man!“', ok: false, info: 'Eine bloße Behauptung überzeugt nicht.' }] },
-        { wer: 'Amara', datei: 'zwerg-10-amara', einwand: '„Manche Kinder haben vielleicht Heimweh.“',
+            { text: '„Das stimmt. Darum bauen wir einen Zaun um den Gemüsegarten und die Blumenbeete.“', ok: true, info: 'Stark! Ein konkreter Plan entkräftet den Einwand.' },
+            { text: '„Blumen sind doch nicht wichtig.“', ok: false, info: 'Damit machst du Grimbart nur noch mehr Sorgen.' },
+            { text: '„Doch, das machen die nicht!“', ok: false, info: 'Eine bloße Behauptung überzeugt nicht.' }] },
+        { wer: 'Amara', datei: 'zwerg-10-amara', einwand: '„Manche Zwerge haben Angst vor Ziegen.“',
           optionen: [
-            { text: '„Dann sollen die halt nicht mitkommen.“', ok: false, info: 'Das schließt Kinder aus – kein gutes Argument.' },
-            { text: '„Das stimmt. Deshalb darf jeder sein Kuscheltier mitbringen, und wer möchte, darf zu Hause anrufen.“', ok: true, info: 'Genau! Du nimmst die Sorge ernst und zeigst eine Lösung.' },
-            { text: '„Heimweh gibt es doch gar nicht.“', ok: false, info: 'Das nimmt die Gefühle anderer nicht ernst.' }] },
-        { wer: 'Grimbart', datei: 'zwerg-11-grimbart', einwand: '„Und wer passt in der Nacht auf euch auf?“',
+            { text: '„Dann sollen die halt in ihrer Hütte bleiben.“', ok: false, info: 'Das schließt Zwerge aus – kein gutes Argument.' },
+            { text: '„Das stimmt. Deshalb dürfen die Ziegen nicht auf den Ratsplatz, und wer möchte, kann einen anderen Weg nehmen.“', ok: true, info: 'Genau! Du nimmst die Sorge ernst und zeigst eine Lösung.' },
+            { text: '„Angst vor Ziegen gibt es doch gar nicht.“', ok: false, info: 'Das nimmt die Gefühle anderer nicht ernst.' }] },
+        { wer: 'Grimbart', datei: 'zwerg-11-grimbart', einwand: '„Und wer passt auf, dass die Ziegen nicht ins Meer laufen?“',
           optionen: [
-            { text: '„Wir passen auf uns selbst auf.“', ok: false, info: 'Das wird Grimbart nicht beruhigen.' },
+            { text: '„Die passen schon auf sich selbst auf.“', ok: false, info: 'Das wird Grimbart nicht beruhigen.' },
             { text: '„Das ist doch egal.“', ok: false, info: 'So nimmst du den Einwand nicht ernst.' },
-            { text: '„Unsere Lehrkraft und zwei Eltern bleiben die ganze Nacht da.“', ok: true, info: 'Super! Eine klare Antwort auf die Sorge.' }] },
+            { text: '„Jeden Tag hat ein anderer Stamm Ziegendienst und bringt die Ziegen abends in den Stall.“', ok: true, info: 'Super! Eine klare Antwort auf die Sorge.' }] },
       ] },
   );
 
@@ -394,19 +394,19 @@
       ] },
     k3s2: {
       titel: 'Wer hört zu?',
-      kopf: 'Ole: „Ich möchte längere Pausen, weil ich mich danach besser konzentriere.“',
+      kopf: 'Paul: „Ich möchte längere Pausen, weil ich mich danach besser konzentriere.“',
       schritte: [
-        { sagt: 'Eine gute Antwort wiederholt zuerst, was Ole wirklich gesagt hat.',
+        { sagt: 'Eine gute Antwort wiederholt zuerst, was Paul wirklich gesagt hat.',
           zeigt: { text: '„Du sagst, dass du dich danach besser konzentrierst …“', art: 'gut', marke: 'hört zu' } },
-        { sagt: 'Vorsicht bei „Du willst also …“! Oft wird dann etwas verdreht. Ole hat nicht gesagt, dass er keinen Unterricht will.',
+        { sagt: 'Vorsicht bei „Du willst also …“! Oft wird dann etwas verdreht. Paul hat nicht gesagt, dass er keinen Unterricht will.',
           zeigt: { text: '„Du willst also gar keinen Unterricht mehr?“', art: 'schlecht', marke: 'verdreht' } },
       ] },
     k3s3: {
       titel: 'Überzeug den Inselrat',
-      kopf: 'Einwand: „Ein Ausflug ist viel zu teuer.“',
+      kopf: 'Einwand: „Für eine Brücke brauchen wir viel zu viel Holz.“',
       schritte: [
-        { sagt: 'Zuerst nehme ich den Einwand ernst und gebe zu, was stimmt.', zeigt: { text: '„Das stimmt, Busfahren kostet Geld.“', art: 'neutral', marke: 'ernst nehmen' } },
-        { sagt: 'Dann zeige ich eine Lösung.', zeigt: { text: '„Aber den Wald erreichen wir zu Fuß.“', art: 'gut', marke: 'Lösung' } },
+        { sagt: 'Zuerst nehme ich den Einwand ernst und gebe zu, was stimmt.', zeigt: { text: '„Das stimmt, eine Brücke braucht viel Holz.“', art: 'neutral', marke: 'ernst nehmen' } },
+        { sagt: 'Dann zeige ich eine Lösung.', zeigt: { text: '„Aber am Strand liegt genug Treibholz.“', art: 'gut', marke: 'Lösung' } },
         { sagt: 'So überzeuge ich, ohne unfreundlich zu werden.' },
       ] },
   };

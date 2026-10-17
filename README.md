@@ -141,6 +141,8 @@ Die Schmiede läuft im normalen Browser-Tab, es wird nichts installiert. Alles, 
 
 `js/data-klasse.js` gleicht das Spiel an die UE „Meinung begründen“ (Deutschbuch 5, S. 57–65) an: Begriffe *Meinung – Begründung – Beispiel*, Echo-Spiel-Formel „Du sagst, dass … Dazu denke ich, dass …“, Gesprächsregeln wie auf dem Beobachtungsbogen zum Echo-Spiel, die Sitzordnungs-Aussagen („begründet oder nicht?“), die Klassendienste-Begründungen, das Missverständnis zwischen Nele und Ben, die Begründungshand (Gebäude-Stollen der Mühle), Richtig-oder-falsch-Fragen im Inselrätsel und die Diskussionsthemen der Klasse (Kletterpark, längere Pausen, Sitzordnung u. a.). Das Spiel bleibt mündlich; der Brief aus der Klassenarbeit wird bewusst nicht geübt.
 
+**Zwei Welten, eine Brücke:** Schulfragen sprechen Kinder mit normalen Namen (keine Namen aus der Klasse), Inselfragen der Zwergenclan. Der Inselrat (Grimbart und Amara) prüft Inselvorhaben: Hängebrücke zum Leuchtturm, Strandfest, Ziegen im Dorf. Meisterin Hammerlind schlägt in der Begrüßung die Brücke: Gute Argumente funktionieren überall. In den Stammesräten ist jedes Thema mit „Aus eurer Klasse“ oder „Für die Insel“ gekennzeichnet.
+
 ## Inhalte anpassen
 
 Alle Aufgaben, Themen und Texte stehen in `js/data.js` (Kapitel 1), `js/data-k2.js`, `js/data-k3.js`, `js/data-mehr.js` (zusätzliche Aufgaben, Vormach-Beispiele, Wissensbuch) und `js/data-spiel.js` (Ränge, Abzeichen, Inselrätsel, Aufträge). Neue Themen für das Meisterstück oder andere Beispielsätze lassen sich dort einfach ergänzen.

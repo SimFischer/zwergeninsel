@@ -337,3 +337,7 @@ body.insel-seite .meldungen { top: calc(3vh * var(--ui, 1)); bottom: auto; flex-
 .stamm-unten { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 10px 16px; border-radius: 14px; background: rgba(255, 250, 240, 0.94); color: var(--tinte); font-size: clamp(17px, 1.3vw, 26px); }
 @media (max-width: 900px) { .stamm-kopf { grid-template-columns: 1fr; } }
 .stamm-kopf { align-items: start; }
+
+/* Themen-Herkunft: Klasse oder Insel */
+.herkunft { display: inline-block; vertical-align: middle; margin-left: 6px; padding: 2px 10px; border-radius: 999px; font-family: var(--text, inherit); font-size: calc(16px * var(--ui, 1)); font-weight: 700; letter-spacing: .02em; background: #2f6f8f; color: #fff; }
+.herkunft.insel { background: #6b4a1e; }
