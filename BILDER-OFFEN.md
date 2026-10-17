@@ -2,22 +2,21 @@
 
 Stand: 17.10.2026. Alle Dateien gehören nach `bilder/` (PNG, freigestellt). Fehlt ein Bild, zeigt die App einen Ersatz – nichts geht kaputt.
 
-## Aus der ersten Bilderserie (Prompt 3 „Nachzügler“)
+## Prompt 3 – die letzten 18 Bilder (Text: BILDER-PROMPT-3.md)
 
 | Datei | Wo es auftaucht |
 | --- | --- |
 | festhalle-ruine.png | Insel, Kapitel 3, vor dem Bau |
 | schiff.png | Insel, Kapitel 3, segelt bei der Schlussfeier los |
-| schiff-ruine.png | Insel, Kapitel 3, liegt über dem Wrack am Strand |
 | fahne.png, laterne.png, kristall-laterne.png, blumenbeet.png, bank.png, faesser.png, statue.png, wegweiser.png, gemuesegarten.png, ziegen.png | Schmuck im Dorf (Edelsteine der Klasse) |
 | holz.png, stein.png, eisen.png | Baumaterial: Kopfleiste der Schmiede und „Station geschafft!“ |
 | edelstein.png | Kopfleiste der Schmiede, Materialtafel am Board |
 | stern.png | Bonusspiele (Sterne) |
 | zwergenpass-karte.png | Bildschirm „Zwergenpass eingeben“ |
 
-Bewusst gestrichen, weil die App sie selbst zeichnet: pergament, holzschild, steinrahmen, schloss.
+Bewusst gestrichen, weil die App sie selbst zeichnet: pergament, holzschild, steinrahmen, schloss. Ebenso schiff-ruine: Das Wrack ist schon im Inselbild gemalt.
 
-## Aus der zweiten Bilderserie (Prompt 2, läuft im ChatGPT-Chat)
+## Aus der zweiten Bilderserie (Prompt 2 – in ChatGPT fertig, noch nicht eingebaut)
 
 - Tiere: moewe-unten, moewe-geschenk, krabbe, delfin, huhn, hase, schildkroete, schmetterling (moewe-oben ist schon da)
 - Wolken: wolke-1, wolke-2, wolke-3
