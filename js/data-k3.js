@@ -225,7 +225,7 @@
   ZI.KAPITEL[2].fertig = true;
 
   /* Insel: das Schiff kommt dazu, Bauplan und Ratsfrage für Kapitel 3 */
-  ZI.GEBAEUDE.push({ id: 'schiff', name: 'Schiff', kapitel: 3, x: 90, y: 95, w: 13 });
+  ZI.GEBAEUDE.push({ id: 'schiff', name: 'Schiff', kapitel: 3, x: 14, y: 82, w: 15 });
   ZI.BAUPLAN.push([
     { anteil: 0, gebaeude: 'leuchtturm' },
     { anteil: 0.5, rat: ['festhalle', 'schiff'] },

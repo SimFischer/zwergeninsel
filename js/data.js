@@ -4,7 +4,8 @@
 const ZI = window.ZI || (window.ZI = {});
 
 /* ---------- Bilder ---------- */
-ZI.BILD = (name) => 'bilder/' + name + '.png';
+ZI.JPG = ['titel-hintergrund', 'schmiede-hintergrund', 'stollen-hintergrund', 'zwergenrat-hintergrund', 'vulkan-hintergrund', 'fest-szene', 'insel-grund'];
+ZI.BILD = (name) => 'bilder/' + name + (ZI.JPG.includes(name) ? '.jpg' : '.png');
 
 /* ---------- Die 12 Zwerge ----------
    unlock(s): s ist der Spielstand (siehe pass.js), gibt true zurück, wenn freigeschaltet. */
@@ -337,18 +338,18 @@ ZI.TIPPS = {
    x, y: Position in Prozent auf der Insel (Mitte unten des Gebäudes), w: Breite in Prozent
    ========================================================= */
 ZI.GEBAEUDE = [
-  { id: 'lagerfeuer', name: 'Lagerfeuerplatz', kapitel: 1, x: 50, y: 60, w: 9 },
-  { id: 'huette1', name: 'Runde Hütte', kapitel: 1, x: 37, y: 52, w: 11 },
-  { id: 'huette2', name: 'Ziegelhütte', kapitel: 1, x: 62, y: 50, w: 11 },
-  { id: 'werkstatt', name: 'Werkstatt', kapitel: 1, x: 27, y: 66, w: 12 },
-  { id: 'huette3', name: 'Hügelhütte', kapitel: 1, x: 71, y: 64, w: 11 },
-  { id: 'steg', name: 'Steg', kapitel: 1, x: 82, y: 82, w: 13 },
-  { id: 'bibliothek', name: 'Bibliothek', kapitel: 2, x: 24, y: 40, w: 11 },
-  { id: 'ratsplatz', name: 'Ratsplatz', kapitel: 2, x: 50, y: 36, w: 13 },
-  { id: 'brunnen', name: 'Brunnen', kapitel: 2, x: 42, y: 74, w: 8 },
-  { id: 'muehle', name: 'Mühle', kapitel: 2, x: 75, y: 38, w: 11 },
-  { id: 'leuchtturm', name: 'Leuchtturm', kapitel: 3, x: 86, y: 30, w: 10 },
-  { id: 'festhalle', name: 'Festhalle', kapitel: 3, x: 58, y: 76, w: 14 },
+  { id: 'lagerfeuer', name: 'Lagerfeuerplatz', kapitel: 1, x: 39, y: 53.7, w: 9 },
+  { id: 'huette1', name: 'Runde Hütte', kapitel: 1, x: 24, y: 65.0, w: 11 },
+  { id: 'huette2', name: 'Ziegelhütte', kapitel: 1, x: 40, y: 72.1, w: 11 },
+  { id: 'werkstatt', name: 'Werkstatt', kapitel: 1, x: 21, y: 47.2, w: 12 },
+  { id: 'huette3', name: 'Hügelhütte', kapitel: 1, x: 62, y: 64.5, w: 12 },
+  { id: 'steg', name: 'Steg', kapitel: 1, x: 78, y: 88, w: 11 },
+  { id: 'bibliothek', name: 'Bibliothek', kapitel: 2, x: 29, y: 29.4, w: 11 },
+  { id: 'ratsplatz', name: 'Ratsplatz', kapitel: 2, x: 50, y: 46.7, w: 13 },
+  { id: 'brunnen', name: 'Brunnen', kapitel: 2, x: 54, y: 84.7, w: 8 },
+  { id: 'muehle', name: 'Mühle', kapitel: 2, x: 69, y: 38.6, w: 11 },
+  { id: 'leuchtturm', name: 'Leuchtturm', kapitel: 3, x: 70, y: 15.1, w: 9 },
+  { id: 'festhalle', name: 'Festhalle', kapitel: 3, x: 82, y: 68.6, w: 14 },
 ];
 
 /* Reihenfolge in Kapitel 1. 'rat' = hier entscheidet der Zwergenrat zwischen zwei Gebäuden. */
@@ -383,16 +384,16 @@ ZI.SATZANFAENGE = [
 /* Schmuck: alle 15 Edelsteine der Klasse kommt ein Stück dazu */
 ZI.SCHMUCK_PRO = 15;
 ZI.SCHMUCK = [
-  { id: 'fahne', name: 'Fahne', x: 44, y: 46, w: 4 },
-  { id: 'laterne', name: 'Laterne', x: 56, y: 66, w: 3.5 },
-  { id: 'blumenbeet', name: 'Blumenbeet', x: 33, y: 60, w: 6 },
-  { id: 'bank', name: 'Bank', x: 45, y: 66, w: 5 },
-  { id: 'faesser', name: 'Fässer', x: 21, y: 70, w: 5 },
-  { id: 'kristall-laterne', name: 'Kristall-Laterne', x: 66, y: 56, w: 3.5 },
-  { id: 'gemuesegarten', name: 'Gemüsegarten', x: 78, y: 58, w: 7 },
-  { id: 'ziegen', name: 'Ziegen', x: 63, y: 42, w: 6 },
-  { id: 'statue', name: 'Zwergenstatue', x: 50, y: 48, w: 4 },
-  { id: 'wegweiser', name: 'Wegweiser', x: 40, y: 82, w: 4 },
-  { id: 'fahne', name: 'Fahne', x: 70, y: 74, w: 4 },
-  { id: 'laterne', name: 'Laterne', x: 30, y: 46, w: 3.5 },
+  { id: 'fahne', name: 'Fahne', x: 45, y: 47, w: 3.5 },
+  { id: 'laterne', name: 'Laterne', x: 34, y: 56, w: 3 },
+  { id: 'blumenbeet', name: 'Blumenbeet', x: 30, y: 66, w: 5 },
+  { id: 'bank', name: 'Bank', x: 47, y: 73, w: 4.5 },
+  { id: 'faesser', name: 'Fässer', x: 14, y: 48, w: 4.5 },
+  { id: 'kristall-laterne', name: 'Kristall-Laterne', x: 57, y: 66, w: 3 },
+  { id: 'gemuesegarten', name: 'Gemüsegarten', x: 87, y: 51, w: 7 },
+  { id: 'ziegen', name: 'Ziegen', x: 47, y: 22, w: 6 },
+  { id: 'statue', name: 'Zwergenstatue', x: 56, y: 47, w: 3.5 },
+  { id: 'wegweiser', name: 'Wegweiser', x: 51, y: 58, w: 3.5 },
+  { id: 'fahne', name: 'Fahne', x: 76, y: 40, w: 3.5 },
+  { id: 'laterne', name: 'Laterne', x: 36, y: 30, w: 3 },
 ];

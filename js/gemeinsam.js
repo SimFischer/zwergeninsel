@@ -46,8 +46,15 @@
 
   /* Bild mit eigenem Ersatz: Fehlt das Bild, erscheint ersatz (ein Element) – oder gar nichts */
   ZI.bildOder = function bildOder(datei, alt, ersatz, cls) {
-    const img = h('img', { src: ZI.BILD(datei), alt: alt || '', class: cls || null, draggable: 'false', decoding: 'async' });
-    img.addEventListener('error', () => { if (ersatz) img.replaceWith(ersatz); else img.remove(); }, { once: true });
+    const liste = Array.isArray(datei) ? datei.filter(Boolean) : [datei];
+    const img = h('img', { src: ZI.BILD(liste[0]), alt: alt || '', class: cls || null, draggable: 'false', decoding: 'async' });
+    let n = 0;
+    img.addEventListener('error', function weiter() {
+      n++;
+      if (n < liste.length) { img.src = ZI.BILD(liste[n]); return; }
+      img.removeEventListener('error', weiter);
+      if (ersatz) img.replaceWith(ersatz); else img.remove();
+    });
     return img;
   };
 

@@ -125,11 +125,11 @@
   ];
   /* Sonder-Schmuck für erfüllte Aufträge */
   ZI.SONDERSCHMUCK = [
-    { id: 'sonder-amboss-denkmal', alt: 'statue', name: 'Amboss-Denkmal', x: 47, y: 86, w: 6 },
-    { id: 'sonder-pavillon', alt: 'kristall-laterne', name: 'Musikpavillon', x: 34, y: 78, w: 8 },
-    { id: 'sonder-blumenbogen', alt: 'fahne', name: 'Blumenbogen', x: 60, y: 30, w: 6 },
-    { id: 'sonder-baumhaus', alt: 'gemuesegarten', name: 'Baumhaus', x: 30, y: 30, w: 8 },
-    { id: 'sonder-festbaum', alt: 'ziegen', name: 'Festbaum', x: 78, y: 72, w: 5 },
-    { id: 'sonder-aussichtsturm', alt: 'wegweiser', name: 'Aussichtsturm', x: 66, y: 88, w: 6 },
+    { id: 'sonder-amboss-denkmal', alt: 'statue', name: 'Amboss-Denkmal', x: 41, y: 57, w: 5 },
+    { id: 'sonder-pavillon', alt: 'kristall-laterne', name: 'Musikpavillon', x: 47, y: 24, w: 8 },
+    { id: 'sonder-blumenbogen', alt: 'fahne', name: 'Blumenbogen', x: 56, y: 63, w: 5 },
+    { id: 'sonder-baumhaus', alt: 'gemuesegarten', name: 'Baumhaus', x: 10, y: 47, w: 8 },
+    { id: 'sonder-festbaum', alt: 'ziegen', name: 'Festbaum', x: 88, y: 72, w: 6 },
+    { id: 'sonder-aussichtsturm', alt: 'wegweiser', name: 'Aussichtsturm', x: 84, y: 50, w: 6 },
   ];
 })();

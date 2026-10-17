@@ -60,14 +60,15 @@
   const grund = h('div', { class: 'insel-grund' }, h('div', { class: 'insel-ersatz' }), h('div', { class: 'wellen' }));
   const grundBild = h('img', { src: ZI.BILD('insel-grund'), alt: '' });
   grundBild.addEventListener('error', () => grundBild.remove(), { once: true });
+  grundBild.addEventListener('load', () => grund.classList.add('mit-bild'), { once: true });
   grund.appendChild(grundBild);
   buehne.appendChild(grund);
   const bauEls = {};
   /* Wo Rauch aufsteigt (Position im Gebäudebild in Prozent) */
   const RAUCH = { lagerfeuer: [50, 30], huette1: [74, 8], huette2: [62, 10], huette3: [55, 12], werkstatt: [70, 6], festhalle: [50, 6] };
-  ZI.GEBAEUDE.forEach((g) => {
+  ZI.GEBAEUDE.slice().sort((a, b) => a.y - b.y).forEach((g) => {
     const el = h('div', { class: 'bau', style: { left: g.x + '%', top: g.y + '%', width: g.w + '%' } },
-      h('div', { class: 'ruine' }, bild(g.id + '-ruine', g.name + ' (Ruine)')),
+      h('div', { class: 'ruine' }, ZI.bildOder(g.id + '-ruine', g.name + ' (Ruine)', null)),
       h('div', { class: 'fertig', style: { display: 'none' } }, bild(g.id, g.name)),
       RAUCH[g.id] ? h('div', { class: 'rauch', style: { left: RAUCH[g.id][0] + '%', top: RAUCH[g.id][1] + '%' }, 'aria-hidden': 'true' }, h('span'), h('span'), h('span')) : null);
     bauEls[g.id] = el;
@@ -118,7 +119,7 @@
     box.appendChild(a);
     if (!geschenk) {
       const b = h('img', { src: ZI.BILD('moewe-unten'), alt: '', class: 'fluegel-b' });
-      b.addEventListener('error', ersatz, { once: true });
+      b.addEventListener('error', () => { b.remove(); box.classList.add('ein-bild'); }, { once: true });
       box.appendChild(b);
     }
     return box;
@@ -190,9 +191,9 @@
   function zeigeSchmuck(animiert) {
     const anzahl = Math.min(ZI.SCHMUCK.length, Math.floor((edelsteine() + (insel.geschenke || 0) * 5) / ZI.SCHMUCK_PRO));
     ZI.setze(sonderSchicht, ...ZI.SONDERSCHMUCK.slice(0, insel.sonder || 0).map((s) =>
-      h('div', { class: 'schmuck sonder' + (/laterne/.test(s.id) ? ' lampe' : ''), style: { left: s.x + '%', top: s.y + '%', width: s.w + '%', animation: 'none' } }, bild([s.id, s.alt], s.name))));
+      h('div', { class: 'schmuck sonder' + (/laterne/.test(s.id) ? ' lampe' : ''), style: { left: s.x + '%', top: s.y + '%', width: s.w + '%', animation: 'none' } }, ZI.bildOder([s.id, s.alt], s.name, null))));
     ZI.setze(schmuckSchicht, ...ZI.SCHMUCK.slice(0, anzahl).map((s, i) => {
-      const el = h('div', { class: 'schmuck' + (/laterne/.test(s.id) ? ' lampe' : ''), style: { left: s.x + '%', top: s.y + '%', width: s.w + '%' } }, bild(s.id, s.name));
+      const el = h('div', { class: 'schmuck' + (/laterne/.test(s.id) ? ' lampe' : ''), style: { left: s.x + '%', top: s.y + '%', width: s.w + '%' } }, ZI.bildOder(s.id, s.name, null));
       if (!animiert || i < insel.schmuck) el.style.animation = 'none';
       return el;
     }));
@@ -201,7 +202,13 @@
   }
 
   /* Gelieferte Zwerge stehen um das Lagerfeuer */
+  const PLAETZE = [[34, 55], [44, 55], [37, 59], [42, 59], [31, 52], [47, 52],
+    [64, 83], [68, 81], [77, 82], [27, 79], [31, 81], [19, 68], [29, 67], [36, 73], [45, 72],
+    [57, 66], [67, 65], [44, 47], [55, 47], [16, 48], [26, 48], [25, 31], [64, 40], [74, 40],
+    [79, 52], [89, 54], [43, 24], [52, 24], [72, 19], [85, 69], [60, 85], [22, 84]];
   function platz(i) {
+    if (i < PLAETZE.length) return { x: PLAETZE[i][0], y: PLAETZE[i][1] };
+    i -= PLAETZE.length;
     const ring = Math.floor(i / 10); const pos = i % 10;
     const winkel = (pos / 10) * Math.PI * 2 + ring * 0.3;
     const rx = 9 + ring * 4.5; const ry = 5 + ring * 2.6;
@@ -218,6 +225,7 @@
     }));
   }
 
+  function tafelZu() { return !!ZI.speicher.lesen('zi-tafel-zu', true); }
   function zeigeTafel() {
     const k = kap();
     const m = material(); const zl = ziel();
@@ -231,15 +239,20 @@
     else if (nk) status = h('div', { class: 'klein' }, h('b', null, 'Kapitel ' + ZI.KAPITEL[k].nr + ' geschafft! '), 'Runenwort für Kapitel ' + nk.nr + ': ', h('b', null, nk.runenwort),
       naechstesKapitelBereit() ? h('div', { style: { marginTop: '8px' } }, h('button', { class: 'knopf klein', onclick: kapitelWeiter }, 'Kapitel ' + nk.nr + ' beginnen')) : null);
     else status = h('div', { class: 'klein' }, h('b', null, 'Das ganze Dorf steht!'));
+    const zu = tafelZu();
+    tafel.classList.toggle('zu', zu);
     ZI.setze(tafel,
-      h('h2', { style: { fontSize: '26px' } }, 'Baumaterial'),
+      h('div', { class: 'tafel-kopf' },
+        h('h2', { style: { fontSize: '26px' } }, 'Baumaterial'),
+        h('button', { class: 'tafel-klapp', 'aria-label': zu ? 'Tafel aufklappen' : 'Tafel einklappen', 'aria-expanded': String(!zu),
+          onclick: () => { ZI.speicher.schreiben('zi-tafel-zu', !zu); zeigeTafel(); } }, zu ? '▾' : '▴')),
       h('div', null, h('span', { class: 'zahl' }, String(m)), h('span', { style: { fontSize: '22px' } }, ' von ' + zl)),
       h('div', { class: 'balken', role: 'progressbar', 'aria-valuenow': String(anteil), 'aria-valuemin': '0', 'aria-valuemax': '100' }, h('div', { style: { width: anteil + '%' } })),
       status,
-      auftragAnzeige(),
-      h('div', { class: 'zeile' }, bild('edelstein', 'Edelsteine'), gems + ' Edelsteine · ' + insel.schmuck + ' Schmuckstücke' + (insel.geschenke ? ' · ' + insel.geschenke + ' Möwengeschenke' : '')),
-      h('div', { class: 'zeile' }, bild('zwerg-01-brumm', 'Zwerge'), Object.keys(insel.zwerge).length + ' von ' + insel.klassengroesse + ' Zwergen haben geliefert'),
-      m === 0 ? h('div', { class: 'klein' }, 'Jede geschaffte Station im Hauptstollen ' + (k > 0 ? 'von Kapitel ' + ZI.KAPITEL[k].nr + ' ' : '') + 'bringt 1 Material. Am Ende der Stunde scannt ihr die Lieferungen.') : null);
+      zu ? null : auftragAnzeige(),
+      zu ? null : h('div', { class: 'zeile' }, bild('edelstein', 'Edelsteine'), gems + ' Edelsteine · ' + insel.schmuck + ' Schmuckstücke' + (insel.geschenke ? ' · ' + insel.geschenke + ' Möwengeschenke' : '')),
+      zu ? null : h('div', { class: 'zeile' }, bild('zwerg-01-brumm', 'Zwerge'), Object.keys(insel.zwerge).length + ' von ' + insel.klassengroesse + ' Zwergen haben geliefert'),
+      m === 0 && !zu ? h('div', { class: 'klein' }, 'Jede geschaffte Station im Hauptstollen ' + (k > 0 ? 'von Kapitel ' + ZI.KAPITEL[k].nr + ' ' : '') + 'bringt 1 Material. Am Ende der Stunde scannt ihr die Lieferungen.') : null);
   }
 
   function kapitelWeiter() {
