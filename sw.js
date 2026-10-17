@@ -1,7 +1,7 @@
 /* Zwergeninsel – Offline-Speicher
    Beim Start wird alles Wichtige zwischengespeichert. Danach läuft die App auch ohne WLAN.
    Nach jeder Änderung an der App die Versionsnummer erhöhen. */
-const VERSION = 'zwergeninsel-v6';
+const VERSION = 'zwergeninsel-v7';
 const KERN = [
   './', 'index.html', 'insel.html', 'manifest.webmanifest',
   'css/spiel.css', 'css/insel.css',
