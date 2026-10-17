@@ -97,7 +97,7 @@
       optionen: it.optionen.map((o) => ({ text: o.text, ok: o.ok })), info: 'Ein gutes Beispiel zeigt, dass die Begründung stimmt.' }));
     if (bisKapitel >= 1) {
       nimm(ZI.TEIL_ERKENNEN, 3, (it) => ({ frage: 'Welcher Teil des Arguments ist das?', kopf: it.satz,
-        optionen: ['These', 'Begründung', 'Beispiel'].map((t) => ({ text: t, ok: t === it.teil })), info: ZI.TEIL_INFO[it.teil] }));
+        optionen: ['Meinung', 'Begründung', 'Beispiel'].map((t) => ({ text: t, ok: t === it.teil })), info: ZI.TEIL_INFO[it.teil] }));
       const beitraege = [];
       ZI.MOTOR_BREMSE.forEach((g) => g.beitraege.forEach((b) => beitraege.push(b)));
       nimm(beitraege, 3, (b) => ({ frage: 'Gesprächsmotor oder Gesprächsbremse?', kopf: b.text,

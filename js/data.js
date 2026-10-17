@@ -369,7 +369,7 @@ ZI.RATSFRAGE_K1 = {
 
 ZI.RATSREGELN = [
   'Wir lassen andere ausreden.',
-  'Wir knüpfen an: „Du sagst, dass … Ich denke, dass …“',
+  'Wir knüpfen an: „Du sagst, dass … Dazu denke ich, dass …“',
   'Wir begründen mit weil, da oder denn.',
   'Wir bleiben freundlich, auch wenn wir anderer Meinung sind.',
 ];

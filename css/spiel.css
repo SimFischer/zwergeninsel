@@ -634,3 +634,9 @@ img.truhe-klein, .platzhalter.truhe-klein { width: 110px; height: auto; max-heig
 .stamm-person { display: flex; flex-direction: column; padding: 8px 12px; border-radius: 10px; background: #fffaf0; border: 2px solid rgba(58, 38, 23, 0.2); font-size: 17px; }
 .stamm-person.ich { border-color: var(--gold); background: #fff1cf; }
 @media (max-width: 760px) { .stamm-spalten, .stamm-optionen { grid-template-columns: 1fr; } }
+
+/* ---------- Begründungshand ---------- */
+.hand-kopf { display: flex; align-items: center; gap: 12px; }
+.hand-symbol { font-size: 44px; line-height: 1; }
+.hand-liste .check { gap: 10px; }
+.finger { flex: none; width: 30px; height: 30px; border-radius: 50%; background: #f3e6c8; border: 2px solid #b08a5a; display: flex; align-items: center; justify-content: center; font-family: var(--titel); font-size: 18px; }

@@ -423,7 +423,7 @@
       { text: 'Ich kann meine Meinung laut und begründet sagen.', uebung: { art: 'tief', i: 2 } },
     ],
     [
-      { text: 'Ich kenne die drei Teile eines Arguments: These, Begründung und Beispiel.', uebung: { art: 'kern', i: 0 } },
+      { text: 'Ich kenne die drei Teile eines Arguments: Meinung, Begründung und Beispiel.', uebung: { art: 'kern', i: 0 } },
       { text: 'Ich erkenne Gesprächsmotoren und Gesprächsbremsen.', uebung: { art: 'kern', i: 1 } },
       { text: 'Ich höre genau zu und erkenne Meinung, Begründung und Beispiel.', uebung: { art: 'kern', i: 2 } },
       { text: 'Ich unterscheide Stützen von neuen Argumenten.', uebung: { art: 'tief', i: 1 } },

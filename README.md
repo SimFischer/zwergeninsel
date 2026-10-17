@@ -40,7 +40,7 @@ Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden ke
 
 **Hauptstollen**
 
-1. *Argument-Puzzle* – These, Begründung und Beispiel zusammensetzen (Farben wie im Arbeitsblatt: rot, gelb, grün)
+1. *Argument-Puzzle* – Meinung, Begründung und Beispiel zusammensetzen (Farben wie im Arbeitsblatt: rot, gelb, grün)
 2. *Motor oder Bremse?* – Beiträge aus Klassengesprächen sortieren: Gesprächsmotor oder Gesprächsbremse
 3. *Hör-Stollen* – das iPad liest ein Argument vor, ohne Text; danach Fragen zu Meinung, Begründung und Beispiel
 
@@ -48,7 +48,7 @@ Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden ke
 
 1. *Kobold-Kampf* – gemischte Aufgaben aus Kapitel 1 und 2 als Bosskampf
 2. *Argument-Kette* – Stützen von neuen Argumenten unterscheiden (Reihe und Kette)
-3. *Meisterstück II* – laut argumentieren mit These, Begründung und Beispiel, Partner-Check mit vier Punkten
+3. *Meisterstück II* – laut argumentieren mit Meinung, Begründung und Beispiel, Partner-Check mit vier Punkten
 
 **Bonusinsel:** *Beispiel-Regen* – passende Beispiele fangen
 
@@ -132,6 +132,10 @@ Jede Gebäude-Übung bringt einen Rangpunkt und eine Seite im Wissensbuch (insge
 - **Klassengröße:** Insel → Zahnrad. Das Dorf ist fertig, wenn alle Kinder ihren Hauptstollen geschafft haben.
 - **Sichern:** Insel → Zahnrad → „Insel sichern“. Der Inselstand liegt nur auf dem Gerät, auf dem die Insel läuft. Bitte immer dasselbe Gerät benutzen oder vorher sichern.
 - **Inselbotschaft:** steht immer in der Materialtafel. Nach dem Rat und nach jedem Kapitel ändert sie sich – die Kinder tippen dann die neue ein.
+
+## Angepasst an den Unterricht der 5a
+
+`js/data-klasse.js` gleicht das Spiel an die UE „Meinung begründen“ (Deutschbuch 5, S. 57–65) an: Begriffe *Meinung – Begründung – Beispiel*, Echo-Spiel-Formel „Du sagst, dass … Dazu denke ich, dass …“, Gesprächsregeln wie auf dem Beobachtungsbogen zum Echo-Spiel, die Sitzordnungs-Aussagen („begründet oder nicht?“), die Klassendienste-Begründungen, das Missverständnis zwischen Nele und Ben, die Begründungshand (Gebäude-Stollen der Mühle), Richtig-oder-falsch-Fragen im Inselrätsel und die Diskussionsthemen der Klasse (Kletterpark, längere Pausen, Sitzordnung u. a.). Das Spiel bleibt mündlich; der Brief aus der Klassenarbeit wird bewusst nicht geübt.
 
 ## Inhalte anpassen
 

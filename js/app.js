@@ -359,14 +359,14 @@
     },
     { // Kapitel 2
       kern: [
-        { name: 'Argument-Puzzle', info: 'Setz These, Begründung und Beispiel richtig zusammen.', icon: ['icon-puzzle', 'pergament'], spiel: () => spielPuzzle(), vor: 'k2s1' },
+        { name: 'Argument-Puzzle', info: 'Setz Meinung, Begründung und Beispiel richtig zusammen.', icon: ['icon-puzzle', 'pergament'], spiel: () => spielPuzzle(), vor: 'k2s1' },
         { name: 'Motor oder Bremse?', info: 'Was bringt ein Gespräch weiter, was stoppt es?', icon: ['icon-motor-bremse', 'schleifstein'], spiel: () => spielMotor(), vor: 'k2s2' },
         { name: 'Hör-Stollen', info: 'Hör genau zu und finde Begründung und Beispiel.', icon: ['icon-hoeren', 'laterne'], spiel: () => spielHoeren(), vor: 'k2s3' },
       ],
       tief: [
         { name: 'Kobold-Kampf', info: 'Der Fehlerkobold ist zurück! Besiege ihn mit allem, was du kannst.', icon: ['icon-kobold-kampf', 'kobold-chaos'], spiel: () => spielBoss() },
         { name: 'Argument-Kette', info: 'Welche Stützen machen ein Argument stärker?', icon: ['icon-kette', 'eisen-gluehend'], spiel: () => spielKette() },
-        { name: 'Meisterstück II', info: 'Laut argumentieren mit These, Begründung und Beispiel.', icon: ['icon-meisterstueck2', 'meisterin-jubelt'], spiel: () => spielMeisterstueck(2) },
+        { name: 'Meisterstück II', info: 'Laut argumentieren mit Meinung, Begründung und Beispiel.', icon: ['icon-meisterstueck2', 'meisterin-jubelt'], spiel: () => spielMeisterstueck(2) },
       ],
       bonus: { name: 'Beispiel-Regen', info: 'Fang die Beispiele, die wirklich passen! Bis zu 3 Sterne.', icon: ['icon-beispielregen', 'edelstein'], spiel: () => spielFunkenregen(ZI.BEISPIELREGEN, 'Beispiel-Regen', 'Oben stehen eine Meinung und eine Begründung. Von oben regnen Beispiele. Tippe nur die Beispiele an, die zur Begründung passen! Unpassende kosten einen Punkt.') },
     },
@@ -802,7 +802,7 @@
      Sortierspiel: jede Karte in eine von zwei Gruppen
      (Erz oder Schlacke? · Motor oder Bremse?)
      ========================================================= */
-  function sortierSpiel({ titel, runden, jaText, neinText, frageText, tipp, start, wsVorher, wsNachher, rundeFertig, falschJa, falschNein, ende }) {
+  function sortierSpiel({ titel, runden, jaText: jaT, neinText: neinT, frageText: frageT, tipp, start, wsVorher, wsNachher, rundeFertig: rundeF, falschJa: falschJ, falschNein: falschN, ende }) {
     const bue = buehne(wsVorher);
     const box = h('div', { class: 'aufgabe pergament auf-pergament' });
     const rahmen = spielRahmen({ titel, anzahl: runden.length, aufgabe: box, bue });
@@ -811,6 +811,9 @@
 
     function runde() {
       const rd = runden[r];
+      // eine Runde darf eigene Beschriftungen haben (z. B. „begründet / nicht begründet“)
+      const jaText = rd.jaText || jaT; const neinText = rd.neinText || neinT; const frageText = rd.frage || frageT;
+      const falschJa = rd.falschJa || falschJ; const falschNein = rd.falschNein || falschN; const rundeFertig = rd.rundeFertig || rundeF;
       const karten = mischen(rd.karten);
       let i = 0;
       bue.werkstueck(wsVorher);
@@ -869,11 +872,11 @@
   function spielErz() {
     sortierSpiel({
       titel: 'Erz oder Schlacke?',
-      runden: mischen(ZI.ERZ_SCHLACKE).slice(0, 3).map((rd) => ({ kopf: rd.meinung, karten: rd.gruende.map((g) => ({ text: g.text, ja: g.erz, info: g.info })) })),
+      runden: [ZI.zufall(ZI.BEGRUENDET_RUNDEN)].concat(mischen(ZI.ERZ_SCHLACKE).slice(0, 2).map((rd) => ({ kopf: rd.meinung, karten: rd.gruende.map((g) => ({ text: g.text, ja: g.erz, info: g.info })) }))),
       jaText: 'Erz', neinText: 'Schlacke',
       frageText: 'Passt die Begründung zur Meinung? Erz oder Schlacke?',
       tipp: ZI.TIPPS.erz,
-      start: 'Erz sind Begründungen, die zur Meinung passen. Schlacke werfen wir weg.',
+      start: 'Zuerst prüfen wir: Ist eine Meinung überhaupt begründet? Danach trennen wir Erz – passende Begründungen – von Schlacke.',
       wsVorher: 'eisen-roh', wsNachher: 'eisen-gluehend',
       rundeFertig: 'Das Erz glüht! Diese Meinung ist gut begründet.',
       falschJa: 'Hm, passt dieser Grund wirklich zur Meinung?',
@@ -1128,7 +1131,7 @@
   }
 
   function teilZeile(art, text) {
-    const namen = { these: 'These', begruendung: 'Begründung', beispiel: 'Beispiel' };
+    const namen = { these: 'Meinung', begruendung: 'Begründung', beispiel: 'Beispiel' };
     return h('div', { class: 'teil teil-' + art }, h('span', { class: 'teil-name' }, namen[art]), h('span', null, text));
   }
 
@@ -1139,7 +1142,7 @@
     const bue = buehne('runenplatte');
     const box = h('div', { class: 'aufgabe pergament auf-pergament' });
     const rahmen = spielRahmen({ titel: 'Argument-Puzzle', anzahl: schritte.length, aufgabe: box, bue });
-    bue.sage('Der Fehlerkobold hat drei Argumente auseinandergerissen. Setz sie wieder zusammen: These, Begründung, Beispiel.', 'erklaert');
+    bue.sage('Der Fehlerkobold hat drei Argumente auseinandergerissen. Setz sie wieder zusammen: Meinung, Begründung, Beispiel.', 'erklaert');
     let nr = 0;
 
     function schritt() {
@@ -1152,10 +1155,10 @@
       weiter.addEventListener('click', () => { nr++; rahmen.fortschritt(nr); if (nr < schritte.length) schritt(); else ende(); });
 
       function waehle(art) {
-        const frage = art === 'begruendung' ? 'Welche Begründung gehört zu dieser These?' : 'Welches Beispiel passt dazu?';
+        const frage = art === 'begruendung' ? 'Welche Begründung gehört zu dieser Meinung?' : 'Welches Beispiel passt dazu?';
         const liste = optionenListe(puzzle.map((a) => ({
           text: a[art], ok: a === arg,
-          info: art === 'begruendung' ? 'Diese Begründung gehört zu einer anderen These.' : 'Dieses Beispiel gehört zu einem anderen Argument.',
+          info: art === 'begruendung' ? 'Diese Begründung gehört zu einer anderen Meinung.' : 'Dieses Beispiel gehört zu einem anderen Argument.',
         })), { bue, rueck, fertig: () => {
           teile.appendChild(teilZeile(art, arg[art]));
           ZI.setze(rueck);
@@ -1228,7 +1231,7 @@
 
   /* Tiefer Stollen 1: Kobold-Kampf (gemischte Aufgaben aus Kapitel 1 und 2) */
   function spielBoss() {
-    const teile = ['These', 'Begründung', 'Beispiel'];
+    const teile = ['Meinung', 'Begründung', 'Beispiel'];
     const aufgaben = [
       ...mischen(ZI.STUMPF_SCHARF).slice(0, 2).map((it) => ({ frage: 'Welche Begründung ist scharf?', kopf: it.meinung,
         optionen: it.optionen.map((o) => ({ text: o.text, ok: o.scharf, info: o.info })) })),
@@ -1764,11 +1767,73 @@
             h('p', { class: 'klein', style: { margin: '8px 0 0' } }, 'Setzt euch zusammen. Jeder sagt mindestens einmal seine Meinung mit Begründung.'))))));
   }
 
+  /* ---------- Begründungshand: die zwei stärksten von fünf Begründungen wählen ---------- */
+  function spielHand(u, ende) {
+    const items = mischen(u.items).slice(0, 3);
+    const bue = buehne('eisen-roh');
+    const box = h('div', { class: 'aufgabe pergament auf-pergament' });
+    const rahmen = spielRahmen({ titel: u.name, anzahl: items.length, aufgabe: box, bue });
+    bue.sage(u.start, 'erklaert');
+    let nr = 0;
+    function item() {
+      const it = items[nr];
+      const karten = mischen(it.begruendungen);
+      const gewaehlt = new Set();
+      let versuche = 0; let fertig = false;
+      bue.werkstueck('eisen-roh');
+      const rueck = h('div');
+      const liste = h('div', { class: 'checkliste hand-liste' });
+      const pruefKnopf = h('button', { class: 'knopf', style: { alignSelf: 'flex-end' }, disabled: true }, 'Prüfen');
+      const weiter = h('button', { class: 'knopf', style: { display: 'none', alignSelf: 'flex-end' } }, nr + 1 < items.length ? 'Weiter' : 'Fertig!');
+      weiter.addEventListener('click', () => { nr++; rahmen.fortschritt(nr); if (nr < items.length) item(); else ende(); });
+      function zeichne(loesung) {
+        ZI.setze(liste, ...karten.map((k, i) => {
+          const an = gewaehlt.has(i) || (loesung && k.ok);
+          return h('button', { class: 'check' + (an ? ' an' : ''), 'aria-pressed': String(an), onclick: () => {
+            if (fertig) return;
+            if (gewaehlt.has(i)) gewaehlt.delete(i); else if (gewaehlt.size < 2) gewaehlt.add(i); else { ZI.meldung('Wähle genau zwei Begründungen.'); return; }
+            ZI.ton.plopp(); pruefKnopf.disabled = gewaehlt.size !== 2; zeichne();
+          } }, h('span', { class: 'finger', 'aria-hidden': 'true' }, String(i + 1)), h('span', { class: 'kasten' }, an ? icon.haken() : null), k.text);
+        }));
+      }
+      pruefKnopf.addEventListener('click', () => {
+        const falsche = [...gewaehlt].filter((i) => !karten[i].ok);
+        if (!falsche.length) {
+          fertig = true; ZI.ton.richtig();
+          ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, h('b', null, zufall(ZI.LOB) + ' '), 'Das sind die zwei stärksten Begründungen: wichtig und für viele gültig.'));
+          bue.sage('Mit diesen zwei Fingern der Begründungshand überzeugst du am meisten.', 'jubelt');
+          bue.schlag(() => bue.werkstueck('eisen-gluehend'));
+          pruefKnopf.style.display = 'none'; weiter.style.display = '';
+          return;
+        }
+        versuche++; ZI.ton.falsch();
+        ZI.setze(rueck, h('div', { class: 'rueckmeldung schlecht' }, falsche.map((i) => h('div', null, '„' + karten[i].text + '“ – ' + karten[i].info))));
+        falsche.forEach((i) => gewaehlt.delete(i));
+        pruefKnopf.disabled = true;
+        if (versuche >= 2) {
+          fertig = true;
+          bue.sage('Ich zeige dir die zwei stärksten. Lies genau, warum sie mehr überzeugen.', 'tipp');
+          zeichne(true); pruefKnopf.style.display = 'none'; weiter.style.display = '';
+          return;
+        }
+        bue.sage('Fast! Frag dich: Gilt die Begründung nur für mich – oder für viele?', 'ermutigt');
+        zeichne();
+      });
+      ZI.setze(box,
+        aufgabenKopf(u.frage, () => it.meinung + ' ' + karten.map((k, i) => (i + 1) + '. ' + k.text).join(' '), u.tipp, bue),
+        h('div', { class: 'hand-kopf' }, h('span', { class: 'hand-symbol', 'aria-hidden': 'true' }, '✋'), h('div', { class: 'meinung' }, it.meinung)),
+        liste, rueck, pruefKnopf, weiter);
+      zeichne();
+    }
+    item();
+  }
+
   /* ---------- Gebäude-Übung spielen ---------- */
   function spielBau(u) {
     const g = ZI.GEBAEUDE.find((x) => x.id === u.id);
     const ende = () => geschafft({ titel: 'Gebäude-Stollen geschafft!', text: 'Du hast „' + u.name + '“ gemeistert. Dafür gibt es einen Rangpunkt und eine neue Seite im Wissensbuch.',
       datei: u.id, alt: g ? g.name : u.name, eintragen: (s) => s.setzeBau(u.bit) });
+    if (u.typ === 'hand') { spielHand(u, ende); return; }
     if (u.typ === 'sortier') {
       sortierSpiel({
         titel: u.name, frageText: u.frage, tipp: u.tipp, start: u.start,

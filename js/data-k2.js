@@ -139,15 +139,15 @@
 
   /* Für den Boss: Welcher Teil des Arguments ist das? */
   ZI.TEIL_ERKENNEN = [
-    { satz: '„Ich finde, dass wir einen Schwimmtag machen sollten.“', teil: 'These' },
+    { satz: '„Ich finde, dass wir einen Schwimmtag machen sollten.“', teil: 'Meinung' },
     { satz: '„… weil man beim Schwimmen den ganzen Körper trainiert.“', teil: 'Begründung' },
     { satz: '„Zum Beispiel werden beim Kraulen Arme und Beine kräftiger.“', teil: 'Beispiel' },
-    { satz: '„Ich bin der Meinung, dass Haustiere in die Schule dürfen.“', teil: 'These' },
+    { satz: '„Ich bin der Meinung, dass Haustiere in die Schule dürfen.“', teil: 'Meinung' },
     { satz: '„… denn Tiere können Kinder beruhigen.“', teil: 'Begründung' },
     { satz: '„Meine Nachbarin hat zum Beispiel erzählt, dass ihr Hund sie nach einem Streit tröstet.“', teil: 'Beispiel' },
   ];
   ZI.TEIL_INFO = {
-    These: 'Die These ist die Meinung: „Ich finde, dass …“',
+    Meinung: 'Die Meinung sagt, was du denkst: „Ich finde, dass …“',
     'Begründung': 'Die Begründung sagt, warum: „… weil …“ oder „… denn …“',
     Beispiel: 'Das Beispiel macht die Begründung anschaulich: „Zum Beispiel …“',
   };
@@ -206,12 +206,12 @@
      Tipps der Meisterin für Kapitel 2
      ========================================================= */
   Object.assign(ZI.TIPPS, {
-    puzzle: 'Ein Argument hat drei Teile: Die These ist die Meinung. Die Begründung sagt, warum. Das Beispiel zeigt es ganz genau.',
+    puzzle: 'Ein Argument hat drei Teile: Die Meinung sagt, was du denkst. Die Begründung sagt, warum. Das Beispiel zeigt es ganz genau.',
     motor: 'Ein Motor bringt das Gespräch weiter: begründen, nachfragen, anknüpfen, andere einbeziehen. Eine Bremse stoppt es: auslachen, dazwischenrufen, Thema wechseln.',
     hoeren: 'Hör genau hin. Achte auf die Wörter „weil“, „denn“ und „zum Beispiel“. Danach kommt das, was du suchst. Du darfst so oft anhören, wie du willst.',
     kette: 'Eine Stütze baut auf dem Hauptargument auf und erklärt es genauer. Ein Satz mit „außerdem“ ist meist ein neues Argument.',
     boss: 'Der Kobold mischt alles durcheinander. Lies jede Aufgabe genau und nimm dir Zeit.',
-    meister2: 'Diesmal mit allen drei Teilen: These („Ich finde, dass …“), Begründung („weil …“) und ein Beispiel („Zum Beispiel …“).',
+    meister2: 'Diesmal mit allen drei Teilen: Meinung („Ich finde, dass …“), Begründung („weil …“) und ein Beispiel („Zum Beispiel …“).',
   });
 
   ZI.KAPITEL[1].fertig = true;
