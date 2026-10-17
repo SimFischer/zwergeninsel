@@ -40,27 +40,27 @@
       test: (s) => s.coreTotal() + s.deepTotal() >= 1 },
     { id: 'k1', name: 'Gestrandet', text: 'Den Hauptstollen in Kapitel 1 geschafft.', stufe: 'bronze', symbol: 'hammer',
       test: (s) => s.coreCount(0) === 3 },
-    { id: 'k2', name: 'Dorfbaumeister', text: 'Den Hauptstollen in Kapitel 2 geschafft.', stufe: 'silber', symbol: 'hammer',
+    { id: 'k2', name: 'Dorfbaumeister', nameW: 'Dorfbaumeisterin', text: 'Den Hauptstollen in Kapitel 2 geschafft.', stufe: 'silber', symbol: 'hammer',
       test: (s) => s.coreCount(1) === 3 },
-    { id: 'k3', name: 'Festredner', text: 'Den Hauptstollen in Kapitel 3 geschafft.', stufe: 'gold', symbol: 'hammer',
+    { id: 'k3', name: 'Festredner', nameW: 'Festrednerin', text: 'Den Hauptstollen in Kapitel 3 geschafft.', stufe: 'gold', symbol: 'hammer',
       test: (s) => s.coreCount(2) === 3 },
-    { id: 'fehler', name: 'Fehlerjäger', text: 'Die Fehlerjagd geschafft.', stufe: 'bronze', symbol: 'lupe',
+    { id: 'fehler', name: 'Fehlerjäger', nameW: 'Fehlerjägerin', text: 'Die Fehlerjagd geschafft.', stufe: 'bronze', symbol: 'lupe',
       test: (s) => s.hatTief(0, 0) },
-    { id: 'kobold', name: 'Kobold-Bezwinger', text: 'Den Fehlerkobold im Kobold-Kampf besiegt.', stufe: 'silber', symbol: 'schild',
+    { id: 'kobold', name: 'Kobold-Bezwinger', nameW: 'Kobold-Bezwingerin', text: 'Den Fehlerkobold im Kobold-Kampf besiegt.', stufe: 'silber', symbol: 'schild',
       test: (s) => s.hatTief(1, 0) },
-    { id: 'rede', name: 'Redemeister', text: 'Alle drei Meisterstücke laut gemeistert.', stufe: 'gold', symbol: 'sprechblase',
+    { id: 'rede', name: 'Redemeister', nameW: 'Redemeisterin', text: 'Alle drei Meisterstücke laut gemeistert.', stufe: 'gold', symbol: 'sprechblase',
       test: (s) => s.hatTief(0, 2) && s.hatTief(1, 2) && s.hatTief(2, 2) },
     { id: 'ohr', name: 'Zuhör-Profi', text: 'Hör-Stollen und „Wer hört zu?“ geschafft.', stufe: 'silber', symbol: 'ohr',
       test: (s) => s.hatKern(1, 2) && s.hatKern(2, 1) },
-    { id: 'rat', name: 'Ratsüberzeuger', text: 'Den Inselrat überzeugt.', stufe: 'silber', symbol: 'sprechblase',
+    { id: 'rat', name: 'Ratsüberzeuger', nameW: 'Ratsüberzeugerin', text: 'Den Inselrat überzeugt.', stufe: 'silber', symbol: 'sprechblase',
       test: (s) => s.hatKern(2, 2) },
     { id: 'krone1', name: 'Goldene Krone', text: 'Eine Station ganz ohne Fehler geschafft.', stufe: 'bronze', symbol: 'krone',
       test: (s) => s.kronenTotal() >= 1 },
-    { id: 'krone5', name: 'Kronenschmied', text: 'Fünf goldene Kronen gesammelt.', stufe: 'silber', symbol: 'krone',
+    { id: 'krone5', name: 'Kronenschmied', nameW: 'Kronenschmiedin', text: 'Fünf goldene Kronen gesammelt.', stufe: 'silber', symbol: 'krone',
       test: (s) => s.kronenTotal() >= 5 },
     { id: 'krone9', name: 'Goldene Hand', text: 'Alle neun Hauptstollen-Stationen fehlerfrei.', stufe: 'gold', symbol: 'krone',
       test: (s) => s.kronenTotal() === 9 },
-    { id: 'stern3', name: 'Sternenfänger', text: '3 Sterne in einem Bonusspiel.', stufe: 'silber', symbol: 'stern',
+    { id: 'stern3', name: 'Sternenfänger', nameW: 'Sternenfängerin', text: '3 Sterne in einem Bonusspiel.', stufe: 'silber', symbol: 'stern',
       test: (s) => s.bonusMax() === 3 },
     { id: 'stern9', name: 'Sternenhimmel', text: 'In allen drei Bonusspielen 3 Sterne.', stufe: 'gold', symbol: 'stern',
       test: (s) => s.bonusTotal() === 9 },
@@ -68,11 +68,17 @@
       test: (s) => s.gems() >= 30 },
     { id: 'buch', name: 'Bücherwurm', text: 'Alle Seiten im Wissensbuch gefunden.', stufe: 'gold', symbol: 'buch',
       test: (s, x) => x.wissen === ZI.WISSEN.length },
-    { id: 'freunde', name: 'Zwergenfreund', text: 'Acht Zwerge freigeschaltet.', stufe: 'silber', symbol: 'helm',
+    { id: 'freunde', name: 'Zwergenfreund', nameW: 'Zwergenfreundin', text: 'Acht Zwerge freigeschaltet.', stufe: 'silber', symbol: 'helm',
       test: (s) => s.freieZwerge().length >= 8 },
     { id: 'clan', name: 'Der ganze Clan', text: 'Alle zwölf Zwerge freigeschaltet.', stufe: 'gold', symbol: 'helm',
       test: (s) => s.freieZwerge().length === 12 },
   ];
+
+  /* Name eines Abzeichens passend zum Zwerg (Zwerginnen bekommen die weibliche Form) */
+  ZI.abzeichenName = (a, s) => {
+    const z = s && ZI.ZWERGE.find((d) => d.nr === s.zwerg);
+    return z && z.w && a.nameW ? a.nameW : a.name;
+  };
 
   /* =========================================================
      INSELRÄTSEL – Wiederholung zum Stundenbeginn am Board

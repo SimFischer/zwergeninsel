@@ -228,7 +228,7 @@ ZI.FEHLERJAGD = [
 ZI.BEISPIELE = [
   { argument: 'Ich finde, dass wir mehr Pausen draußen machen sollten, weil Bewegung beim Lernen hilft.',
     optionen: [
-      { text: 'Zum Beispiel kann ich nach dem Fangenspielen im Matheunterricht viel besser stillsitzen.', ok: true,
+      { text: 'Zum Beispiel kann ich nach dem Fangenspielen im Matheunterricht viel besser aufpassen.', ok: true,
         info: 'Genau! Das Beispiel zeigt, dass die Begründung stimmt.' },
       { text: 'Zum Beispiel ist unser Schulhof grau.', ok: false,
         info: 'Das Beispiel hat nichts mit Bewegung und Lernen zu tun.' },

@@ -55,6 +55,14 @@
   }
 
   /* ---------- Darstellung ---------- */
+  /* Bedienelemente wachsen auf großen Boards mit (Full HD, 4K) */
+  function uiGroesse() {
+    const f = Math.max(1, Math.min(1.5, Math.min(window.innerWidth / 1440, window.innerHeight / 810)));
+    document.documentElement.style.setProperty('--ui', f.toFixed(3));
+  }
+  uiGroesse();
+  window.addEventListener('resize', uiGroesse);
+  document.body.classList.add('insel-seite');
   const screen = h('div', { class: 'insel-screen' });
   const buehne = h('div', { class: 'insel-buehne' });
   const grund = h('div', { class: 'insel-grund' }, h('div', { class: 'insel-ersatz' }), h('div', { class: 'wellen' }));
@@ -359,7 +367,7 @@
       });
       ZI.setze(inhalt,
         h('div', { class: 'raetsel-karte pergament auf-pergament' },
-          h('div', { class: 'frage', style: { fontSize: '26px', color: 'var(--tinte-hell)' } },
+          h('div', { class: 'frage', style: { fontSize: 'clamp(24px, 2vw, 40px)', color: 'var(--tinte-hell)' } },
             h('button', { class: 'rund', 'aria-label': 'Vorlesen', onclick: () => ZI.vorlesen(f.frage + ' ' + (f.kopf || '') + ' ' + f.optionen.map((o, i) => buchst[i] + ': ' + o.text).join('. ')) }, icon.vorlesen()),
             h('span', null, f.frage)),
           f.kopf ? h('div', { class: 'meinung', style: { fontSize: 'clamp(24px, 2.4vw, 38px)', whiteSpace: 'pre-line' } }, f.kopf) : null,
@@ -595,7 +603,7 @@
     if (!ZI.KAPITEL[k + 1] && bauEls.schiff) { bauEls.schiff.classList.remove('segelt'); void bauEls.schiff.offsetWidth; bauEls.schiff.classList.add('segelt'); }
     const nk = ZI.KAPITEL[k + 1];
     const f = ZI.fenster([
-      h('div', { style: { width: '100%', borderRadius: '14px', overflow: 'hidden' } }, bild('fest-szene', 'Fest im Zwergendorf')),
+      h('div', { class: 'fest-bild' }, bild('fest-szene', 'Fest im Zwergendorf')),
       h('h2', null, 'Kapitel ' + ZI.KAPITEL[k].nr + ' geschafft!'),
       nk ? h('p', { style: { margin: 0, fontSize: '22px' } }, 'Euer Dorf wächst! Mit diesem Runenwort öffnet ihr in der Schmiede Kapitel ' + nk.nr + ':') : h('p', { style: { margin: 0, fontSize: '22px' } }, 'Das ganze Dorf steht. Was für eine Leistung, 5a!'),
       nk ? h('div', { class: 'runenwort' }, nk.runenwort) : null,

@@ -401,11 +401,8 @@ h1, h2, h3 { font-family: var(--titel); font-weight: 400; margin: 0; letter-spac
 @keyframes drehen { to { transform: rotate(360deg); } }
 .knopf-reihe { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 
-.meldung {
-  position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 60;
-  padding: 12px 22px; font-size: 20px; max-width: 90vw; text-align: center;
-  animation: einblenden 0.3s;
-}
+.meldungen { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 60; display: flex; flex-direction: column-reverse; align-items: center; gap: 8px; pointer-events: none; width: max-content; max-width: 90vw; }
+.meldung { padding: 12px 22px; font-size: 20px; max-width: 90vw; text-align: center; animation: einblenden 0.3s; }
 
 /* ---------- Hochformat ---------- */
 @media (orientation: portrait), (max-width: 860px) {
@@ -573,3 +570,22 @@ h1, h2, h3 { font-family: var(--titel); font-weight: 400; margin: 0; letter-spac
 .knopf-link { align-self: flex-start; background: none; border: none; padding: 4px 0; font: inherit; font-size: 16px; color: var(--tinte-hell); text-decoration: underline; cursor: pointer; }
 @media (max-width: 700px) { .karten-raster { grid-template-columns: repeat(6, 1fr); } }
 .pass-code { white-space: nowrap; font-size: clamp(26px, 3.4vw, 40px); letter-spacing: 2px; }
+.kombo[hidden] { display: none; }
+
+/* Startbild: Titel in den Himmel, damit die Zwerge auf dem Floß frei bleiben */
+.start-mitte { justify-content: flex-start; padding-top: clamp(28px, 7vh, 80px); gap: 18px; }
+.logo-unter { font-weight: 700; text-shadow: 0 2px 4px rgba(40, 20, 8, 0.9), 0 0 18px rgba(40, 20, 8, 0.6); }
+/* Meisterin auf der Bühne größer */
+.meisterin { width: 46%; max-width: 260px; }
+@media (max-height: 800px) { .meisterin { max-width: 210px; } }
+/* Aufgabenkarte nur so hoch wie ihr Inhalt */
+.spiel > .aufgabe { align-self: flex-start; max-height: 100%; }
+img.truhe-klein, .platzhalter.truhe-klein { width: 110px; height: auto; max-height: 90px; object-fit: contain; }
+.belohnung-seiten { display: flex; flex-direction: column; gap: 10px; align-self: stretch; }
+/* Fußleiste im Fenster: Knopf bleibt sichtbar, auch wenn der Inhalt scrollt */
+.fenster-fuss { position: sticky; bottom: -26px; align-self: stretch; display: flex; justify-content: center; padding: 10px 0 4px; margin-bottom: -6px; background: linear-gradient(180deg, rgba(243, 228, 196, 0), #f1e1bf 40%); }
+.fenster.erfolge-kompakt { gap: 10px; max-width: 720px; }
+.fenster.erfolge-kompakt h2 { font-size: 24px !important; margin: 0; }
+.fenster.erfolge-kompakt .rang-neu h2 { font-size: 30px !important; }
+.fenster.erfolge-kompakt .huepf-zwerg.gross { width: 110px; }
+.fenster.erfolge-kompakt .rang-emblem { width: 70px; height: 70px; }

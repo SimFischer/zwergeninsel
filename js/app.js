@@ -63,8 +63,8 @@
     const neueSeiten = wissenFrei(stand).filter((w) => !seitenVorher.includes(w));
     const neueAbzeichen = abzeichenFrei(stand).filter((a) => !abzeichenVorher.includes(a));
     const rangNeu = ZI.rang(stand);
-    zeigeNeueSeiten(neueSeiten, () => zeigeErfolge(rangNeu.nr > rangVorher.nr ? rangNeu : null, neueAbzeichen,
-      () => zeigeFreischaltungen(neu, danach)));
+    zeigeErfolge(rangNeu.nr > rangVorher.nr ? rangNeu : null, neueAbzeichen, neueSeiten,
+      () => zeigeFreischaltungen(neu, danach));
   }
 
   /* ---------- Zwergen-Wissensbuch ---------- */
@@ -83,15 +83,6 @@
       h('p', null, w.text),
       h('div', { class: 'seite-beispiel' }, w.beispiel),
       h('button', { class: 'rund klein-rund', 'aria-label': 'Seite vorlesen', onclick: () => ZI.vorlesen(w.titel + '. ' + w.text + ' ' + w.beispiel.replace(/\n/g, ' ')) }, icon.vorlesen()));
-  }
-  function zeigeNeueSeiten(liste, danach) {
-    if (!liste.length) { danach && danach(); return; }
-    const w = liste[0];
-    const f = ZI.fenster([
-      h('h2', null, 'Neue Seite im Wissensbuch!'),
-      seitenKarte(w, true),
-      h('button', { class: 'knopf', onclick: () => { f.schliessen(); zeigeNeueSeiten(liste.slice(1), danach); } }, 'Weiter'),
-    ]);
   }
   function zeigeWissensbuch() {
     const frei = wissenFrei(stand);
@@ -165,7 +156,7 @@
     const z = ZI.ZWERGE.find((d) => d.nr === liste[0]);
     ZI.ton.fanfare(); ZI.konfetti();
     const f = ZI.fenster([
-      h('div', { style: { width: '120px' } }, bild('truhe-offen', 'Offene Schatztruhe')),
+      bild('truhe-offen', 'Offene Schatztruhe', 'truhe-klein'),
       h('h2', null, 'Neuer Zwerg freigeschaltet!'),
       h('div', { class: 'gross-bild strahlen' }, bild(z.datei, z.name)),
       h('div', { style: { fontSize: '26px', fontFamily: 'var(--titel)' } }, z.name + ' · ' + z.rolle),
@@ -620,15 +611,21 @@
     return ZI.ABZEICHEN.filter((a) => a.test(s, x));
   }
   function medaille(a, frei) {
+    const name = ZI.abzeichenName(a, stand);
     return h('div', { class: 'medaille ' + a.stufe + (frei ? '' : ' gesperrt') },
-      h('div', { class: 'medaille-rund' + (frei ? ' mit-bild' : '') }, frei ? ZI.bildOder('abzeichen-' + a.id, a.name, h('span', { class: 'medaille-symbol' }, icon[a.symbol]())) : h('span', null, '?')),
-      h('div', { class: 'medaille-name' }, frei ? a.name : '???'),
+      h('div', { class: 'medaille-rund' + (frei ? ' mit-bild' : '') }, frei ? ZI.bildOder('abzeichen-' + a.id, name, h('span', { class: 'medaille-symbol' }, icon[a.symbol]())) : h('span', null, '?')),
+      h('div', { class: 'medaille-name' }, frei ? name : '???'),
       h('div', { class: 'medaille-text' }, a.text));
   }
-  function zeigeErfolge(neuerRang, abzeichen, danach) {
-    if (!neuerRang && !abzeichen.length) { danach && danach(); return; }
-    ZI.ton.fanfare(); ZI.konfetti(120);
+  /* Alle Belohnungen einer Station in EINEM Fenster: Wissensbuch, Rang, Abzeichen */
+  function zeigeErfolge(neuerRang, abzeichen, seiten, danach) {
+    seiten = seiten || [];
+    if (!neuerRang && !abzeichen.length && !seiten.length) { danach && danach(); return; }
+    if (neuerRang || abzeichen.length) { ZI.ton.fanfare(); ZI.konfetti(120); }
     const f = ZI.fenster([
+      seiten.length ? h('div', { class: 'belohnung-seiten' },
+        h('h2', { style: { fontSize: '26px' } }, seiten.length === 1 ? 'Neue Seite im Wissensbuch!' : seiten.length + ' neue Seiten im Wissensbuch!'),
+        ...seiten.map((w) => seitenKarte(w, true))) : null,
       neuerRang ? h('div', { class: 'rang-neu' },
         h('div', { style: { fontSize: '18px', color: 'var(--tinte-hell)' } }, 'Neuer Rang!'),
         h('h2', null, neuerRang.name),
@@ -637,8 +634,10 @@
           h('div', { class: 'huepf-zwerg gross' }, bild([aktuellerZwerg().datei + '-jubel', aktuellerZwerg().datei], aktuellerZwerg().name)))) : null,
       abzeichen.length ? h('h2', { style: { fontSize: '28px' } }, abzeichen.length === 1 ? 'Neues Abzeichen!' : abzeichen.length + ' neue Abzeichen!') : null,
       abzeichen.length ? h('div', { class: 'medaillen' }, abzeichen.map((a) => medaille(a, true))) : null,
-      h('button', { class: 'knopf', onclick: () => { f.schliessen(); danach && danach(); } }, 'Weiter'),
+      h('div', { class: 'fenster-fuss' }, h('button', { class: 'knopf', onclick: () => { f.schliessen(); danach && danach(); } }, 'Weiter')),
     ]);
+    const teile = (seiten.length ? 1 : 0) + (neuerRang ? 1 : 0) + (abzeichen.length ? 1 : 0);
+    if (teile > 1) f.el.classList.add('erfolge-kompakt');
   }
   function zeigeAlbum() {
     const frei = abzeichenFrei(stand);
@@ -682,7 +681,7 @@
 
     function zeigeItem() {
       const it = items[nr];
-      if (it.ws) bue.person(it.ws); else bue.werkstueck(wsVorher);
+      if (it.ws) bue.person(it.ws); else if (/^kobold/.test(wsVorher)) bue.person(wsVorher); else bue.werkstueck(wsVorher);
       let fehler = 0;
       let geloest = false;
       const rueck = h('div');
@@ -1447,7 +1446,7 @@
     zeige(h('div', { class: 'screen' },
       ZI.hintergrund('zwergenrat-hintergrund', 'hg-ersatz-stollen', 'rgba(20,12,8,0.35)'),
       h('div', { class: 'leiste' },
-        h('button', { class: 'rund', 'aria-label': 'Zurück', onclick: () => { laeuft = false; clearTimeout(timer); zeigeHalle(); } }, icon.zurueck()),
+        h('button', { class: 'rund', 'aria-label': 'Zurück zur Halle', onclick: () => { laeuft = false; clearTimeout(timer); zeigeHalle(); } }, icon.zurueck()),
         h('div', { class: 'titel' }, 'Sprecherwechsel'),
         h('div', { class: 'spacer' }), zaehlerEl, h('div', { class: 'zaehler', 'aria-label': 'Glatte Wechsel' }, bild('stern', 'Punkte'), punktEl), tonKnopf()),
       h('div', { class: 'sw-buehne' }, h('div', { class: 'sw-reihe' }, sprecherBild, blase), ergebnis, knopf)));
@@ -1546,7 +1545,7 @@
     zeige(h('div', { class: 'screen' },
       ZI.hintergrund('vulkan-hintergrund', 'hg-ersatz-vulkan', 'rgba(20,12,8,0.3)'),
       h('div', { class: 'leiste' },
-        h('button', { class: 'rund', 'aria-label': 'Zurück', onclick: () => { laeuft = false; clearInterval(timer); clearTimeout(spawner); zeigeHalle(); } }, icon.zurueck()),
+        h('button', { class: 'rund', 'aria-label': 'Zurück zur Halle', onclick: () => { laeuft = false; clearInterval(timer); clearTimeout(spawner); zeigeHalle(); } }, icon.zurueck()),
         h('div', { class: 'titel' }, titel),
         h('div', { class: 'spacer' }), h('div', { class: 'zaehler', 'aria-label': 'Punkte' }, bild('stern', 'Punkte'), punktEl), zeitEl, tonKnopf()),
       arena));

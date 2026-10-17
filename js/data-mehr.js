@@ -31,7 +31,7 @@
         { text: '… weil sich dann alle besser konzentrieren können.', scharf: true, info: 'Genau! Das erklärt, warum Ruhe hilft.' }] },
     { meinung: 'Ich finde, dass man Tiere gut behandeln sollte, …',
       optionen: [
-        { text: '… weil Tiere genau wie wir Schmerzen und Angst spüren.', scharf: true, info: 'Richtig! Diese Begründung gilt für alle Menschen.' },
+        { text: '… weil Tiere genau wie wir Schmerzen und Angst spüren.', scharf: true, info: 'Richtig! Diese Begründung erklärt, warum Tiere Rücksicht brauchen.' },
         { text: '… weil man das so macht.', scharf: false, info: 'Das erklärt nicht, warum.' },
         { text: '… weil ich Tiere mag.', scharf: false, info: 'Das ist nur dein Gefühl. Warum sollten alle Tiere gut behandeln?' }] },
     { meinung: 'Ich finde, dass man im Bus älteren Menschen seinen Platz anbieten sollte, …',

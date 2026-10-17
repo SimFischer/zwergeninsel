@@ -170,9 +170,12 @@
   };
 
   /* ---------- Kurze Meldung unten ---------- */
+  /* Meldungen erscheinen in einem Stapel, damit sich gleichzeitige nicht überdecken */
   ZI.meldung = function (text, ms) {
+    let stapel = document.querySelector('.meldungen');
+    if (!stapel) { stapel = h('div', { class: 'meldungen', 'aria-live': 'polite' }); document.body.appendChild(stapel); }
     const m = h('div', { class: 'meldung pergament', role: 'status' }, text);
-    document.body.appendChild(m);
+    stapel.appendChild(m);
     setTimeout(() => m.remove(), ms || 2600);
   };
 
