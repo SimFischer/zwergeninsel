@@ -655,3 +655,21 @@ img.truhe-klein, .platzhalter.truhe-klein { width: 110px; height: auto; max-heig
 /* Zwergenpass-Bild neben dem Hinweis */
 .pass-bild { width: 120px; flex: none; }
 .pass-bild img, .pass-bild .platzhalter { width: 100%; height: auto; display: block; }
+
+/* Vollbild-Knopf auf dem Startbildschirm (oben rechts) */
+.vollbild-start { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); z-index: 5; }
+
+/* iPad-Breite: Kopfleiste etwas kompakter, damit alle Knöpfe in eine Zeile passen */
+@media (max-width: 1180px) {
+  .leiste { gap: 8px; padding-left: 14px; padding-right: 14px; }
+  .leiste .rund { width: 48px; height: 48px; }
+  .leiste .rund svg { width: 24px; height: 24px; }
+  .zaehler { padding: 3px 10px 3px 5px; font-size: 20px; gap: 4px; }
+  .zaehler img, .zaehler .platzhalter { width: 30px; height: 30px; }
+}
+
+/* Halle: Rohstoffe stehen normal in der Leiste, im Hochformat in einer eigenen zweiten Zeile */
+.rohstoff-reihe { display: contents; }
+@media (max-width: 900px) {
+  .halle-leiste .rohstoff-reihe { display: flex; gap: 8px; order: 2; flex-basis: 100%; justify-content: center; }
+}

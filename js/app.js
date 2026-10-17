@@ -189,10 +189,32 @@
   function aktuellerZwerg() { return ZI.ZWERGE.find((z) => z.nr === stand.zwerg); }
 
   /* ---------- Gemeinsame Bausteine ---------- */
+  /* ---------- Vollbild (iPad-Safari und Laptop) ---------- */
+  const kannVollbild = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+  const imVollbild = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+  function vollbildUmschalten() {
+    const el = document.documentElement;
+    try {
+      if (imVollbild()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      else if (el.requestFullscreen) el.requestFullscreen().catch(() => ZI.meldung('Vollbild ist auf diesem Gerät nicht möglich.'));
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } catch (e) { ZI.meldung('Vollbild ist auf diesem Gerät nicht möglich.'); }
+  }
+  const vollbildAnzeigen = () => document.querySelectorAll('.vollbild-knopf').forEach((b) => {
+    ZI.setze(b, imVollbild() ? icon.vollbildAus() : icon.vollbild());
+    b.setAttribute('aria-label', imVollbild() ? 'Vollbild beenden' : 'Vollbild');
+  });
+  document.addEventListener('fullscreenchange', vollbildAnzeigen);
+  document.addEventListener('webkitfullscreenchange', vollbildAnzeigen);
+  function vollbildKnopf(extra) {
+    if (!kannVollbild) return null;
+    return h('button', { class: 'rund vollbild-knopf' + (extra ? ' ' + extra : ''), 'aria-label': imVollbild() ? 'Vollbild beenden' : 'Vollbild', title: 'Vollbild', onclick: vollbildUmschalten },
+      imVollbild() ? icon.vollbildAus() : icon.vollbild());
+  }
   function tonKnopf() {
     const b = h('button', { class: 'rund', 'aria-label': 'Ton an oder aus' }, ZI.ton.an ? icon.ton() : icon.stumm());
     b.addEventListener('click', () => { const an = ZI.ton.umschalten(); ZI.setze(b, an ? icon.ton() : icon.stumm()); });
-    return b;
+    return [vollbildKnopf(), b];
   }
   function zaehler(datei, name, wert) {
     return h('div', { class: 'zaehler', 'aria-label': name + ': ' + wert }, bild(datei, name), String(wert));
@@ -232,6 +254,7 @@
 
     zeige(h('div', { class: 'screen' },
       ZI.hintergrund('titel-hintergrund', 'hg-ersatz-titel', 'rgba(20,12,8,0.15)'),
+      vollbildKnopf('vollbild-start'),
       h('div', { class: 'start-mitte' },
         h('div', { class: 'logo' }, 'Zwergeninsel'),
         h('div', { class: 'logo-unter' }, 'Schmiede Argumente – baut gemeinsam euer Dorf!'),
@@ -512,7 +535,7 @@
 
     zeige(h('div', { class: 'screen' },
       ZI.hintergrund('stollen-hintergrund', 'hg-ersatz-stollen', 'rgba(20,12,8,0.35)'),
-      h('div', { class: 'leiste' },
+      h('div', { class: 'leiste halle-leiste' },
         h('button', { class: 'rund', style: { width: '64px', height: '64px', padding: 0, background: 'none', boxShadow: 'none' }, 'aria-label': 'Zwergen-Sammlung öffnen', onclick: () => zeigeWahl(false) }, avatar(stand.zwerg, true)),
         h('div', { class: 'rang-box' },
           h('div', { class: 'titel' }, z.name),
@@ -520,8 +543,7 @@
           h('div', { class: 'rang-balken', 'aria-label': rang.naechsterName ? 'Noch ' + (rang.naechsterAb - rang.punkte) + ' Punkte bis ' + rang.naechsterName : 'Höchster Rang erreicht' },
             h('div', { style: { width: (rang.naechsterAb ? ((rang.punkte - rang.ab) / (rang.naechsterAb - rang.ab)) * 100 : 100) + '%' } }))),
         h('div', { class: 'spacer' }),
-        ...rohstoffe,
-        zaehler('edelstein', 'Edelsteine', stand.gems()),
+        h('div', { class: 'rohstoff-reihe' }, ...rohstoffe, zaehler('edelstein', 'Edelsteine', stand.gems())),
         h('button', { class: 'rund', 'aria-label': 'Zwergen-Wissensbuch öffnen', onclick: zeigeWissensbuch }, icon.buch()),
         h('button', { class: 'rund', 'aria-label': 'Abzeichen-Album öffnen', onclick: zeigeAlbum }, icon.album()),
         musikKnopf(),
