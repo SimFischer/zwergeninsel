@@ -366,6 +366,50 @@
     },
   ];
 
+  /* Rollen im Zwergenrat – damit nicht immer dieselben reden */
+  ZI.RATSROLLEN = [
+    { id: 'leitung', name: 'Ratsleitung', text: 'Erteilt das Wort und achtet darauf, dass alle drankommen.', zeichen: '🔔' },
+    { id: 'zusammen', name: 'Zusammenfassung', text: 'Fasst am Ende die wichtigsten Gründe beider Seiten zusammen.', zeichen: '📜' },
+    { id: 'regeln', name: 'Regelwache', text: 'Achtet auf die Ratsregeln und erinnert freundlich daran.', zeichen: '🛡️' },
+    { id: 'zeit', name: 'Zeitwache', text: 'Behält die Redezeit im Blick und sagt Bescheid, wenn die Zeit fast um ist.', zeichen: '⏳' },
+  ];
+
+  /* Rückblick: „Ich kann …“ pro Kapitel. uebung zeigt, wo man nachüben kann. */
+  ZI.ICH_KANN = [
+    [
+      { text: 'Ich erkenne, ob eine Begründung wirklich erklärt, WARUM.', uebung: { art: 'kern', i: 0 } },
+      { text: 'Ich finde Begründungen, die zur Meinung passen.', uebung: { art: 'kern', i: 1 } },
+      { text: 'Ich baue Sätze mit weil, da und denn richtig.', uebung: { art: 'kern', i: 2 } },
+      { text: 'Ich kann eine Begründung mit einem Beispiel stützen.', uebung: { art: 'tief', i: 1 } },
+      { text: 'Ich kann meine Meinung laut und begründet sagen.', uebung: { art: 'tief', i: 2 } },
+    ],
+    [
+      { text: 'Ich kenne die drei Teile eines Arguments: These, Begründung und Beispiel.', uebung: { art: 'kern', i: 0 } },
+      { text: 'Ich erkenne Gesprächsmotoren und Gesprächsbremsen.', uebung: { art: 'kern', i: 1 } },
+      { text: 'Ich höre genau zu und erkenne Meinung, Begründung und Beispiel.', uebung: { art: 'kern', i: 2 } },
+      { text: 'Ich unterscheide Stützen von neuen Argumenten.', uebung: { art: 'tief', i: 1 } },
+    ],
+    [
+      { text: 'Ich erkenne, ob jemand zustimmt, widerspricht oder das Thema wechselt.', uebung: { art: 'kern', i: 0 } },
+      { text: 'Ich knüpfe an das an, was andere gesagt haben.', uebung: { art: 'kern', i: 1 } },
+      { text: 'Ich nehme Einwände ernst und antworte mit einer Lösung.', uebung: { art: 'kern', i: 2 } },
+      { text: 'Ich finde Gegenargumente.', uebung: { art: 'tief', i: 0 } },
+      { text: 'Ich wähle Argumente, die zu meinem Gegenüber passen.', uebung: { art: 'tief', i: 1 } },
+    ],
+  ];
+  ZI.EINSCHAETZUNG = [
+    { wert: 3, text: 'Kann ich sicher', klasse: 'sicher' },
+    { wert: 2, text: 'Fast', klasse: 'fast' },
+    { wert: 1, text: 'Noch üben', klasse: 'ueben' },
+  ];
+
+  /* Stationsnamen für Überblick und Urkunde am Board */
+  ZI.STATIONS_NAMEN = [
+    { kern: ['Stumpf oder scharf?', 'Erz oder Schlacke?', 'Weil-Denn-Amboss'], tief: ['Fehlerjagd', 'Beispiel-Edelstein', 'Meisterstück'], bonus: 'Funkenregen' },
+    { kern: ['Argument-Puzzle', 'Motor oder Bremse?', 'Hör-Stollen'], tief: ['Kobold-Kampf', 'Argument-Kette', 'Meisterstück II'], bonus: 'Beispiel-Regen' },
+    { kern: ['Ja, und – ja, aber?', 'Wer hört zu?', 'Überzeug den Inselrat'], tief: ['Gegenargument-Schmiede', 'Wer überzeugt wen?', 'Streitgespräch'], bonus: 'Sprecherwechsel' },
+  ];
+
   ZI.bauUebung = (id) => ZI.BAU_UEBUNGEN.find((u) => u.id === id) || null;
 
   /* Wissensbuch-Seiten der Gebäude */

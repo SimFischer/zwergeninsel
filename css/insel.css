@@ -272,3 +272,47 @@ body.insel-seite .meldungen { top: calc(3vh * var(--ui, 1)); bottom: auto; flex-
 @keyframes rat-puls { 0%, 100% { box-shadow: 0 0 0 0 rgba(232, 178, 58, 0.0); } 50% { box-shadow: 0 0 0 6px rgba(232, 178, 58, 0.35); } }
 .tafel-botschaft b { white-space: nowrap; }
 .tafel.zu .tafel-botschaft b { font-size: clamp(20px, 1.6vw, 28px); }
+
+/* ---------- Rollen und Redeliste ---------- */
+.rollen-leiste { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: -0.8vw; }
+.rolle-chip { display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; background: rgba(255, 250, 240, 0.92); border: 2px solid #b08a5a; font-size: clamp(15px, 1.1vw, 24px); }
+.rolle-zeichen { font-size: 1.2em; }
+.rollen-karten { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-self: stretch; }
+.rollen-karte { padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.rollen-karte h3 { margin: 0; font-size: 22px; }
+.rollen-karte p { margin: 0; font-size: 15px; color: var(--tinte-hell); flex: 1; }
+.rollen-zeichen { font-size: 40px; line-height: 1; }
+.karten-kopf { display: flex; align-items: center; gap: 6px; }
+.karten-kopf img, .karten-kopf .platzhalter, .karten-kopf-leer { width: 42px; height: 42px; object-fit: contain; font-size: 0; padding: 0; border-radius: 8px; }
+.karten-kopf-leer { background: rgba(58, 38, 23, 0.08); }
+.karten-kopf b { font-family: var(--titel); font-weight: 400; font-size: 26px; }
+.fenster.rede-dialog { max-width: min(1180px, 96vw); width: 96vw; }
+.rede-raster { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; align-self: stretch; }
+.rede-zelle { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; border-radius: 12px; border: 2px solid rgba(58, 38, 23, 0.2); background: rgba(58, 38, 23, 0.06); cursor: pointer; min-height: 76px; }
+.rede-zelle.stufe-1 { background: #e4f1d4; border-color: #9cc46f; }
+.rede-zelle.stufe-2 { background: #c9e3a8; border-color: #6b9b3a; }
+.rede-zelle.stufe-3 { background: #f6dc8a; border-color: #c89a2a; }
+.rede-zelle.hervor { box-shadow: 0 0 0 4px var(--gold, #e8b23a); animation: aufploppen 0.5s; }
+.rede-striche { font-family: var(--titel); letter-spacing: 2px; color: #55812a; min-height: 18px; font-size: 18px; }
+.knopf.aktiv { outline: 3px solid var(--gold, #e8b23a); }
+@media (max-width: 900px) { .rollen-karten { grid-template-columns: 1fr 1fr; } .rede-raster { grid-template-columns: repeat(6, 1fr); } }
+.rat-inhalt { grid-template-rows: auto auto minmax(0, 1fr); }
+.rollen-leiste.leer { display: none; }
+.rolle-chip { color: var(--tinte, #3a2617); background: #fffaf0; box-shadow: 0 3px 0 rgba(0,0,0,0.25); }
+
+/* ---------- Klassenüberblick ---------- */
+.fenster.ueberblick-dialog { max-width: min(1180px, 96vw); width: 96vw; text-align: left; align-items: stretch; }
+.ue-spalten { display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; }
+.ue-spalten h3 { margin: 12px 0 6px; font-size: 22px; }
+.ue-zeile { display: grid; grid-template-columns: 210px 1fr 64px; gap: 10px; align-items: center; font-size: 17px; }
+.ue-balken { height: 16px; border-radius: 8px; background: rgba(58, 38, 23, 0.1); overflow: hidden; }
+.ue-balken div { height: 100%; background: #7fb24a; border-radius: 8px; }
+.ue-zeile.schwer .ue-balken div { background: #e8a23a; }
+.ue-zahl { text-align: right; font-weight: 700; }
+.ue-krone { font-size: 14px; color: var(--tinte-hell); margin: 0 0 6px 220px; }
+.ue-offen { display: flex; flex-wrap: wrap; gap: 8px; }
+.ue-karte { display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border-radius: 10px; background: #fff1cf; border: 2px solid #e8b23a; font-size: 15px; }
+.ue-karte.nie { background: rgba(58, 38, 23, 0.06); border-color: rgba(58, 38, 23, 0.2); }
+.ue-karte .karten-kopf img, .ue-karte .karten-kopf-leer { width: 32px; height: 32px; }
+.ue-karte .karten-kopf b { font-size: 20px; }
+@media (max-width: 900px) { .ue-spalten { grid-template-columns: 1fr; } }

@@ -5,6 +5,7 @@ Ein Lernspiel zum **mündlichen Argumentieren** für die 5. Klasse. Die Kinder s
 - **Schmiede** (Schüler-iPads): `index.html`
 - **Insel** (Lehrer-iPad oder PC am Smartboard): `insel.html`
 - **Zwergenpass-Karten** zum Ausdrucken: `karten.html`
+- **Stundenverläufe und Spickzettel** für die Lehrkraft: `lehrkraft.html`
 
 Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden keine Namen und keine Daten übertragen. Am Ende der Stunde nennt jedes Kind einen 4-stelligen Lieferschein, den die Lehrkraft an der Insel eintippt. Der Spielstand jedes Kindes steckt in einem 12-stelligen Code (XXXX-XXXX-XXXX), dem **Zwergenpass**. Ältere 10-stellige Codes funktionieren weiterhin.
 
@@ -88,6 +89,14 @@ Jedes Gebäude, über das der Rat abstimmt, schaltet in der Schmiede eine eigene
 Jede Gebäude-Übung bringt einen Rangpunkt und eine Seite im Wissensbuch (insgesamt jetzt 28 Seiten).
 
 **Inselbotschaft:** Das Board zeigt in der Materialtafel immer ein Wort aus drei Silben (z. B. „LA DI LO“). Es enthält das offene Kapitel und alle gebauten Gebäude. Die Kinder tippen es zu Stundenbeginn einmal in der Schmiede ein – danach sind die passenden Gebäude-Stollen und Kapitel offen. Die Botschaft gilt auf einem iPad einen Schultag lang. Die alten Runenwörter AMBOSS und LEUCHTTURM funktionieren weiterhin.
+
+**Rollen und Redeliste:** Im Zwergenrat lassen sich vier Rollen auslosen (Ratsleitung, Zusammenfassung, Regelwache, Zeitwache) – wer schon eine Rolle hatte, kommt erst wieder dran, wenn alle einmal dran waren. Die Redeliste zeigt, wer schon etwas beigetragen hat, und schlägt Kinder vor, die noch nicht dran waren.
+
+## Rückblick, Überblick, Urkunden
+
+- **Rückblick (Schmiede):** In jedem Kapitel „Selbst einschätzen“: „Ich kann …“-Sätze mit „Kann ich sicher / Fast / Noch üben“. Bei Unsicherheit schlägt die App die passende Station zum Üben vor; am Ende steht ein persönliches Ziel. Die Einschätzung bleibt auf dem iPad.
+- **Klassenüberblick (Board → Zahnrad):** Wie viele Kinder welche Station geschafft haben, wer den Hauptstollen noch nicht fertig hat und welche Station selten fehlerfrei gelingt (Tipp fürs Plenum). Fehlerfrei-Werte und Gebäude-Stollen kennt die Insel nur aus langen Zwergenpass-Codes.
+- **Urkunden (Board → Zahnrad):** eine Seite pro Kind mit Zwerg, Rang, Erfolgen und einer „Ich kann …“-Tabelle zum Ankreuzen.
 
 ## Lernhilfen in allen Kapiteln
 

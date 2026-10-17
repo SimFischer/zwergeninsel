@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zwergeninsel – Stundenverlauf und Spickzettel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Lilita+One&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 12mm; }
+  :root { --tinte: #3a2617; --hell: #6b5442; --holz: #8a4b1c; --rand: #b08a5a; --papier: #fffaf0; --gruen: #e4f1d4; --gold: #fff1cf; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Andika', sans-serif; color: var(--tinte); background: #efe6d6; font-size: 15px; line-height: 1.45; }
+  .leiste { position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 10px 16px; background: #3a2617; color: #fff4dc; }
+  .leiste a, .leiste button { font: inherit; font-weight: 700; color: var(--tinte); background: #e8b23a; border: 0; border-radius: 8px; padding: 7px 14px; text-decoration: none; cursor: pointer; }
+  .leiste span { margin-right: auto; font-family: 'Lilita One', sans-serif; font-size: 20px; }
+  .blatt { max-width: 186mm; margin: 16px auto; background: var(--papier); border-radius: 10px; padding: 12mm 13mm; box-shadow: 0 2px 10px rgba(0,0,0,.12); }
+  h1 { font-family: 'Lilita One', sans-serif; font-weight: 400; color: var(--holz); font-size: 28px; margin: 0 0 2px; }
+  h2 { font-size: 18px; margin: 16px 0 6px; }
+  .unter { color: var(--hell); margin: 0 0 10px; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; }
+  th, td { border: 1px solid var(--rand); padding: 5px 8px; vertical-align: top; text-align: left; }
+  th { background: #f3e6c8; }
+  td.zeit { width: 62px; white-space: nowrap; font-weight: 700; }
+  td.wer { width: 74px; white-space: nowrap; color: var(--hell); }
+  .kasten { border: 2px solid var(--rand); border-radius: 8px; padding: 8px 12px; margin: 8px 0; background: #fff; }
+  .kasten.gold { background: var(--gold); border-color: #e8b23a; }
+  .kasten.gruen { background: var(--gruen); border-color: #9cc46f; }
+  .spalten { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+  ul { margin: 4px 0; padding-left: 20px; }
+  li { margin-bottom: 2px; }
+  .k { display: inline-block; padding: 0 6px; border-radius: 5px; background: #f3e6c8; border: 1px solid var(--rand); font-weight: 700; white-space: nowrap; }
+  @media print {
+    body { background: #fff; font-size: 11pt; }
+    .leiste { display: none; }
+    .blatt { box-shadow: none; margin: 0; padding: 0; max-width: none; border-radius: 0; break-after: page; }
+    .blatt:last-child { break-after: auto; }
+  }
+  @media (max-width: 700px) { .spalten { grid-template-columns: 1fr; } .blatt { padding: 18px; } }
+</style>
+</head>
+<body>
+<div class="leiste"><span>Zwergeninsel · Für Lehrkräfte</span><a href="#s1">Stunde 1</a><a href="#s2">Stunde 2</a><a href="#s3">Stunde 3</a><a href="#spick">Spickzettel</a><button onclick="window.print()">Drucken</button></div>
+
+<!-- ===================== STUNDE 1 ===================== -->
+<section class="blatt" id="s1">
+  <h1>Stunde 1 · Gestrandet</h1>
+  <p class="unter">Schwerpunkt: Begründungen, die wirklich erklären – Verknüpfen mit weil, da und denn.</p>
+  <div class="kasten gold"><b>Vorbereiten:</b> Zwergenpass-Karten drucken (<span class="k">karten.html</span>) und verteilen. Insel am Board öffnen, unter Zahnrad die Klassengröße prüfen. Koffer-iPads mit der Schmiede (<span class="k">index.html</span>) bereitlegen.</div>
+  <table>
+    <tr><th>Zeit</th><th>Wer</th><th>Ablauf</th></tr>
+    <tr><td class="zeit">0–5</td><td class="wer">Plenum</td><td><b>Geschichte am Board:</b> Der Zwergenclan ist gestrandet. Die Ruinen zeigen, was wir aufbauen. „Mit jedem guten Argument bekommt das Dorf Baumaterial.“ Ziel klären: Wir lernen, unsere Meinung überzeugend zu begründen.</td></tr>
+    <tr><td class="zeit">5–8</td><td class="wer">iPads</td><td><b>Start:</b> „Neuer Zwerg“ → Zwerg wählen → Kartennummer antippen (steht oben auf der Karte). Name auf die Karte schreiben.</td></tr>
+    <tr><td class="zeit">8–30</td><td class="wer">iPads</td><td><b>Schmiede, Hauptstollen:</b> Stumpf oder scharf? · Erz oder Schlacke? · Weil-Denn-Amboss. Meisterin Hammerlind macht jede Station einmal vor. Wer fertig ist: Tiefe Stollen und Funkenregen (bringen Edelsteine für Schmuck, nicht für Gebäude).<br><i>Sie gehen herum, hören beim Meisterstück zu und helfen Kindern, die zweimal falsch lagen.</i></td></tr>
+    <tr><td class="zeit">30–34</td><td class="wer">Board</td><td><b>Lieferung:</b> „Lieferung“ antippen. Jedes Kind sagt seinen Lieferschein („Sieben: S V C U“), Sie tippen am Laptop mit. Danach schreiben die Kinder ihren Zwergenpass auf die Karte. Das Dorf wächst – und hält an: <b>Der Zwergenrat muss entscheiden.</b></td></tr>
+    <tr><td class="zeit">34–45</td><td class="wer">Plenum</td><td><b>Zwergenrat (2 Fragen):</b> „Rollen“ → auslosen (Ratsleitung, Zusammenfassung, Regelwache, Zeitwache). Jedes Gebäude zeigt, welche Übung es freischaltet: Welche braucht unsere Klasse zuerst? Satzanfänge stehen am Board. „Redeliste“ zeigt, wer schon dran war. Abstimmen → das Gebäude entsteht. Die zweite Frage öffnet sich danach von selbst.</td></tr>
+  </table>
+  <div class="spalten">
+    <div class="kasten gruen"><b>Differenzierung</b><ul><li>Langsame: nur Hauptstollen, Vorlese-Knopf, Hilfe nach 2 Fehlern.</li><li>Schnelle: Tiefe Stollen, Bonusinsel, Meisterstück mit Partner.</li><li>Das Dorf wächst nur durch den Hauptstollen – jedes Kind zählt gleich.</li></ul></div>
+    <div class="kasten"><b>Wenn die Zeit knapp wird</b><ul><li>Rat auf eine Frage kürzen, die zweite zu Beginn von Stunde 2.</li><li>Redezeit unter 5 Minuten halten (Zeitwache!).</li><li>Lieferung nie streichen – sonst fehlt das Material.</li></ul></div>
+  </div>
+</section>
+
+<!-- ===================== STUNDE 2 ===================== -->
+<section class="blatt" id="s2">
+  <h1>Stunde 2 · Das Dorf wächst</h1>
+  <p class="unter">Schwerpunkt: These – Begründung – Beispiel, Gesprächsmotoren und gutes Zuhören.</p>
+  <table>
+    <tr><th>Zeit</th><th>Wer</th><th>Ablauf</th></tr>
+    <tr><td class="zeit">0–6</td><td class="wer">Plenum</td><td><b>Inselrätsel:</b> 5 Wiederholungsfragen, die Klasse zeigt A/B/C mit den Fingern. Für jede Runde, in der die Mehrheit richtig lag, bringt eine Möwe ein Geschenk.<br>Optional: <b>Auftrag des Tages</b> wählen (z. B. „Heute schaffen wir 11 Tiefe Stollen“).</td></tr>
+    <tr><td class="zeit">6–9</td><td class="wer">iPads</td><td><b>Anmelden:</b> „Ich habe einen Zwergenpass“ → Code von der Karte eintippen. Dann <b>Inselbotschaft</b> eintippen (steht in der Materialtafel, drei Silben). Damit öffnen sich Kapitel 2 und die Gebäude-Stollen.</td></tr>
+    <tr><td class="zeit">9–31</td><td class="wer">iPads</td><td><b>Schmiede, Kapitel 2:</b> Argument-Puzzle · Motor oder Bremse? · Hör-Stollen (Kopfhörer!). Wer fertig ist: Gebäude-Stollen aus Kapitel 1, Tiefe Stollen, Beispiel-Regen. Wer Kapitel 1 noch nicht fertig hat, macht das zuerst.</td></tr>
+    <tr><td class="zeit">31–35</td><td class="wer">Board</td><td><b>Lieferung</b> wie in Stunde 1. Pässe aufschreiben lassen.</td></tr>
+    <tr><td class="zeit">35–45</td><td class="wer">Plenum</td><td><b>Zwergenrat (2 Fragen):</b> Bibliothek oder Ratsplatz? Brunnen oder Mühle? Neue Rollen auslosen – wer schon eine hatte, kommt erst wieder dran, wenn alle einmal dran waren. Auf Anknüpfen achten: „Du sagst, dass … Ich denke, dass …“</td></tr>
+  </table>
+  <div class="kasten gold"><b>Kapitel 2 öffnet sich nicht?</b> Ein Kapitel ist geschafft, wenn das Material der ganzen Klasse reicht (3 pro Kind). Fehlen Kinder, unter Zahnrad die Klassengröße verkleinern oder dort „Kapitel 2“ von Hand wählen. Danach zeigt die Tafel die passende Inselbotschaft.</div>
+</section>
+
+<!-- ===================== STUNDE 3 ===================== -->
+<section class="blatt" id="s3">
+  <h1>Stunde 3 · Das Inselfest</h1>
+  <p class="unter">Schwerpunkt: auf andere eingehen, Einwände entkräften, Gegenargumente – und Rückblick.</p>
+  <table>
+    <tr><th>Zeit</th><th>Wer</th><th>Ablauf</th></tr>
+    <tr><td class="zeit">0–5</td><td class="wer">Plenum</td><td><b>Inselrätsel</b> (jetzt mit Fragen aus allen Kapiteln).</td></tr>
+    <tr><td class="zeit">5–8</td><td class="wer">iPads</td><td>Zwergenpass und neue <b>Inselbotschaft</b> eintippen.</td></tr>
+    <tr><td class="zeit">8–26</td><td class="wer">iPads</td><td><b>Schmiede, Kapitel 3:</b> Ja, und – ja, aber? · Wer hört zu? · Überzeug den Inselrat. Danach Gebäude-Stollen aus Kapitel 2, Tiefe Stollen (Streitgespräch zu zweit!).</td></tr>
+    <tr><td class="zeit">26–30</td><td class="wer">Board</td><td><b>Lieferung.</b> Für die Urkunden möglichst den <b>langen Zwergenpass</b> eingeben lassen (Lieferungen → „Langen Zwergenpass-Code eintippen“): Dann kennt die Insel auch Kronen und Gebäude-Stollen.</td></tr>
+    <tr><td class="zeit">30–37</td><td class="wer">Plenum</td><td><b>Letzter Zwergenrat:</b> Leuchtturm oder Festhalle? Danach entsteht das Schiff, das Fest beginnt, das Schiff segelt los.</td></tr>
+    <tr><td class="zeit">37–45</td><td class="wer">iPads</td><td><b>Rückblick:</b> In jedem Kapitel ganz unten „Selbst einschätzen“. Die Kinder sehen, welche Station sie noch üben können, und formulieren ein Ziel. Abschluss im Kreis: „Was kann ich jetzt besser als vor drei Stunden?“</td></tr>
+  </table>
+  <div class="spalten">
+    <div class="kasten gruen"><b>Nach der Stunde</b><ul><li>Zahnrad → <b>Klassenüberblick</b>: Welche Station fällt schwer? Wer hat den Hauptstollen noch nicht fertig?</li><li>Zahnrad → <b>Urkunden drucken</b>: eine pro Kind, mit „Ich kann …“-Tabelle zum Ankreuzen.</li></ul></div>
+    <div class="kasten"><b>Weiterarbeiten</b><ul><li>Die Selbsteinschätzung ist eine gute Grundlage für ein Lernentwicklungsgespräch.</li><li>Im Klassenrat die Rollenkarten und Satzanfänge weiter nutzen.</li></ul></div>
+  </div>
+</section>
+
+<!-- ===================== SPICKZETTEL ===================== -->
+<section class="blatt" id="spick">
+  <h1>Spickzettel fürs Lehrerpult</h1>
+  <div class="spalten">
+    <div>
+      <h2>Die drei Codes</h2>
+      <ul>
+        <li><b>Kartennummer</b> (1–32): steht auf der Karte, bleibt immer gleich.</li>
+        <li><b>Lieferschein</b> (4 Zeichen, z. B. <span class="k">S V C U</span>): nennt das Kind am Ende der Stunde. Sie tippen ihn an der Insel ein, ohne Enter.</li>
+        <li><b>Zwergenpass</b> (12 Zeichen, <span class="k">XXXX-XXXX-XXXX</span>): ganzer Spielstand. Kommt nach jeder Stunde auf die Karte. Alten Code durchstreichen.</li>
+        <li><b>Inselbotschaft</b> (3 Silben, z. B. <span class="k">LA DI LO</span>): steht in der Materialtafel. Die Kinder tippen sie einmal pro Stunde in der Schmiede ein.</li>
+      </ul>
+      <h2>Am Board</h2>
+      <ul>
+        <li><b>Lieferungen:</b> Codes eintippen, grüne Nummern = heute geliefert, „Rückgängig“ für den letzten Eintrag.</li>
+        <li><b>Zwergenrat:</b> Rollen, Redeliste, Redezeit, Abstimmen.</li>
+        <li><b>Inselrätsel:</b> 5 Fragen zur Wiederholung.</li>
+        <li><b>Auftrag:</b> Klassenziel des Tages.</li>
+        <li><b>Mond:</b> Nachtmodus. <b>Zahnrad:</b> Klassengröße, Kapitel, Überblick, Urkunden, Sichern.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Wenn etwas hakt</h2>
+      <table>
+        <tr><th>Problem</th><th>Lösung</th></tr>
+        <tr><td>Code vergessen</td><td>Auf der Karte steht der letzte. Notfalls neu starten – das Dorf behält das Material der Kartennummer.</td></tr>
+        <tr><td>Anderes iPad</td><td>„Ich habe einen Zwergenpass“ – alles ist wieder da.</td></tr>
+        <tr><td>Lieferschein „ungültig“</td><td>Noch einmal vorlesen lassen. Im Code gibt es keine 0, 1, I, O.</td></tr>
+        <tr><td>Falsche Karte geliefert</td><td>„Rückgängig“ oder Zahnrad → Lieferung entfernen.</td></tr>
+        <tr><td>Gebäude-Stollen gesperrt</td><td>Neue Inselbotschaft eintippen (sie gilt einen Schultag).</td></tr>
+        <tr><td>Kapitel öffnet nicht</td><td>Zahnrad → Klassengröße verkleinern oder Kapitel wählen.</td></tr>
+        <tr><td>Dorf baut nicht weiter</td><td>Der Zwergenrat muss erst entscheiden (Tafel zeigt es an).</td></tr>
+        <tr><td>Anderer Laptop</td><td>Die Insel liegt nur auf dem Gerät: vorher „Insel sichern“, dann „Insel laden“.</td></tr>
+      </table>
+      <div class="kasten gold"><b>Ausprobieren:</b> In der Schmiede unten „Für Lehrkräfte: Testmodus“ – alle Stollen sind offen.</div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

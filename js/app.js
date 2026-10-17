@@ -234,7 +234,8 @@
       h('p', null, 'Im Testmodus sind alle Stollen und das Bonusspiel sofort offen, damit Sie alles ausprobieren können. Der Modus gilt nur, bis die App geschlossen wird.'),
       h('div', { class: 'knopf-reihe' },
         h('a', { class: 'knopf moos klein', href: 'insel.html', style: { textDecoration: 'none' } }, 'Zur Insel (Board)'),
-        h('a', { class: 'knopf moos klein', href: 'karten.html', style: { textDecoration: 'none' } }, 'Zwergenpass-Karten drucken')),
+        h('a', { class: 'knopf moos klein', href: 'karten.html', style: { textDecoration: 'none' } }, 'Zwergenpass-Karten drucken'),
+        h('a', { class: 'knopf moos klein', href: 'lehrkraft.html', style: { textDecoration: 'none' } }, 'Stundenverlauf & Spickzettel')),
       h('div', { class: 'knopf-reihe' },
         h('button', { class: 'knopf holz', onclick: () => f.schliessen() }, 'Abbrechen'),
         h('button', { class: 'knopf', onclick: () => { testmodus = true; sessionStorage.setItem('zi-test', '1'); f.schliessen(); zeigeStart(); } }, 'Testmodus an')),
@@ -444,6 +445,11 @@
           h('div', { class: 'stationen' },
             stationKarte(inh.bonus, k, sterne > 0, !tiefOffen, 'Schaffe zuerst den Hauptstollen.', undefined, null, 'bonus', 0),
             h('div', { class: 'st-info', style: { alignSelf: 'center', fontSize: '18px' } }, 'Deine Sterne: ' + '★'.repeat(sterne) + '☆'.repeat(3 - sterne)))),
+        h('section', { class: 'pergament stollen auf-pergament rueckblick-abschnitt' },
+          h('div', null,
+            h('h2', null, 'Rückblick: Was kann ich schon?'),
+            h('p', { class: 'erklaer' }, tiefOffen ? 'Schätz dich selbst ein. Wo du noch unsicher bist, zeigt dir Meisterin Hammerlind, was du üben kannst.' : 'Öffnet sich, wenn du den Hauptstollen geschafft hast.')),
+          h('button', { class: 'knopf' + (tiefOffen ? '' : ' holz'), disabled: tiefOffen ? null : true, onclick: () => zeigeRueckblick(k) }, 'Selbst einschätzen')),
       ];
     }
 
@@ -1573,6 +1579,54 @@
   /* =========================================================
      LIEFERUNG & ZWERGENPASS
      ========================================================= */
+  /* =========================================================
+     RÜCKBLICK – Selbsteinschätzung mit Übungstipp
+     ========================================================= */
+  function rueckblickSpeicher() { return 'zi-rueckblick-' + (stand.karte || stand.id); }
+  function starteUebung(k, art, i) {
+    const def = INHALT[k] && INHALT[k][art] && INHALT[k][art][i];
+    if (!def) return;
+    K = k; letzterReiter = k; aktStation = { k, art, i };
+    def.spiel();
+  }
+  function zeigeRueckblick(k) {
+    const werte = speicher.lesen(rueckblickSpeicher(), {});
+    const liste = ZI.ICH_KANN[k] || [];
+    const box = h('div', { class: 'rueckblick-liste' });
+    const ziel = h('div');
+    function zeichne() {
+      ZI.setze(box, ...liste.map((it, n) => {
+        const key = k + '-' + n; const w = werte[key];
+        const def = INHALT[k][it.uebung.art][it.uebung.i];
+        const offen = it.uebung.art === 'kern' || stand.coreCount(k) === 3 || testmodus;
+        return h('div', { class: 'rueckblick-zeile pergament auf-pergament' + (w ? ' w' + w : '') },
+          h('div', { class: 'rueckblick-text' }, it.text),
+          h('div', { class: 'rueckblick-wahl', role: 'radiogroup', 'aria-label': it.text },
+            ZI.EINSCHAETZUNG.map((e) => h('button', { class: 'einschaetzung ' + e.klasse + (w === e.wert ? ' gewaehlt' : ''), role: 'radio', 'aria-checked': String(w === e.wert),
+              onclick: () => { werte[key] = e.wert; speicher.schreiben(rueckblickSpeicher(), werte); ZI.ton.plopp(); zeichne(); } }, e.text))),
+          w && w < 3 ? h('div', { class: 'rueckblick-tipp' },
+            h('span', null, w === 1 ? 'Übe noch einmal: ' : 'Zum Festigen: ', h('b', null, '„' + def.name + '“')),
+            offen ? h('button', { class: 'knopf klein', onclick: () => starteUebung(k, it.uebung.art, it.uebung.i) }, 'Jetzt üben') : null) : null);
+      }));
+      const ueben = liste.map((it, n) => ({ it, w: werte[k + '-' + n] })).filter((x) => x.w === 1);
+      const alle = liste.every((it, n) => werte[k + '-' + n]);
+      ZI.setze(ziel, alle ? h('div', { class: 'rueckblick-ziel pergament auf-pergament' },
+        h('div', { class: 'rueckblick-meisterin' }, bild('meisterin-ermutigt', 'Meisterin Hammerlind')),
+        h('div', null,
+          h('h3', { style: { margin: '0 0 4px' } }, 'Mein Ziel'),
+          h('p', { style: { margin: 0 } }, ueben.length ? 'Als Nächstes übe ich: ' + INHALT[k][ueben[0].it.uebung.art][ueben[0].it.uebung.i].name + '. Dann kann ich bald sagen: „' + ueben[0].it.text + '“'
+            : 'Stark! Du fühlst dich überall schon sicher. Hilf doch jemandem, der noch übt.'))) : null);
+    }
+    zeichne();
+    zeige(h('div', { class: 'screen' },
+      ZI.hintergrund('stollen-hintergrund', 'hg-ersatz-stollen', 'rgba(20,12,8,0.45)'),
+      h('div', { class: 'leiste' },
+        h('button', { class: 'rund', 'aria-label': 'Zurück zur Halle', onclick: () => zeigeHalle() }, icon.zurueck()),
+        h('div', null, h('div', { class: 'titel' }, 'Rückblick · Kapitel ' + ZI.KAPITEL[k].nr), h('div', { class: 'untertitel' }, 'Wie sicher bist du? Sei ehrlich – niemand sonst sieht das.')),
+        h('div', { class: 'spacer' })),
+      h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2 } }, h('div', { class: 'rueckblick' }, box, ziel))));
+  }
+
   /* =========================================================
      INSELBOTSCHAFT – vom Board, sagt der Schmiede, was gebaut ist
      ========================================================= */

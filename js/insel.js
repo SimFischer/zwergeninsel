@@ -435,7 +435,7 @@
     const k = info.kapitel;
     s.kern[k] |= info.kern; s.tief[k] |= info.tief; s.bonus[k] = Math.max(s.bonus[k], info.bonus);
     s.offen = Math.max(s.offen, k);
-    insel.zwerge[key] = { code: s.code(), erst: alt ? alt.erst : Date.now(), zeit: Date.now(), tag: heute(), karte: info.karte };
+    insel.zwerge[key] = { code: s.code(), erst: alt ? alt.erst : Date.now(), zeit: Date.now(), tag: heute(), karte: info.karte, lang: !!(alt && alt.lang) };
     sichern();
     return { id: key, stand: s, neu: !alt, vorher: alt ? Object.assign({}, alt) : null, info };
   }
@@ -453,6 +453,14 @@
     for (let k = 0; k <= s.offen; k++) {
       erg = annehmenSchein({ karte: s.karte, zwerg: s.zwerg, kapitel: k, kern: s.kern[k], tief: s.tief[k], bonus: s.bonus[k] }, true) || erg;
     }
+    // Kronen und Gebäude-Übungen stecken nur im langen Code – dazurechnen
+    const key = 'karte-' + s.karte;
+    const ges = ZI.Stand.ausCode(insel.zwerge[key].code);
+    for (let k = 0; k < 3; k++) ges.kronen[k] |= s.kronen[k];
+    ges.bau |= s.bau;
+    insel.zwerge[key].code = ges.code(); insel.zwerge[key].lang = true;
+    sichern();
+    if (erg) erg.stand = ges;
     return erg;
   }
   function kartenNr(id, e) { return e && e.karte ? e.karte : null; }
@@ -576,6 +584,105 @@
   }
 
   /* ---------- Zwergenrat ---------- */
+  /* ---------- Kartennummern und Zwerge ---------- */
+  function kartenNummern() {
+    const max = Math.min(32, Math.max(insel.klassengroesse, ...Object.values(insel.zwerge).map((e) => e.karte || 0)));
+    return Array.from({ length: max }, (_, i) => i + 1);
+  }
+  function zwergDerKarte(n) {
+    const e = insel.zwerge['karte-' + n];
+    const s = e && ZI.Stand.ausCode(e.code);
+    return s ? ZI.ZWERGE.find((d) => d.nr === s.zwerg) : null;
+  }
+  function kartenKopf(n) {
+    const z = zwergDerKarte(n);
+    return h('div', { class: 'karten-kopf' }, z ? bild(z.datei, z.name) : h('div', { class: 'karten-kopf-leer' }), h('b', null, String(n)));
+  }
+
+  /* ---------- Rollen im Zwergenrat ---------- */
+  function rollenLeiste() {
+    const r = insel.rollen || {};
+    if (!ZI.RATSROLLEN.some((x) => r[x.id])) return h('div', { class: 'rollen-leiste leer' });
+    return h('div', { class: 'rollen-leiste' }, ZI.RATSROLLEN.map((x) => r[x.id] ? h('div', { class: 'rolle-chip' },
+      h('span', { class: 'rolle-zeichen', 'aria-hidden': 'true' }, x.zeichen), h('span', null, x.name + ': '), h('b', null, 'Karte ' + r[x.id]),
+      zwergDerKarte(r[x.id]) ? h('span', null, ' · ' + zwergDerKarte(r[x.id]).name) : null) : null));
+  }
+  function oeffneRollen(danach) {
+    insel.rollen = insel.rollen || {};
+    insel.hatteRolle = insel.hatteRolle || [];
+    const liste = h('div', { class: 'rollen-karten' });
+    function lose(rid) {
+      const vergeben = ZI.RATSROLLEN.filter((x) => x.id !== rid).map((x) => insel.rollen[x.id]);
+      let pool = kartenNummern().filter((n) => !vergeben.includes(n));
+      const neu = pool.filter((n) => !insel.hatteRolle.includes(n)); // wer noch nie eine Rolle hatte, kommt zuerst dran
+      if (neu.length) pool = neu;
+      const n = ZI.zufall(pool);
+      insel.rollen[rid] = n;
+      if (!insel.hatteRolle.includes(n)) insel.hatteRolle.push(n);
+    }
+    function zeichne() {
+      ZI.setze(liste, ...ZI.RATSROLLEN.map((x) => {
+        const n = insel.rollen[x.id];
+        return h('div', { class: 'rollen-karte pergament auf-pergament' },
+          h('div', { class: 'rollen-zeichen', 'aria-hidden': 'true' }, x.zeichen),
+          h('h3', null, x.name),
+          h('p', null, x.text),
+          n ? kartenKopf(n) : h('div', { class: 'klein' }, 'noch frei'),
+          h('button', { class: 'knopf holz klein', onclick: () => { lose(x.id); sichern(); ZI.ton.plopp(); zeichne(); } }, n ? 'Andere Karte' : 'Auslosen'));
+      }));
+    }
+    zeichne();
+    const f = ZI.fenster([
+      h('h2', null, 'Rollen im Zwergenrat'),
+      h('p', { style: { margin: 0 } }, 'Jede Rolle hilft, dass das Gespräch gut läuft. Wer schon einmal eine Rolle hatte, wird erst wieder gelost, wenn alle dran waren.'),
+      liste,
+      h('div', { class: 'knopf-reihe' },
+        h('button', { class: 'knopf holz', onclick: () => { ZI.RATSROLLEN.forEach((x) => lose(x.id)); sichern(); ZI.ton.fanfare(); zeichne(); } }, 'Alle Rollen auslosen'),
+        h('button', { class: 'knopf', onclick: () => { f.schliessen(); danach && danach(); } }, 'Fertig')),
+    ]);
+    f.el.classList.add('breit');
+  }
+
+  /* ---------- Redeliste: wer hat schon gesprochen? ---------- */
+  function oeffneRedeliste(frageId) {
+    insel.rede = insel.rede || {};
+    const liste = insel.rede[frageId] || (insel.rede[frageId] = {});
+    let minus = false;
+    const raster = h('div', { class: 'rede-raster' });
+    const kopf = h('div', { class: 'liefer-zaehler' });
+    const minusKnopf = h('button', { class: 'knopf holz klein' }, 'Strich wegnehmen');
+    minusKnopf.addEventListener('click', () => { minus = !minus; minusKnopf.classList.toggle('aktiv', minus); minusKnopf.textContent = minus ? 'Fertig mit Wegnehmen' : 'Strich wegnehmen'; });
+    function zeichne(hervor) {
+      const nummern = kartenNummern();
+      const gesprochen = nummern.filter((n) => liste[n] > 0).length;
+      kopf.textContent = gesprochen + ' von ' + nummern.length + ' haben schon gesprochen';
+      ZI.setze(raster, ...nummern.map((n) => {
+        const c = liste[n] || 0;
+        const b = h('button', { class: 'rede-zelle stufe-' + Math.min(c, 3) + (hervor === n ? ' hervor' : ''), 'aria-label': 'Karte ' + n + ', ' + c + ' Beiträge' },
+          kartenKopf(n), h('span', { class: 'rede-striche' }, c ? '|'.repeat(Math.min(c, 6)) : ''));
+        b.addEventListener('click', () => { liste[n] = Math.max(0, c + (minus ? -1 : 1)); sichern(); ZI.ton.plopp(); zeichne(); });
+        return b;
+      }));
+    }
+    zeichne();
+    const f = ZI.fenster([
+      h('div', { class: 'liefer-kopf' }, h('h2', { style: { margin: 0 } }, 'Redeliste'), kopf),
+      h('p', { style: { margin: 0 } }, 'Tippt auf eine Karte, wenn jemand etwas beigetragen hat. Grau heißt: war noch nicht dran.'),
+      raster,
+      h('div', { class: 'knopf-reihe' },
+        h('button', { class: 'knopf holz klein', onclick: () => {
+          const leise = kartenNummern().filter((n) => !(liste[n] > 0));
+          if (!leise.length) { ZI.meldung('Alle waren schon dran!'); return; }
+          const n = ZI.zufall(leise); zeichne(n); ZI.ton.plopp();
+          ZI.meldung('Vielleicht möchte Karte ' + n + ' etwas sagen?', 3500);
+        } }, 'Wer war noch nicht dran?'),
+        minusKnopf,
+        h('button', { class: 'knopf holz klein', onclick: () => { Object.keys(liste).forEach((k) => delete liste[k]); sichern(); zeichne(); } }, 'Zurücksetzen'),
+        h('button', { class: 'knopf', onclick: () => f.schliessen() }, 'Fertig')),
+    ]);
+    f.el.classList.add('breit', 'rede-dialog');
+  }
+
   function oeffneRat(frageId) {
     const fragen = ZI.RATSFRAGEN[kap()] || [];
     if (!fragen.length) { ZI.meldung('In diesem Kapitel gibt es keine Ratsfrage mehr.'); return; }
@@ -623,9 +730,13 @@
         fragen.length > 1 ? h('div', { class: 'rat-reiter' }, fragen.map((f, i) => h('button', {
           class: 'knopf klein' + (f === RF ? '' : ' holz'), 'aria-pressed': String(f === RF),
           onclick: () => { if (f === RF) return; clearInterval(uhrTimer); rat.remove(); oeffneRat(f.id); } }, 'Frage ' + (i + 1) + (insel.rat[f.id] ? ' ✓' : '')))) : null,
-        h('div', { class: 'spacer' }), uhr, uhrKnopf),
+        h('div', { class: 'spacer' }),
+        h('button', { class: 'knopf holz klein', onclick: () => oeffneRollen(() => rat.querySelector('.rollen-leiste').replaceWith(rollenLeiste())) }, 'Rollen'),
+        h('button', { class: 'knopf holz klein', onclick: () => oeffneRedeliste(RF.id) }, 'Redeliste'),
+        uhr, uhrKnopf),
       h('div', { class: 'rat-inhalt' },
         h('div', { class: 'rat-frage pergament' }, (fragen.length > 1 ? 'Frage ' + (nr + 1) + ' von ' + fragen.length + ': ' : '') + RF.frage),
+        rollenLeiste(),
         optionKarte(a), optionKarte(b),
         h('div', { class: 'rat-regeln pergament auf-pergament' },
           h('h3', null, 'Worüber wir abwägen'),
@@ -669,6 +780,113 @@
   }
 
   /* ---------- Einstellungen ---------- */
+  /* ---------- Klassenüberblick (nur für die Lehrkraft) ---------- */
+  function oeffneUeberblick() {
+    let k = kap();
+    const inhalt = h('div', { class: 'ueberblick' });
+    const reiter = h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-start' } });
+    function zeichne() {
+      ZI.setze(reiter, ...ZI.STATIONS_NAMEN.map((_, i) => h('button', { class: 'knopf klein' + (i === k ? '' : ' holz'), onclick: () => { k = i; zeichne(); } }, 'Kapitel ' + (i + 1))));
+      const nummern = kartenNummern();
+      const st = nummern.map((n) => { const e = insel.zwerge['karte-' + n]; return { n, s: e ? ZI.Stand.ausCode(e.code) : null, e }; });
+      const da = st.filter((x) => x.s);
+      const lang = da.filter((x) => x.e.lang);
+      const N = ZI.STATIONS_NAMEN[k];
+      const balken = (name, zahl, gesamt, schwer) => h('div', { class: 'ue-zeile' + (schwer ? ' schwer' : '') },
+        h('div', { class: 'ue-name' }, name),
+        h('div', { class: 'ue-balken' }, h('div', { style: { width: (gesamt ? (zahl / gesamt) * 100 : 0) + '%' } })),
+        h('div', { class: 'ue-zahl' }, zahl + ' / ' + gesamt));
+      const kernZeilen = N.kern.map((name, i) => {
+        const geschafft = da.filter((x) => x.s.hatKern(k, i)).length;
+        const gl = lang.filter((x) => x.s.hatKern(k, i)).length;
+        const krone = lang.filter((x) => x.s.hatKrone(k, i)).length;
+        return h('div', null, balken(name, geschafft, nummern.length, geschafft < nummern.length * 0.6),
+          gl ? h('div', { class: 'ue-krone' }, 'fehlerfrei: ' + krone + ' von ' + gl + ' (' + Math.round((krone / gl) * 100) + ' %)') : null);
+      });
+      const tiefZeilen = N.tief.map((name, i) => balken(name, da.filter((x) => x.s.hatTief(k, i)).length, nummern.length, false));
+      const bauZeilen = lang.length ? ZI.BAU_UEBUNGEN.filter((u) => u.kapitel === k).map((u) => balken(u.name, lang.filter((x) => x.s.hatBau(u.bit)).length, lang.length, false)) : [];
+      // Kronen-Quote als Hinweis auf schwierige Stationen
+      const quote = N.kern.map((name, i) => { const g = lang.filter((x) => x.s.hatKern(k, i)).length; const kr = lang.filter((x) => x.s.hatKrone(k, i)).length; return { name, q: g ? kr / g : 1, g }; }).filter((x) => x.g >= 3).sort((a, b) => a.q - b.q);
+      const offen = st.filter((x) => !x.s || x.s.coreCount(k) < 3);
+      ZI.setze(inhalt,
+        h('div', { class: 'ue-spalten' },
+          h('div', null,
+            h('h3', null, 'Hauptstollen'), ...kernZeilen,
+            h('h3', null, 'Tiefe Stollen'), ...tiefZeilen,
+            bauZeilen.length ? h('h3', null, 'Gebäude-Stollen (aus ' + lang.length + ' langen Codes)') : null, ...bauZeilen),
+          h('div', null,
+            h('h3', null, 'Hauptstollen noch nicht fertig (' + offen.length + ')'),
+            offen.length ? h('div', { class: 'ue-offen' }, offen.map((x) => h('div', { class: 'ue-karte' + (x.s ? '' : ' nie') },
+              kartenKopf(x.n), h('span', null, x.s ? x.s.coreCount(k) + '/3' : 'nie geliefert')))) : h('p', null, 'Alle haben den Hauptstollen geschafft!'),
+            quote.length && quote[0].q < 0.6 ? h('div', { class: 'rueckmeldung tipp', style: { marginTop: '14px' } },
+              h('b', null, 'Tipp fürs Plenum: '), '„' + quote[0].name + '“ gelingt nur ' + Math.round(quote[0].q * 100) + ' % fehlerfrei. Das lohnt sich, gemeinsam noch einmal anzuschauen.') : null,
+            h('p', { class: 'klein', style: { marginTop: '14px' } }, 'Die 4-stelligen Lieferscheine zeigen, welche Stationen geschafft sind. Fehlerfrei-Werte und Gebäude-Stollen kennt die Insel nur, wenn Kinder ihren langen Zwergenpass eingeben (Lieferungen → „Langen Zwergenpass-Code eintippen“).'))));
+    }
+    zeichne();
+    const f = ZI.fenster([h('h2', null, 'Klassenüberblick'), reiter, inhalt,
+      h('div', { class: 'knopf-reihe' },
+        h('button', { class: 'knopf holz', onclick: () => { f.schliessen(); oeffneUrkunden(); } }, 'Urkunden drucken'),
+        h('button', { class: 'knopf', onclick: () => f.schliessen() }, 'Schließen'))], { schliessbar: true });
+    f.el.classList.add('breit', 'ueberblick-dialog');
+  }
+
+  /* ---------- Urkunden für alle Kinder ---------- */
+  function oeffneUrkunden() {
+    const daten = kartenNummern().map((n) => { const e = insel.zwerge['karte-' + n]; const s = e && ZI.Stand.ausCode(e.code); return s ? { n, s, lang: !!e.lang } : null; }).filter(Boolean);
+    if (!daten.length) { ZI.meldung('Noch keine Lieferungen – es gibt noch keine Urkunden.'); return; }
+    const w = window.open('', '_blank');
+    if (!w) { ZI.meldung('Bitte Pop-ups für diese Seite erlauben.'); return; }
+    const basis = location.href.replace(/[^/]*$/, '');
+    const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const zahl = (x, ein, mehr) => '<b>' + x + '</b> ' + (x === 1 ? ein : mehr);
+    const urkunde = ({ n, s, lang }) => {
+      const z = ZI.ZWERGE.find((d) => d.nr === s.zwerg);
+      const rang = ZI.rang(s);
+      const kapitel = [0, 1, 2].filter((k) => s.coreCount(k) === 3).length;
+      const ichKann = ZI.ICH_KANN.slice(0, Math.max(1, kapitel)).flat().slice(0, 8);
+      return `<section class="urkunde">
+        <div class="kopf"><img src="${basis}bilder/${z.datei}.png" alt=""><div><div class="titel">Urkunde</div><div class="unter">Zwergeninsel · Mündliches Argumentieren</div></div><div class="nr">${n}</div></div>
+        <p class="name">Name: <span></span></p>
+        <p>hat als <b>${esc(z.name)}</b> den Rang <b>${esc(rang.name)}</b> erreicht.</p>
+        <ul class="werte">
+          <li>${zahl(s.coreTotal(), 'Station', 'Stationen')} im Hauptstollen</li>
+          <li>${zahl(s.deepTotal(), 'Tiefer Stollen', 'Tiefe Stollen')}</li>
+          ${lang ? `<li>${zahl(s.bauTotal(), 'Gebäude-Stollen', 'Gebäude-Stollen')}</li><li>${zahl(s.kronenTotal(), 'goldene Krone', 'goldene Kronen')}</li>` : ''}
+          <li>${zahl(s.gems(), 'Edelstein', 'Edelsteine')}</li>
+        </ul>
+        <table class="ichkann"><thead><tr><th>Ich kann …</th><th>sicher</th><th>fast</th><th>üben</th></tr></thead><tbody>
+          ${ichKann.map((i) => `<tr><td>${esc(i.text.replace(/^Ich /, '… '))}</td><td></td><td></td><td></td></tr>`).join('')}
+        </tbody></table>
+        <div class="fuss"><span>Datum: ____________</span><span>Unterschrift: ________________</span></div>
+      </section>`;
+    };
+    w.document.write(`<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Urkunden Zwergeninsel</title>
+      <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Lilita+One&display=swap" rel="stylesheet">
+      <style>
+        @page { size: A4; margin: 12mm; }
+        body { font-family: 'Andika', sans-serif; color: #3a2617; margin: 0; background: #eee; }
+        .hinweis { max-width: 186mm; margin: 12px auto; background: #fff; padding: 12px 16px; border-radius: 10px; }
+        .hinweis button { font: inherit; font-weight: 700; padding: 8px 16px; border-radius: 8px; border: 2px solid #8a6438; background: #e8b23a; cursor: pointer; }
+        .urkunde { width: 186mm; height: 270mm; box-sizing: border-box; margin: 0 auto 12px; background: #fffaf0; border: 2.5mm double #8a6438; border-radius: 6mm; padding: 12mm 14mm; display: flex; flex-direction: column; gap: 5mm; break-after: page; font-size: 13pt; }
+        .kopf { display: flex; align-items: center; gap: 6mm; }
+        .kopf img { width: 42mm; height: 42mm; object-fit: contain; }
+        .titel { font-family: 'Lilita One', sans-serif; font-size: 42pt; color: #8a4b1c; line-height: 1; }
+        .unter { font-size: 12pt; color: #6b5442; }
+        .nr { margin-left: auto; font-family: 'Lilita One', sans-serif; font-size: 22pt; background: #8a4b1c; color: #fff4dc; border-radius: 4mm; padding: 2mm 5mm; }
+        .name { font-size: 15pt; } .name span { display: inline-block; width: 110mm; border-bottom: 0.4mm solid #8a6438; }
+        .werte { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 8mm; padding-left: 6mm; margin: 0; }
+        .ichkann { width: 100%; border-collapse: collapse; font-size: 11.5pt; }
+        .ichkann th, .ichkann td { border: 0.3mm solid #b08a5a; padding: 2mm 3mm; }
+        .ichkann th { background: #f3e6c8; text-align: left; } .ichkann td:not(:first-child), .ichkann th:not(:first-child) { width: 15mm; text-align: center; }
+        .fuss { margin-top: auto; display: flex; justify-content: space-between; font-size: 12pt; }
+        @media print { body { background: #fff; } .hinweis { display: none; } .urkunde { margin: 0; } }
+      </style></head><body>
+      <div class="hinweis">${daten.length} Urkunden – eine pro Seite. Die Kinder kreuzen ihre „Ich kann …“-Einschätzung selbst an. <button onclick="window.print()">Drucken</button></div>
+      ${daten.map(urkunde).join('')}
+      </body></html>`);
+    w.document.close();
+  }
+
   function oeffneEinstellungen() {
     const zahl = h('input', { type: 'number', min: '1', max: '40', value: String(insel.klassengroesse), 'aria-label': 'Anzahl Kinder' });
     const tabelle = h('table', { class: 'lieferliste' },
@@ -701,6 +919,10 @@
           onclick: () => { insel.kapitel = k; sichern(); f.schliessen(); allesZeigen(false); ZI.meldung('Die Insel zeigt jetzt Kapitel ' + (k + 1) + '.'); } }, 'Kapitel ' + (k + 1)))),
       h('h3', { style: { fontSize: '24px', alignSelf: 'flex-start' } }, 'Lieferungen (' + Object.keys(insel.zwerge).length + ')'),
       Object.keys(insel.zwerge).length ? tabelle : h('p', { style: { margin: 0 } }, 'Noch keine Lieferungen.'),
+      h('div', { class: 'knopf-reihe' },
+        h('button', { class: 'knopf klein', onclick: () => { f.schliessen(); oeffneUeberblick(); } }, 'Klassenüberblick'),
+        h('button', { class: 'knopf klein', onclick: () => { f.schliessen(); oeffneUrkunden(); } }, 'Urkunden drucken'),
+        h('a', { class: 'knopf klein', href: 'lehrkraft.html', target: '_blank', style: { textDecoration: 'none' } }, 'Stundenverlauf & Spickzettel')),
       h('div', { class: 'knopf-reihe' },
         h('button', { class: 'knopf holz klein', onclick: sichernAlsDatei }, 'Insel sichern (Datei)'),
         h('button', { class: 'knopf holz klein', onclick: () => datei.click() }, 'Insel laden'),
