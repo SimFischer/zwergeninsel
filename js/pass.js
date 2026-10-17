@@ -119,6 +119,64 @@
     }
   }
 
+  /* =========================================================
+     LIEFERSCHEIN – 4 Zeichen, die die Lehrkraft am Board eintippt.
+     Er trägt nur, was die Insel braucht (20 Bit):
+     karte 5 | zwerg 4 | kapitel 2 | kern 3 | tief 3 | bonus 2 | prüfbit 1
+     Die Bits werden gemischt, damit ein Tippfehler fast immer auffällt
+     (ungültiger Zwerg, ungültiges Kapitel oder falsches Prüfbit).
+     ========================================================= */
+  const RUNDEN = [0x2B7, 0x1C3, 0x3A9, 0x0F5];
+  const rundenF = (x, k) => (((x * 0x2F) ^ k) + (x >> 3)) & 0x3FF;
+  function mischVor(v) {
+    let l = v >> 10; let r = v & 0x3FF;
+    for (const k of RUNDEN) { const t = r; r = l ^ rundenF(r, k); l = t; }
+    return (l << 10) | r;
+  }
+  function mischZurueck(v) {
+    let l = v >> 10; let r = v & 0x3FF;
+    for (let i = RUNDEN.length - 1; i >= 0; i--) { const t = l; l = r ^ rundenF(l, RUNDEN[i]); r = t; }
+    return (l << 10) | r;
+  }
+  const paritaet = (v) => { let p = 0; while (v) { p ^= v & 1; v >>= 1; } return p; };
+
+  Object.defineProperty(Stand.prototype, 'karte', {
+    get() { return this.id >= 1 && this.id <= 32 ? this.id : null; },
+  });
+  /* Lieferschein für das Kapitel k (Standard: das höchste offene Kapitel) */
+  Stand.prototype.lieferCode = function (k) {
+    if (!this.karte) return null;
+    if (k === undefined) k = this.offen;
+    let v = this.karte - 1;
+    v = (v << 4) | ((this.zwerg - 1) & 15);
+    v = (v << 2) | (k & 3);
+    v = (v << 3) | (this.kern[k] & 7);
+    v = (v << 3) | (this.tief[k] & 7);
+    v = (v << 2) | (this.bonus[k] & 3);
+    v = (v << 1) | paritaet(v);
+    v = mischVor(v);
+    let t = '';
+    for (let i = 0; i < 4; i++) { t = ALPHA[v & 31] + t; v >>= 5; }
+    return t;
+  };
+  Stand.ausLieferCode = function (text) {
+    const clean = String(text || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
+    if (clean.length !== 4) return null;
+    let v = 0;
+    for (const ch of clean) { const n = ALPHA.indexOf(ch); if (n < 0) return null; v = (v << 5) | n; }
+    v = mischZurueck(v);
+    const p = v & 1; v >>= 1;
+    if (paritaet(v) !== p) return null;
+    const bonus = v & 3; v >>= 2;
+    const tief = v & 7; v >>= 3;
+    const kern = v & 7; v >>= 3;
+    const kapitel = v & 3; v >>= 2;
+    const zwerg = (v & 15) + 1; v >>= 4;
+    const karte = (v & 31) + 1;
+    if (zwerg > 12 || kapitel > 2) return null;
+    return { karte, zwerg, kapitel, kern, tief, bonus };
+  };
+
   /* Eingabefeld formatieren: 10 Zeichen als XXXXX-XXXXX, sonst XXXX-XXXX-XXXX */
   ZI.formatiereCode = function (roh) {
     const v = String(roh || '').toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 12);
@@ -126,5 +184,4 @@
   };
 
   ZI.Stand = Stand;
-  ZI.QR_PREFIX = 'ZWERGENINSEL:';
-})();
+  })();

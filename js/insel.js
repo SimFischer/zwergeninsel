@@ -135,8 +135,7 @@
   const unterTitel = h('div', { class: 'unter' });
   const titel = h('div', { class: 'insel-titel' }, h('h1', null, 'Die Zwergeninsel'), unterTitel);
   const knoepfe = h('div', { class: 'insel-knoepfe' },
-    h('button', { class: 'knopf', onclick: oeffneScanner }, icon.kamera(), 'Lieferung scannen'),
-    h('button', { class: 'knopf holz', onclick: oeffneCodeEingabe }, icon.tastatur(), 'Code eintippen'),
+    h('button', { class: 'knopf', onclick: oeffneLieferungen }, icon.tastatur(), 'Lieferungen'),
     h('button', { class: 'knopf holz', onclick: oeffneRat }, 'Zwergenrat'),
     h('button', { class: 'knopf holz', onclick: oeffneRaetsel }, 'Inselrätsel'),
     h('button', { class: 'knopf holz', onclick: oeffneAuftrag }, 'Auftrag'),
@@ -252,7 +251,7 @@
       zu ? null : auftragAnzeige(),
       zu ? null : h('div', { class: 'zeile' }, bild('edelstein', 'Edelsteine'), gems + ' Edelsteine · ' + insel.schmuck + ' Schmuckstücke' + (insel.geschenke ? ' · ' + insel.geschenke + ' Möwengeschenke' : '')),
       zu ? null : h('div', { class: 'zeile' }, bild('zwerg-01-brumm', 'Zwerge'), Object.keys(insel.zwerge).length + ' von ' + insel.klassengroesse + ' Zwergen haben geliefert'),
-      m === 0 && !zu ? h('div', { class: 'klein' }, 'Jede geschaffte Station im Hauptstollen ' + (k > 0 ? 'von Kapitel ' + ZI.KAPITEL[k].nr + ' ' : '') + 'bringt 1 Material. Am Ende der Stunde scannt ihr die Lieferungen.') : null);
+      m === 0 && !zu ? h('div', { class: 'klein' }, 'Jede geschaffte Station im Hauptstollen ' + (k > 0 ? 'von Kapitel ' + ZI.KAPITEL[k].nr + ' ' : '') + 'bringt 1 Material. Am Ende der Stunde tippt ihr die Lieferscheine ein.') : null);
   }
 
   function kapitelWeiter() {
@@ -382,113 +381,155 @@
   }
 
   /* ---------- Lieferung annehmen ---------- */
-  function annehmen(text) {
-    const roh = String(text || '').trim();
-    const code = roh.startsWith(ZI.QR_PREFIX) ? roh.slice(ZI.QR_PREFIX.length) : roh;
-    const s = ZI.Stand.ausCode(code);
-    if (!s) return null;
-    const id = String(s.id); // eine id pro Kind – auch wenn es den Zwerg wechselt
-    const alt = insel.zwerge[id];
+  /* Lieferschein (4 Zeichen) in den Stand der Karte einrechnen */
+  function annehmenSchein(info, erzwingen) {
+    const key = 'karte-' + info.karte;
+    const alt = insel.zwerge[key];
     const altStand = alt ? ZI.Stand.ausCode(alt.code) : null;
-    // Ein älterer Code (weniger Fortschritt) überschreibt nie einen neueren
-    const fortschrittAlt = altStand ? altStand.coreCount(kap()) * 100 + altStand.gems() : -1;
-    const fortschrittNeu = s.coreCount(kap()) * 100 + s.gems();
-    if (!alt || fortschrittNeu >= fortschrittAlt) insel.zwerge[id] = { code: s.code(), erst: alt ? alt.erst : Date.now(), zeit: Date.now() };
+    if (altStand && altStand.zwerg !== info.zwerg && !erzwingen) return { konflikt: true, altZwerg: altStand.zwerg, info };
+    const s = altStand || new ZI.Stand({ id: info.karte });
+    s.id = info.karte; s.zwerg = info.zwerg;
+    const k = info.kapitel;
+    s.kern[k] |= info.kern; s.tief[k] |= info.tief; s.bonus[k] = Math.max(s.bonus[k], info.bonus);
+    s.offen = Math.max(s.offen, k);
+    insel.zwerge[key] = { code: s.code(), erst: alt ? alt.erst : Date.now(), zeit: Date.now(), tag: heute(), karte: info.karte };
     sichern();
-    return { id, stand: s, neu: !alt };
+    return { id: key, stand: s, neu: !alt, vorher: alt ? Object.assign({}, alt) : null, info };
   }
+  /* ganzer Zwergenpass (12 Zeichen) – falls jemand den langen Code nennt */
+  function annehmenPass(text) {
+    const s = ZI.Stand.ausCode(text);
+    if (!s) return null;
+    if (!s.karte) {
+      const id = String(s.id); const alt = insel.zwerge[id];
+      insel.zwerge[id] = { code: s.code(), erst: alt ? alt.erst : Date.now(), zeit: Date.now(), tag: heute() };
+      sichern();
+      return { id, stand: s, neu: !alt, vorher: alt ? Object.assign({}, alt) : null };
+    }
+    let erg = null;
+    for (let k = 0; k <= s.offen; k++) {
+      erg = annehmenSchein({ karte: s.karte, zwerg: s.zwerg, kapitel: k, kern: s.kern[k], tief: s.tief[k], bonus: s.bonus[k] }, true) || erg;
+    }
+    return erg;
+  }
+  function kartenNr(id, e) { return e && e.karte ? e.karte : null; }
 
-  /* ---------- Scanner ---------- */
-  function oeffneScanner() {
-    const video = h('video', { playsinline: 'true', muted: 'true', autoplay: 'true' });
-    video.muted = true;
-    const liste = h('div', { class: 'scan-liste' }, h('div', { class: 'klein', style: { color: 'var(--tinte-hell)' } }, 'Haltet den QR-Code vor die Kamera.'));
-    const canvas = document.createElement('canvas');
-    const ctx2 = canvas.getContext('2d', { willReadFrequently: true });
-    let stream = null; let laeuft = true;
-    const zuletzt = {};
+  /* ---------- Lieferungen eintippen (Tastatur oder Bildschirmtastatur) ---------- */
+  const ZEICHEN = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+  function oeffneLieferungen() {
     const neueIds = [];
-    let anzahl = 0;
+    let puffer = '';
+    let letzte = null; // für „Rückgängig“
+    const kaesten = [0, 1, 2, 3].map(() => h('div', { class: 'schein-kasten' }));
+    const anzeige = h('div', { class: 'schein-eingabe', 'aria-live': 'polite' }, ...kaesten);
+    const rueck = h('div', { class: 'liefer-rueck' }, h('div', { class: 'klein' }, 'Tippt die 4 Zeichen vom Lieferschein ein. Nach dem 4. Zeichen wird sofort geliefert.'));
+    const raster = h('div', { class: 'liefer-raster' });
+    const zaehler = h('div', { class: 'liefer-zaehler' });
+    const tasten = h('div', { class: 'schein-tasten' },
+      ...ZEICHEN.split('').map((c) => h('button', { class: 'schein-taste', onclick: () => tippe(c) }, c)),
+      h('button', { class: 'schein-taste breit', 'aria-label': 'Löschen', onclick: loesche }, '⌫'));
+
+    function zeigePuffer() { kaesten.forEach((k, i) => { k.textContent = puffer[i] || ''; k.classList.toggle('voll', !!puffer[i]); }); }
+    function tippe(c) {
+      c = String(c).toUpperCase();
+      if (!ZEICHEN.includes(c)) { if (/^[01IO]$/.test(c)) ZI.meldung('Im Lieferschein gibt es keine 0, 1, I oder O.', 2000); return; }
+      if (puffer.length >= 4) puffer = ''; // offene Rückfrage: neuer Code beginnt
+      puffer += c; zeigePuffer(); ZI.ton.klick && ZI.ton.klick();
+      if (puffer.length === 4) setTimeout(pruefe, 120);
+    }
+    function loesche() { puffer = puffer.slice(0, -1); zeigePuffer(); }
+
+    function pruefe() {
+      const info = ZI.Stand.ausLieferCode(puffer);
+      if (!info) {
+        ZI.ton.falsch();
+        anzeige.classList.remove('wackeln'); void anzeige.offsetWidth; anzeige.classList.add('wackeln');
+        ZI.setze(rueck, h('div', { class: 'rueckmeldung schlecht' }, '„' + puffer + '“ ist kein gültiger Lieferschein. Bitte noch einmal vorlesen lassen.'));
+        puffer = ''; setTimeout(zeigePuffer, 500);
+        return;
+      }
+      const erg = annehmenSchein(info, false);
+      if (erg.konflikt) { frageKonflikt(erg); return; }
+      gelungen(erg);
+    }
+    function frageKonflikt(erg) {
+      const alt = ZI.ZWERGE.find((d) => d.nr === erg.altZwerg); const neu = ZI.ZWERGE.find((d) => d.nr === erg.info.zwerg);
+      ZI.ton.falsch();
+      ZI.setze(rueck, h('div', { class: 'rueckmeldung tipp' },
+        h('div', null, h('b', null, 'Karte ' + erg.info.karte + ':'), ' Bisher war das ' + alt.name + ', jetzt kommt ' + neu.name + '. Hat das Kind den Zwerg gewechselt?'),
+        h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-start', marginTop: '8px' } },
+          h('button', { class: 'knopf klein', onclick: () => gelungen(annehmenSchein(erg.info, true)) }, 'Ja, übernehmen'),
+          h('button', { class: 'knopf holz klein', onclick: () => { puffer = ''; zeigePuffer(); ZI.setze(rueck, h('div', { class: 'klein' }, 'Abgebrochen. Bitte die Kartennummer prüfen.')); } }, 'Nein, abbrechen'))));
+    }
+    function gelungen(erg) {
+      ZI.ton.richtig();
+      if (!neueIds.includes(erg.id)) neueIds.push(erg.id);
+      letzte = erg;
+      const z = ZI.ZWERGE.find((d) => d.nr === erg.stand.zwerg);
+      const i = erg.info;
+      const teile = [i.kapitel !== kap() ? 'Kapitel ' + (i.kapitel + 1) : null, ZI.Stand.bits(i.kern) + ' Material', i.tief ? ZI.Stand.bits(i.tief) + ' Tiefe Stollen' : null].filter(Boolean);
+      ZI.setze(rueck, h('div', { class: 'liefer-ok' },
+        h('div', { class: 'liefer-ok-bild' }, bild(z.datei, z.name)),
+        h('div', null, h('div', { class: 'liefer-ok-titel' }, 'Karte ' + i.karte + ' · ' + z.name), h('div', null, teile.join(' · '))),
+        h('button', { class: 'knopf holz klein', onclick: rueckgaengig }, 'Rückgängig')));
+      puffer = ''; zeigePuffer(); zeigeRaster();
+    }
+    function rueckgaengig() {
+      if (!letzte) return;
+      if (letzte.vorher) insel.zwerge[letzte.id] = letzte.vorher; else delete insel.zwerge[letzte.id];
+      const pos = neueIds.indexOf(letzte.id); if (pos >= 0 && !letzte.vorher) neueIds.splice(pos, 1);
+      sichern(); letzte = null; zeigeRaster();
+      ZI.setze(rueck, h('div', { class: 'klein' }, 'Rückgängig gemacht.'));
+    }
+    function zeigeRaster() {
+      const max = Math.max(insel.klassengroesse, ...Object.values(insel.zwerge).map((e) => e.karte || 0));
+      let heuteZahl = 0;
+      const zellen = [];
+      for (let n = 1; n <= Math.min(32, max); n++) {
+        const e = insel.zwerge['karte-' + n];
+        const da = e && e.tag === heute();
+        if (da) heuteZahl++;
+        zellen.push(h('div', { class: 'liefer-zelle' + (da ? ' da' : e ? ' frueher' : ''), title: da ? 'heute geliefert' : e ? 'früher geliefert' : 'noch nie geliefert' }, String(n)));
+      }
+      ZI.setze(raster, ...zellen);
+      zaehler.textContent = heuteZahl + ' von ' + insel.klassengroesse + ' Karten heute geliefert';
+    }
+    function langerCode() {
+      const eingabe = h('input', { class: 'eingabe', maxlength: '14', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'XXXX-XXXX-XXXX', 'aria-label': 'Zwergenpass-Code' });
+      eingabe.addEventListener('input', () => { eingabe.value = ZI.formatiereCode(eingabe.value); });
+      const hin = h('div');
+      const ok = () => {
+        const erg = annehmenPass(eingabe.value);
+        if (!erg) { ZI.ton.falsch(); ZI.setze(hin, h('div', { class: 'rueckmeldung schlecht' }, 'Der Code stimmt nicht.')); return; }
+        g.schliessen(); if (!erg.info) erg.info = { karte: erg.stand.karte || '–', kapitel: kap(), kern: erg.stand.kern[kap()], tief: erg.stand.tief[kap()] };
+        gelungen(erg);
+      };
+      eingabe.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') ok(); });
+      const g = ZI.fenster([h('h2', null, 'Langen Zwergenpass eintippen'), eingabe, hin,
+        h('div', { class: 'knopf-reihe' }, h('button', { class: 'knopf holz', onclick: () => g.schliessen() }, 'Abbrechen'), h('button', { class: 'knopf', onclick: ok }, 'Liefern'))]);
+      setTimeout(() => eingabe.focus(), 150);
+    }
+    function taste(e) {
+      if (document.querySelectorAll('.fenster').length > 1) return; // anderes Fenster obenauf
+      if (e.key === 'Backspace') { e.preventDefault(); loesche(); return; }
+      if (e.key === 'Escape') { schliessen(); return; }
+      if (e.key.length === 1 && /[0-9a-z]/i.test(e.key)) { e.preventDefault(); tippe(e.key); }
+    }
+    function schliessen() { document.removeEventListener('keydown', taste); f.schliessen(); allesZeigen(true, neueIds); }
 
     const f = ZI.fenster([
-      h('h2', null, 'Lieferungen scannen'),
-      h('div', { class: 'scanner' }, video, liste),
+      h('div', { class: 'liefer-kopf' }, h('h2', { style: { margin: 0 } }, 'Lieferungen'), zaehler),
+      h('div', { class: 'liefer-fenster' },
+        h('div', { class: 'liefer-links' }, anzeige, rueck, tasten),
+        h('div', { class: 'liefer-rechts' },
+          h('div', { class: 'klein' }, 'Grün: heute geliefert'),
+          raster,
+          h('button', { class: 'knopf-link', onclick: langerCode }, 'Langen Zwergenpass-Code eintippen'))),
       h('div', { class: 'knopf-reihe' }, h('button', { class: 'knopf', onclick: schliessen }, 'Fertig – Dorf bauen!')),
     ]);
-    f.el.classList.add('breit');
-
-    function schliessen() {
-      laeuft = false;
-      if (stream) stream.getTracks().forEach((t) => t.stop());
-      f.schliessen();
-      allesZeigen(true, neueIds);
-    }
-
-    function schleife() {
-      if (!laeuft) return;
-      if (video.readyState >= 2 && video.videoWidth) {
-        const w = 640; const hh = Math.round((video.videoHeight / video.videoWidth) * w);
-        canvas.width = w; canvas.height = hh;
-        ctx2.drawImage(video, 0, 0, w, hh);
-        const bildDaten = ctx2.getImageData(0, 0, w, hh);
-        const erg = window.jsQR(bildDaten.data, w, hh, { inversionAttempts: 'dontInvert' });
-        if (erg && erg.data && (!zuletzt[erg.data] || Date.now() - zuletzt[erg.data] > 4000)) {
-          zuletzt[erg.data] = Date.now();
-          const a = annehmen(erg.data);
-          if (a) {
-            anzahl++;
-            if (!neueIds.includes(a.id)) neueIds.push(a.id);
-            const z = ZI.ZWERGE.find((d) => d.nr === a.stand.zwerg);
-            ZI.ton.richtig();
-            if (liste.firstChild && liste.firstChild.classList && liste.firstChild.classList.contains('klein')) ZI.setze(liste, );
-            liste.prepend(h('div', { class: 'scan-eintrag' }, bild(z.datei, z.name),
-              h('div', null, h('b', null, z.name), ' · ' + a.stand.coreCount(kap()) + ' Material, ' + a.stand.gems() + ' Edelsteine')));
-          } else {
-            ZI.ton.falsch(); ZI.meldung('Dieser QR-Code gehört nicht zur Zwergeninsel.');
-          }
-        }
-      }
-      requestAnimationFrame(schleife);
-    }
-
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      ZI.setze(liste, h('div', { class: 'rueckmeldung schlecht' }, 'Auf diesem Gerät gibt es keinen Kamerazugriff. Nutzt „Code eintippen“.'));
-      return;
-    }
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 } }, audio: false })
-      .then((s) => { stream = s; video.srcObject = s; video.play().catch(() => {}); schleife(); })
-      .catch(() => {
-        ZI.setze(liste, h('div', { class: 'rueckmeldung schlecht' }, 'Die Kamera konnte nicht geöffnet werden. Erlaubt den Kamerazugriff im Browser oder nutzt „Code eintippen“.'));
-      });
-  }
-
-  /* ---------- Code eintippen ---------- */
-  function oeffneCodeEingabe() {
-    const eingabe = h('input', { class: 'eingabe', maxlength: '14', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'XXXX-XXXX-XXXX', 'aria-label': 'Zwergenpass-Code' });
-    const rueck = h('div');
-    const neueIds = [];
-    eingabe.addEventListener('input', () => {
-      eingabe.value = ZI.formatiereCode(eingabe.value);
-    });
-    const ok = () => {
-      const a = annehmen(eingabe.value);
-      if (!a) { ZI.ton.falsch(); ZI.setze(rueck, h('div', { class: 'rueckmeldung schlecht' }, 'Der Code stimmt nicht. Bitte jedes Zeichen prüfen.')); return; }
-      ZI.ton.richtig();
-      if (!neueIds.includes(a.id)) neueIds.push(a.id);
-      const z = ZI.ZWERGE.find((d) => d.nr === a.stand.zwerg);
-      ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, z.name + ' hat geliefert: ' + a.stand.coreCount(kap()) + ' Material, ' + a.stand.gems() + ' Edelsteine.'));
-      eingabe.value = ''; eingabe.focus();
-    };
-    eingabe.addEventListener('keydown', (e) => { if (e.key === 'Enter') ok(); });
-    const f = ZI.fenster([
-      h('h2', null, 'Code eintippen'),
-      h('p', { style: { margin: 0 } }, 'Den Code vom Zwergenpass eingeben. Ihr könnt mehrere Codes nacheinander eintippen.'),
-      eingabe, rueck,
-      h('div', { class: 'knopf-reihe' },
-        h('button', { class: 'knopf holz', onclick: ok }, 'Liefern'),
-        h('button', { class: 'knopf', onclick: () => { f.schliessen(); allesZeigen(true, neueIds); } }, 'Fertig – Dorf bauen!')),
-    ]);
-    setTimeout(() => eingabe.focus(), 200);
+    f.el.classList.add('breit', 'liefer-dialog');
+    document.addEventListener('keydown', taste);
+    zeigePuffer(); zeigeRaster();
   }
 
   /* ---------- Zwergenrat ---------- */

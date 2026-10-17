@@ -188,3 +188,42 @@
 .tafel.zu { width: clamp(240px, 19vw, 330px); padding: 12px 16px; gap: 6px; }
 .tafel.zu .zahl { font-size: clamp(28px, 2.4vw, 42px); }
 .moewe.ein-bild .fluegel-a { animation: none; }
+
+/* ---------- Lieferungen eintippen ---------- */
+.fenster.liefer-dialog { max-width: min(1180px, 96vw); width: 96vw; }
+.liefer-kopf { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.liefer-zaehler { font-size: 20px; font-weight: 700; color: var(--tinte-hell); }
+.liefer-fenster { display: grid; grid-template-columns: 1.25fr 1fr; gap: 26px; align-items: start; }
+.liefer-links { display: flex; flex-direction: column; gap: 14px; }
+.schein-eingabe { display: flex; gap: 12px; justify-content: center; }
+.schein-kasten { width: 92px; height: 108px; border-radius: 16px; border: 4px dashed #b08a5a; background: #fffaf0; display: flex; align-items: center; justify-content: center; font-family: 'Courier New', monospace; font-weight: 700; font-size: 72px; color: #3a2617; }
+.schein-kasten.voll { border-style: solid; border-color: #8a6438; }
+.schein-eingabe.wackeln { animation: wackeln 0.45s; }
+@keyframes wackeln { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-12px); } 40% { transform: translateX(12px); } 60% { transform: translateX(-8px); } 80% { transform: translateX(8px); } }
+.liefer-rueck { min-height: 86px; display: flex; align-items: center; }
+.liefer-rueck > * { width: 100%; }
+.liefer-ok { display: flex; align-items: center; gap: 14px; padding: 10px 14px; border-radius: 14px; background: #e4f1d4; border: 3px solid #6b9b3a; animation: aufploppen 0.4s ease-out; }
+.liefer-ok-bild { width: 64px; height: 64px; flex: none; }
+.liefer-ok-bild img { width: 100%; height: 100%; object-fit: contain; }
+.liefer-ok-titel { font-family: var(--titel); font-size: 26px; }
+.liefer-ok > div:nth-child(2) { flex: 1; font-size: 19px; }
+.schein-tasten { display: grid; grid-template-columns: repeat(9, 1fr); gap: 7px; }
+.schein-taste { aspect-ratio: 1; border-radius: 10px; border: 2px solid #8a6438; background: #fffaf0; font-family: 'Courier New', monospace; font-weight: 700; font-size: clamp(20px, 2.2vw, 30px); color: #3a2617; cursor: pointer; box-shadow: 0 3px 0 rgba(58, 38, 23, 0.3); }
+.schein-taste:active { transform: translateY(2px); box-shadow: none; }
+.schein-taste.breit { grid-column: span 4; aspect-ratio: auto; background: #f2d9b0; }
+.liefer-rechts { display: flex; flex-direction: column; gap: 10px; }
+.liefer-raster { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.liefer-zelle { aspect-ratio: 1.15; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--titel); font-size: clamp(20px, 2vw, 30px); background: rgba(58, 38, 23, 0.08); color: rgba(58, 38, 23, 0.55); border: 2px solid rgba(58, 38, 23, 0.15); }
+.liefer-zelle.frueher { background: #f3e6c8; color: #6b5442; }
+.liefer-zelle.da { background: #7fb24a; color: #fff; border-color: #55812a; }
+.knopf-link { align-self: flex-start; background: none; border: none; padding: 4px 0; font: inherit; font-size: 16px; color: var(--tinte-hell); text-decoration: underline; cursor: pointer; }
+@media (max-width: 900px) { .liefer-fenster { grid-template-columns: 1fr; } .schein-kasten { width: 70px; height: 84px; font-size: 54px; } }
+.fenster.liefer-dialog { max-height: 96vh; overflow-y: auto; padding-top: 18px; padding-bottom: 18px; gap: 12px; }
+.liefer-rueck { min-height: 72px; }
+@media (max-height: 820px) {
+  .schein-kasten { width: 72px; height: 84px; font-size: 54px; border-width: 3px; }
+  .schein-taste { aspect-ratio: 1.35; font-size: 22px; }
+  .liefer-zelle { aspect-ratio: 1.5; font-size: 22px; }
+  .liefer-rueck { min-height: 60px; }
+  .liefer-ok-bild { width: 48px; height: 48px; }
+}

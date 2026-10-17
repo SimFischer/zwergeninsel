@@ -6,7 +6,7 @@ Ein Lernspiel zum **mündlichen Argumentieren** für die 5. Klasse. Die Kinder s
 - **Insel** (Lehrer-iPad oder PC am Smartboard): `insel.html`
 - **Zwergenpass-Karten** zum Ausdrucken: `karten.html`
 
-Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden keine Namen und keine Daten übertragen. Der Spielstand jedes Kindes steckt in einem 12-stelligen Code (XXXX-XXXX-XXXX), dem **Zwergenpass**. Ältere 10-stellige Codes funktionieren weiterhin.
+Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden keine Namen und keine Daten übertragen. Am Ende der Stunde nennt jedes Kind einen 4-stelligen Lieferschein, den die Lehrkraft an der Insel eintippt. Der Spielstand jedes Kindes steckt in einem 12-stelligen Code (XXXX-XXXX-XXXX), dem **Zwergenpass**. Ältere 10-stellige Codes funktionieren weiterhin.
 
 ## Ablauf einer Stunde (45 Minuten)
 
@@ -15,7 +15,7 @@ Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden ke
 | 5 | Insel am Board zeigen: Was ist schon gebaut, was kommt als Nächstes? |
 | 25 | Schmiede auf den iPads: zuerst der Hauptstollen, danach Tiefe Stollen und Bonusinsel |
 | 10–12 | Zwergenrat am Board: diskutieren, abstimmen, entscheiden, was gebaut wird |
-| 3 | Lieferung: Lehrer-iPad scannt die QR-Codes, das Dorf wächst. Kinder schreiben ihren Zwergenpass auf ihre Karte. |
+| 3 | Lieferung: Jedes Kind nennt seinen 4-stelligen Lieferschein („Karte 7: S V C U“), die Lehrkraft tippt ihn an der Insel ein – oder die Kinder tippen selbst auf der Bildschirmtastatur. Danach schreiben sie ihren Zwergenpass auf ihre Karte. |
 
 ## Kapitel 1 – Gestrandet
 
@@ -102,6 +102,8 @@ Auf der Insel: Leuchtturm, Festhalle und Schiff. Danach feiert die Klasse das fe
 ## Für die Lehrkraft
 
 - **Testmodus:** Auf dem Startbildschirm unten „Für Lehrkräfte: Testmodus“. Dann sind alle Stollen sofort offen.
+- **Kartennummern:** Jede Zwergenpass-Karte hat eine feste Nummer (1–32). Das Kind tippt sie einmal beim Start an. Über diese Nummer weiß die Insel, wer geliefert hat; die Übersicht im Lieferfenster zeigt, welche Nummern heute noch fehlen.
+- **Lieferschein:** 4 Zeichen pro Kind, nach dem 4. Zeichen wird ohne Enter geliefert. Tippfehler fallen meist sofort auf; passt der Zwerg nicht zur Karte, fragt die Insel nach. Der letzte Eintrag lässt sich rückgängig machen.
 - **Klassengröße:** Insel → Zahnrad. Das Dorf ist fertig, wenn alle Kinder ihren Hauptstollen geschafft haben.
 - **Sichern:** Insel → Zahnrad → „Insel sichern“. Der Inselstand liegt nur auf dem Gerät, auf dem die Insel läuft. Bitte immer dasselbe Gerät benutzen oder vorher sichern.
 - **Runenwort:** Ist ein Kapitel geschafft, zeigt die Insel ein Runenwort. Damit öffnen die Kinder das nächste Kapitel in der Schmiede.
@@ -118,4 +120,4 @@ Alle Bilder liegen in `bilder/` als PNG. Fehlt ein Bild noch, zeigt die App an s
 
 Reines HTML, CSS und JavaScript, keine Installation nötig. Gehostet über GitHub Pages, auf dem iPad über „Zum Home-Bildschirm“ als App nutzbar und danach auch offline.
 
-Verwendete Bibliotheken: [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) (MIT) und [jsQR](https://github.com/cozmo/jsQR) (Apache 2.0).
+Keine externen Bibliotheken.

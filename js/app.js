@@ -281,9 +281,12 @@
     weiterKnopf.addEventListener('click', () => {
       if (!gewaehlt) return;
       if (neu) {
-        stand = new ZI.Stand({ zwerg: gewaehlt });
-        speichern();
-        zeigeHalle(true);
+        const nr = gewaehlt;
+        waehleKarte(null, (karte) => {
+          stand = new ZI.Stand({ zwerg: nr, id: karte });
+          speichern();
+          zeigeHalle(true);
+        }, () => zeigeWahl(true));
       } else {
         stand.zwerg = gewaehlt; speichern(); zeigeHalle();
       }
@@ -1558,18 +1561,47 @@
   /* =========================================================
      LIEFERUNG & ZWERGENPASS
      ========================================================= */
-  function zeigeLieferung() {
-    const code = stand.code();
-    let qrEl;
-    try {
-      const qr = window.qrcode(0, 'M');
-      qr.addData(ZI.QR_PREFIX + code.replace(/-/g, ''));
-      qr.make();
-      qrEl = h('div', { class: 'qr-feld', html: qr.createSvgTag({ cellSize: 8, margin: 2, scalable: true, alt: 'QR-Code für die Lieferung' }) });
-    } catch (e) {
-      qrEl = h('div', { class: 'qr-feld' }, 'QR-Code nicht verfügbar');
+  /* ---------- Kartennummer wählen (steht auf der Zwergenpass-Karte) ---------- */
+  function waehleKarte(aktuell, fertig, zurueck) {
+    const knoepfe = [];
+    for (let n = 1; n <= 32; n++) {
+      knoepfe.push(h('button', { class: 'karten-nr' + (n === aktuell ? ' gewaehlt' : ''), 'aria-label': 'Karte ' + n,
+        onclick: () => {
+          ZI.ton.plopp();
+          const f = ZI.fenster([
+            h('div', { class: 'karten-nr-gross' }, String(n)),
+            h('h2', null, 'Steht die ' + n + ' auf deiner Karte?'),
+            h('p', { style: { margin: 0 } }, 'Mit dieser Nummer kommt dein Material auf die Insel. Nimm immer dieselbe Nummer.'),
+            h('div', { class: 'knopf-reihe' },
+              h('button', { class: 'knopf holz', onclick: () => f.schliessen() }, 'Nein'),
+              h('button', { class: 'knopf', onclick: () => { f.schliessen(); fertig(n); } }, 'Ja, das ist meine Nummer')),
+          ]);
+        } }, String(n)));
     }
+    zeige(h('div', { class: 'screen' },
+      ZI.hintergrund('stollen-hintergrund', 'hg-ersatz-stollen', 'rgba(20,12,8,0.45)'),
+      h('div', { class: 'leiste' },
+        h('button', { class: 'rund', 'aria-label': 'Zurück', onclick: zurueck }, icon.zurueck()),
+        h('div', null,
+          h('div', { class: 'titel' }, 'Deine Kartennummer'),
+          h('div', { class: 'untertitel' }, 'Welche Nummer steht oben auf deiner Zwergenpass-Karte?')),
+        h('div', { class: 'spacer' })),
+      h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2 } },
+        h('div', { class: 'karten-raster pergament auf-pergament' }, knoepfe))));
+  }
+
+  /* =========================================================
+     LIEFERUNG & ZWERGENPASS
+     ========================================================= */
+  function zeigeLieferung() {
+    if (!stand.karte) {
+      waehleKarte(null, (n) => { stand.id = n; speichern(); zeigeLieferung(); }, () => zeigeHalle());
+      return;
+    }
+    const code = stand.code();
+    const schein = stand.lieferCode();
     const z = aktuellerZwerg();
+    const material = stand.coreCount(stand.offen);
     zeige(h('div', { class: 'screen' },
       ZI.hintergrund('stollen-hintergrund', 'hg-ersatz-stollen', 'rgba(20,12,8,0.45)'),
       h('div', { class: 'leiste' },
@@ -1578,13 +1610,23 @@
         h('div', { class: 'spacer' })),
       h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2, display: 'flex' } },
         h('div', { class: 'lieferung' },
-          qrEl,
+          h('div', { class: 'pergament lieferschein auf-pergament' },
+            h('div', { class: 'lieferschein-kopf' },
+              h('div', { class: 'lieferschein-bild' }, bild(z.datei, z.name)),
+              h('div', null,
+                h('h2', { style: { fontSize: '30px', margin: 0 } }, 'Lieferschein'),
+                h('div', { class: 'klein' }, 'Kapitel ' + (stand.offen + 1) + ' · ' + material + ' Material' + (stand.deepCount(stand.offen) ? ' · ' + stand.deepCount(stand.offen) + ' Tiefe Stollen' : '')))),
+            h('div', { class: 'schein-zeile' },
+              h('div', { class: 'schein-karte' }, h('span', null, 'Karte'), h('b', null, String(stand.karte))),
+              h('div', { class: 'schein-code', 'aria-label': 'Lieferschein: ' + schein.split('').join(' ') },
+                ...schein.split('').map((c) => h('span', null, c)))),
+            h('p', { class: 'schein-text' }, 'Sag deiner Lehrkraft: „Karte ' + stand.karte + ': ' + schein.split('').join(' ') + '“ – oder tipp es selbst an der Insel ein.'),
+            h('button', { class: 'knopf-link', onclick: () => waehleKarte(stand.karte, (n) => { stand.id = n; speichern(); zeigeLieferung(); }, () => zeigeLieferung()) }, 'Falsche Kartennummer?')),
           h('div', { class: 'pergament pass-karte auf-pergament' },
-            h('h2', { style: { fontSize: '30px' } }, 'Dein Zwergenpass'),
+            h('h2', { style: { fontSize: '26px' } }, 'Dein Zwergenpass'),
             h('div', { class: 'pass-code', 'aria-label': 'Code: ' + code.split('').join(' ') }, code),
             h('ol', { class: 'schritte' },
-              h('li', null, 'Zeig den QR-Code deiner Lehrkraft. So kommt dein Material auf die Insel.'),
-              h('li', null, 'Schreib den Code genau ab – auf deine Zwergenpass-Karte. Streich den alten Code durch.'),
+              h('li', null, 'Schreib den Code genau ab – auf deine Karte mit der Nummer ' + stand.karte + '.'),
               h('li', null, 'Nächste Stunde tippst du ihn ein und spielst weiter.')),
             h('div', { class: 'knopf-reihe' },
               h('button', { class: 'knopf holz', onclick: () => zeigeHalle() }, 'Weiterschmieden'),

@@ -552,3 +552,24 @@ h1, h2, h3 { font-family: var(--titel); font-weight: 400; margin: 0; letter-spac
 .kombo-flamme { width: 30px; height: 30px; object-fit: contain; margin: -6px 0; }
 .titel-mit-bild { display: flex; align-items: center; gap: 10px; }
 .titel-bild { width: 44px; height: 44px; object-fit: contain; }
+
+/* ---------- Kartennummer & Lieferschein ---------- */
+.karten-raster { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; padding: 22px; max-width: 900px; margin: 10px auto; }
+.karten-nr { aspect-ratio: 1; border-radius: 16px; border: 3px solid #8a6438; background: #fffaf0; font-family: var(--titel); font-size: clamp(26px, 4vw, 40px); color: #3a2617; cursor: pointer; box-shadow: 0 4px 0 rgba(58, 38, 23, 0.35); }
+.karten-nr:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(58, 38, 23, 0.35); }
+.karten-nr.gewaehlt { background: #f5c24a; }
+.karten-nr-gross { font-family: var(--titel); font-size: 96px; line-height: 1; color: #8a4b1c; text-align: center; }
+.lieferschein { padding: 22px 26px; max-width: 520px; display: flex; flex-direction: column; gap: 14px; }
+.lieferschein-kopf { display: flex; align-items: center; gap: 14px; }
+.lieferschein-bild { width: 76px; height: 76px; flex: none; }
+.lieferschein-bild img { width: 100%; height: 100%; object-fit: contain; }
+.schein-zeile { display: flex; align-items: stretch; gap: 14px; }
+.schein-karte { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 16px; border-radius: 14px; background: #8a4b1c; color: #fff4dc; }
+.schein-karte span { font-size: 16px; }
+.schein-karte b { font-family: var(--titel); font-size: 48px; line-height: 1; font-weight: 400; }
+.schein-code { flex: 1; display: flex; justify-content: center; gap: 8px; }
+.schein-code span { flex: 1; max-width: 76px; display: flex; align-items: center; justify-content: center; font-family: 'Courier New', monospace; font-weight: 700; font-size: clamp(44px, 7vw, 64px); background: #fffaf0; border: 3px solid #8a6438; border-radius: 12px; }
+.schein-text { margin: 0; font-size: 19px; }
+.knopf-link { align-self: flex-start; background: none; border: none; padding: 4px 0; font: inherit; font-size: 16px; color: var(--tinte-hell); text-decoration: underline; cursor: pointer; }
+@media (max-width: 700px) { .karten-raster { grid-template-columns: repeat(6, 1fr); } }
+.pass-code { white-space: nowrap; font-size: clamp(26px, 3.4vw, 40px); letter-spacing: 2px; }
