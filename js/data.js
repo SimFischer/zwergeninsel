@@ -6,6 +6,31 @@ const ZI = window.ZI || (window.ZI = {});
 /* ---------- Bilder ---------- */
 ZI.JPG = ['titel-hintergrund', 'schmiede-hintergrund', 'stollen-hintergrund', 'zwergenrat-hintergrund', 'vulkan-hintergrund', 'fest-szene', 'insel-grund'];
 ZI.BILD = (name) => 'bilder/' + name + (ZI.JPG.includes(name) ? '.jpg' : '.png');
+/* Alle Bilder – werden nach dem Start gestaffelt in den Offline-Speicher geladen (ZI.vorladen) */
+ZI.ALLE_BILDER = [
+  'zwerg-01-brumm', 'zwerg-02-hilda', 'zwerg-03-tarek', 'zwerg-04-lina', 'zwerg-05-kira', 'zwerg-06-ole',
+  'zwerg-07-fenno', 'zwerg-08-mira', 'zwerg-09-bodo', 'zwerg-10-amara', 'zwerg-11-grimbart', 'zwerg-12-rubina',
+  'meisterin-erklaert', 'meisterin-jubelt', 'meisterin-tipp', 'meisterin-ermutigt', 'kobold-frech', 'kobold-chaos',
+  'kobold-besiegt', 'schmiede-hintergrund', 'amboss', 'hammer', 'eisen-roh', 'eisen-gluehend',
+  'axt-stumpf', 'axt-scharf', 'schleifstein', 'runenplatte', 'truhe-zu', 'truhe-offen',
+  'titel-hintergrund', 'stollen-hintergrund', 'zwergenrat-hintergrund', 'vulkan-hintergrund', 'fest-szene', 'insel-grund',
+  'lagerfeuer', 'lagerfeuer-ruine', 'huette1', 'huette1-ruine', 'huette2', 'huette2-ruine',
+  'huette3', 'huette3-ruine', 'werkstatt', 'werkstatt-ruine', 'steg', 'steg-ruine',
+  'bibliothek', 'bibliothek-ruine', 'ratsplatz', 'ratsplatz-ruine', 'brunnen', 'brunnen-ruine',
+  'muehle', 'muehle-ruine', 'leuchtturm', 'leuchtturm-ruine', 'festhalle', 'festhalle-ruine',
+  'schiff', 'schiff-ruine', 'fahne', 'laterne', 'kristall-laterne', 'blumenbeet',
+  'bank', 'faesser', 'statue', 'wegweiser', 'gemuesegarten', 'ziegen',
+  'holz', 'stein', 'eisen', 'edelstein', 'stern',
+  'zwergenpass-karte',
+  'moewe-oben', 'moewe-unten', 'moewe-geschenk', 'krabbe', 'delfin', 'huhn', 'hase', 'schildkroete', 'schmetterling',
+  'wolke-1', 'wolke-2', 'wolke-3', 'sonder-pavillon', 'sonder-blumenbogen', 'sonder-amboss-denkmal', 'sonder-aussichtsturm',
+  'sonder-baumhaus', 'sonder-festbaum', 'krone', 'geschenk', 'auftrag-rolle', 'buch-offen', 'flamme',
+  'rang-1', 'rang-2', 'rang-3', 'rang-4', 'rang-5', 'rang-6', 'rang-7',
+  ...['funke', 'k1', 'k2', 'k3', 'fehler', 'kobold', 'rede', 'ohr', 'rat', 'krone1', 'krone5', 'krone9', 'stern3', 'stern9', 'gems', 'buch', 'freunde', 'clan'].map((a) => 'abzeichen-' + a),
+  'icon-beispiel', 'icon-beispielregen', 'icon-erz-schlacke', 'icon-fehlerjagd', 'icon-funkenregen', 'icon-gegenargument', 'icon-hoeren', 'icon-inselrat', 'icon-ja-und', 'icon-kette', 'icon-kobold-kampf', 'icon-meisterstueck', 'icon-meisterstueck2', 'icon-motor-bremse', 'icon-puzzle', 'icon-situation', 'icon-sprecherwechsel', 'icon-streitgespraech', 'icon-stumpf-scharf', 'icon-weil-denn', 'icon-zuhoeren',
+];
+/* Nur das Board braucht diese; die iPads laden sie nicht */
+ZI.NUR_BOARD = (n) => /-ruine$|^(insel-grund|fest-szene|schiff|fahne|laterne|kristall-laterne|blumenbeet|bank|faesser|statue|wegweiser|gemuesegarten|ziegen|moewe-|krabbe|delfin|huhn|hase|schildkroete|schmetterling|wolke-|sonder-)/.test(n);
 
 /* ---------- Die 12 Zwerge ----------
    unlock(s): s ist der Spielstand (siehe pass.js), gibt true zurück, wenn freigeschaltet. */

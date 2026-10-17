@@ -71,7 +71,7 @@
 /* Zwergenrat */
 .rat { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; }
 .rat-inhalt { position: relative; z-index: 2; flex: 1; display: grid; grid-template-columns: 1fr 1fr 0.9fr; gap: 2vw; padding: 2vw; min-height: 0; }
-.rat-frage { grid-column: 1 / -1; text-align: center; padding: 14px 20px; font-size: clamp(26px, 2.6vw, 44px); font-family: var(--titel); }
+.rat-frage { grid-column: 1 / -1; text-align: center; padding: 14px 20px; font-size: clamp(26px, 2.9vw, 60px); font-family: var(--titel); }
 .rat-option { padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
 .rat-option .bild { width: 60%; }
 .rat-option h3 { font-size: clamp(24px, 2.2vw, 38px); }
@@ -80,7 +80,7 @@
 .rat-regeln h3 { font-size: 26px; margin-bottom: 6px; }
 .rat-regeln ul { margin: 0 0 12px; padding-left: 22px; }
 .rat-regeln li { margin-bottom: 6px; }
-.uhr { font-family: var(--titel); font-size: 40px; text-align: center; }
+.uhr { font-family: var(--titel); font-size: clamp(30px, 3vw, 64px); text-align: center; }
 
 .lieferliste { width: 100%; border-collapse: collapse; font-size: 17px; text-align: left; }
 .lieferliste th, .lieferliste td { padding: 6px 8px; border-bottom: 1px solid rgba(58, 38, 23, 0.2); }
@@ -241,7 +241,8 @@ body.insel-seite .schleier > .fenster.liefer-dialog { width: calc(94vw / var(--u
 .raetsel-karte .frage, .raetsel-karte h2 { font-size: clamp(26px, 2.2vw, 44px); }
 .rat-regeln { font-size: clamp(17px, 1.5vw, 30px); }
 .rat-regeln h3 { font-size: clamp(22px, 1.8vw, 36px); }
-.rat .leiste .titel, .rat .uhr { font-size: clamp(24px, 2vw, 40px); }
+.rat .leiste .titel { font-size: clamp(24px, 2vw, 40px); }
+.rat .uhr { font-size: clamp(30px, 3vw, 64px); }
 .fest-bild { width: 100%; border-radius: 14px; overflow: hidden; }
 .fest-bild img { width: 100%; max-height: 28vh; object-fit: cover; display: block; }
 
@@ -293,7 +294,7 @@ body.insel-seite .meldungen { top: calc(3vh * var(--ui, 1)); bottom: auto; flex-
 .rede-zelle.stufe-2 { background: #c9e3a8; border-color: #6b9b3a; }
 .rede-zelle.stufe-3 { background: #f6dc8a; border-color: #c89a2a; }
 .rede-zelle.hervor { box-shadow: 0 0 0 4px var(--gold, #e8b23a); animation: aufploppen 0.5s; }
-.rede-striche { font-family: var(--titel); letter-spacing: 2px; color: #55812a; min-height: 18px; font-size: 18px; }
+.rede-striche { font-family: var(--titel); letter-spacing: 2px; color: #3f6a1c; min-height: 18px; font-size: 22px; }
 .knopf.aktiv { outline: 3px solid var(--gold, #e8b23a); }
 @media (max-width: 900px) { .rollen-karten { grid-template-columns: 1fr 1fr; } .rede-raster { grid-template-columns: repeat(6, 1fr); } }
 .rat-inhalt { grid-template-rows: auto auto minmax(0, 1fr); }
@@ -341,3 +342,16 @@ body.insel-seite .meldungen { top: calc(3vh * var(--ui, 1)); bottom: auto; flex-
 /* Themen-Herkunft: Klasse oder Insel */
 .herkunft { display: inline-block; vertical-align: middle; margin-left: 6px; padding: 2px 10px; border-radius: 999px; font-family: var(--text, inherit); font-size: calc(16px * var(--ui, 1)); font-weight: 700; letter-spacing: .02em; background: #2f6f8f; color: #fff; }
 .herkunft.insel { background: #6b4a1e; }
+
+/* Inselbotschaft und Stammescode: antippen = bildschirmfüllend für die letzte Reihe */
+button.tafel-botschaft, button.stamm-code { font: inherit; color: inherit; cursor: pointer; width: 100%; text-align: inherit; }
+button.stamm-code { text-align: center; }
+.tafel-botschaft .lupe { font-size: 20px; color: var(--tinte-hell); margin-left: 4px; }
+.tafel-botschaft b { font-size: clamp(28px, 2.4vw, 44px); }
+.gross-code { position: fixed; inset: 0; z-index: 90; background: rgba(20, 12, 7, 0.94); color: #fff4dc; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; cursor: pointer; animation: einblenden 0.2s; text-align: center; padding: 4vh 4vw; }
+.gross-code-titel { font-family: var(--titel); font-size: clamp(32px, 5vh, 72px); color: #e8b23a; }
+.gross-code-wort { font-family: var(--titel); font-size: min(26vh, 15vw); line-height: 1; letter-spacing: 0.08em; white-space: nowrap; }
+.gross-code-hinweis { font-size: clamp(24px, 3.4vh, 48px); }
+.gross-code-zu { font-size: clamp(16px, 2vh, 26px); opacity: 0.6; }
+.tafel-botschaft, .tafel.zu .tafel-botschaft { flex-wrap: wrap; }
+.tafel.zu .tafel-botschaft b { font-size: clamp(28px, 2.4vw, 44px); }

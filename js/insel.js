@@ -78,6 +78,19 @@
     return { gebaeude: ZI.GEBAEUDE.find((g) => g.id === n.gebaeude), bedarf };
   }
 
+  /* ---------- Code groß zeigen: für die letzte Reihe ---------- */
+  function grossZeigen(titel, wort, hinweis) {
+    const zu = () => { ov.remove(); document.removeEventListener('keydown', taste); };
+    const taste = (e) => { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); zu(); } };
+    const ov = h('div', { class: 'gross-code', role: 'dialog', 'aria-label': titel, onclick: zu },
+      h('div', { class: 'gross-code-titel' }, titel),
+      h('div', { class: 'gross-code-wort' }, wort),
+      hinweis ? h('div', { class: 'gross-code-hinweis' }, hinweis) : null,
+      h('div', { class: 'gross-code-zu' }, 'Antippen zum Schließen'));
+    document.addEventListener('keydown', taste);
+    document.body.append(ov);
+  }
+
   /* ---------- Darstellung ---------- */
   /* Bedienelemente wachsen auf großen Boards mit (Full HD, 4K) */
   function uiGroesse() {
@@ -313,8 +326,9 @@
       h('div', null, h('span', { class: 'zahl' }, String(m)), h('span', { style: { fontSize: '22px' } }, ' von ' + zl)),
       h('div', { class: 'balken', role: 'progressbar', 'aria-valuenow': String(anteil), 'aria-valuemin': '0', 'aria-valuemax': '100' }, h('div', { style: { width: anteil + '%' } })),
       status,
-      h('div', { class: 'tafel-botschaft', title: 'Diese Botschaft tippen die Kinder in der Schmiede ein.' },
-        h('span', null, 'Inselbotschaft'), h('b', null, silbig(botschaftDaten().wort))),
+      h('button', { class: 'tafel-botschaft', title: 'Groß zeigen – diese Botschaft tippen die Kinder in der Schmiede ein.',
+        onclick: () => grossZeigen('Inselbotschaft', silbig(botschaftDaten().wort), 'Schmiede → „Inselbotschaft“ → eintippen') },
+        h('span', null, 'Inselbotschaft'), h('b', null, silbig(botschaftDaten().wort)), h('span', { class: 'lupe', 'aria-hidden': 'true' }, '⤢')),
       zu ? null : auftragAnzeige(),
       zu ? null : h('div', { class: 'zeile' }, bild('edelstein', 'Edelsteine'), gems + ' Edelsteine · ' + insel.schmuck + ' Schmuckstücke' + (insel.geschenke ? ' · ' + insel.geschenke + ' Möwengeschenke' : '')),
       zu ? null : h('div', { class: 'zeile' }, bild('zwerg-01-brumm', 'Zwerge'), Object.keys(insel.zwerge).length + ' von ' + insel.klassengroesse + ' Zwergen haben geliefert'),
@@ -570,7 +584,7 @@
       zaehler.textContent = heuteZahl + ' von ' + insel.klassengroesse + ' Karten heute geliefert';
     }
     function langerCode() {
-      const eingabe = h('input', { class: 'eingabe', maxlength: '14', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'XXXX-XXXX-XXXX', 'aria-label': 'Zwergenpass-Code' });
+      const eingabe = h('input', { class: 'eingabe', maxlength: '14', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'XXXX-XXXX-XXXX', 'aria-label': 'Zwergenpass-Code' });
       eingabe.addEventListener('input', () => { eingabe.value = ZI.formatiereCode(eingabe.value); });
       const hin = h('div');
       const ok = () => {
@@ -658,8 +672,8 @@
           h('div', { class: 'stamm-frage' }, ZI.themaText(t)),
           h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-start', marginTop: '6px' } },
             h('button', { class: 'knopf holz klein', onclick: () => { st.thema = (st.thema + 1) % ZI.STAMMES_THEMEN.length; st.stimmen = {}; sichern(); zeichne(); } }, 'Anderes Thema'))),
-        h('div', { class: 'stamm-code pergament' },
-          h('div', { class: 'klein' }, 'Stammescode für die iPads'),
+        h('button', { class: 'stamm-code pergament', title: 'Groß zeigen', onclick: () => grossZeigen('Stammescode', silbig(code), 'Schmiede → „Stammesrat“ → Code eintippen') },
+          h('div', { class: 'klein' }, 'Stammescode für die iPads · antippen = groß'),
           h('b', null, silbig(code)),
           h('div', { class: 'klein' }, 'Schmiede → „Stammesrat“ → Code eintippen. Dort steht deine Rolle.')));
       ZI.setze(raster, ...staemme.map((g) => h('div', { class: 'stamm-karte pergament auf-pergament', style: { borderTopColor: g.farbe } },
@@ -911,18 +925,18 @@
       </section>`;
     };
     w.document.write(`<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Urkunden Zwergeninsel</title>
-      <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Lilita+One&display=swap" rel="stylesheet">
+      <link href="${new URL('schrift/schrift.css', location.href).href}" rel="stylesheet">
       <style>
         @page { size: A4; margin: 12mm; }
-        body { font-family: 'Andika', sans-serif; color: #3a2617; margin: 0; background: #eee; }
+        body { font-family: 'Insel Text', sans-serif; color: #3a2617; margin: 0; background: #eee; }
         .hinweis { max-width: 186mm; margin: 12px auto; background: #fff; padding: 12px 16px; border-radius: 10px; }
         .hinweis button { font: inherit; font-weight: 700; padding: 8px 16px; border-radius: 8px; border: 2px solid #8a6438; background: #e8b23a; cursor: pointer; }
         .urkunde { width: 186mm; height: 270mm; box-sizing: border-box; margin: 0 auto 12px; background: #fffaf0; border: 2.5mm double #8a6438; border-radius: 6mm; padding: 12mm 14mm; display: flex; flex-direction: column; gap: 5mm; break-after: page; font-size: 13pt; }
         .kopf { display: flex; align-items: center; gap: 6mm; }
         .kopf img { width: 42mm; height: 42mm; object-fit: contain; }
-        .titel { font-family: 'Lilita One', sans-serif; font-size: 42pt; color: #8a4b1c; line-height: 1; }
+        .titel { font-family: 'Insel Titel', sans-serif; font-size: 42pt; color: #8a4b1c; line-height: 1; }
         .unter { font-size: 12pt; color: #6b5442; }
-        .nr { margin-left: auto; font-family: 'Lilita One', sans-serif; font-size: 22pt; background: #8a4b1c; color: #fff4dc; border-radius: 4mm; padding: 2mm 5mm; }
+        .nr { margin-left: auto; font-family: 'Insel Titel', sans-serif; font-size: 22pt; background: #8a4b1c; color: #fff4dc; border-radius: 4mm; padding: 2mm 5mm; }
         .name { font-size: 15pt; } .name span { display: inline-block; width: 110mm; border-bottom: 0.4mm solid #8a6438; }
         .werte { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 8mm; padding-left: 6mm; margin: 0; }
         .ichkann { width: 100%; border-collapse: collapse; font-size: 11.5pt; }
@@ -1001,5 +1015,5 @@
   }
 
   allesZeigen(false);
-  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) { navigator.serviceWorker.register('sw.js').catch(() => {}); ZI.vorladen(true); }
 })();

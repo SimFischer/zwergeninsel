@@ -147,6 +147,13 @@ Die Schmiede läuft im normalen Browser-Tab, es wird nichts installiert. Alles, 
 
 `js/data-vielfalt.js` ergänzt alle Stationen um weitere Aufgaben (rund 90 neue), damit Kinder beim zweiten und dritten Durchgang Neues sehen: u. a. Inselrat 8 Vorhaben, Motor/Bremse 7 Gespräche, Sprecherwechsel 3 Ratsgespräche, jeder Gebäude-Stollen 8–10 Aufgaben. Neue Themen: Leseecke, Fahrrad, Klassenrat, Wasserspender, Unterricht draußen.
 
+## Schule: Datenschutz, WLAN, Smartboard
+
+- **Keine fremden Server:** Schriften liegen in `schrift/` (verkleinerte Fassungen von Andika und Lilita One, SIL Open Font License). Es werden keine Daten an Google oder andere Dienste übertragen.
+- **Schwaches WLAN:** Beim ersten Öffnen werden nur gut 600 KB geladen; die Bilder holt jedes iPad danach gestaffelt (zufällig 10–90 s später), damit nicht 27 iPads gleichzeitig laden. Antwortet das Netz nicht binnen 3 s, kommt die gespeicherte Fassung. Ohne WLAN laufen Schmiede und Board weiter.
+- **Smartboard:** Inselbotschaft und Stammescode lassen sich antippen und erscheinen bildschirmfüllend. Ratsfrage, Uhr und Codes sind auf einem 65-Zoll-Board bis etwa 7 m lesbar.
+- **iPad/Safari:** kein Zoom durch Doppeltippen, keine Autokorrektur in Code-Feldern, Fenster rutschen über die Bildschirmtastatur.
+
 ## Inhalte anpassen
 
 Alle Aufgaben, Themen und Texte stehen in `js/data.js` (Kapitel 1), `js/data-k2.js`, `js/data-k3.js`, `js/data-mehr.js` (zusätzliche Aufgaben, Vormach-Beispiele, Wissensbuch) und `js/data-spiel.js` (Ränge, Abzeichen, Inselrätsel, Aufträge). Neue Themen für das Meisterstück oder andere Beispielsätze lassen sich dort einfach ergänzen.

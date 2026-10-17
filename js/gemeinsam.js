@@ -128,6 +128,35 @@
     loeschen(k) { try { sessionStorage.removeItem(k); } catch (e) { /* egal */ } },
   };
 
+  /* ---------- iPad-Bildschirmtastatur: freie Höhe merken ---------- */
+  if (window.visualViewport) {
+    const tastatur = () => {
+      const verdeckt = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+      document.documentElement.style.setProperty('--tastatur', (verdeckt > 80 ? verdeckt : 0) + 'px');
+    };
+    window.visualViewport.addEventListener('resize', tastatur);
+    window.visualViewport.addEventListener('scroll', tastatur);
+  }
+
+  /* ---------- Bilder für den Offline-Fall nachladen ----------
+     Nicht alle 27 iPads gleichzeitig: jedes wartet zufällig 10–90 Sekunden und lädt dann ein Bild nach dem anderen.
+     Schon gespeicherte Bilder kosten kein WLAN (der Offline-Speicher antwortet). */
+  ZI.vorladen = function (fuerBoard) {
+    try {
+      if (!('serviceWorker' in navigator) || (location.protocol !== 'https:' && location.hostname !== 'localhost')) return;
+      const liste = (ZI.ALLE_BILDER || []).filter((n) => fuerBoard || !ZI.NUR_BOARD(n)).map(ZI.BILD);
+      let i = 0;
+      const naechstes = () => {
+        if (i >= liste.length) return;
+        if (navigator.onLine === false) { setTimeout(naechstes, 30000); return; }
+        const img = new Image();
+        img.onload = img.onerror = () => setTimeout(naechstes, 120);
+        img.src = liste[i++];
+      };
+      navigator.serviceWorker.ready.then(() => setTimeout(naechstes, (fuerBoard ? 2 : 10 + Math.random() * 80) * 1000));
+    } catch (e) { /* egal */ }
+  };
+
   /* ---------- Klänge (ohne Dateien, mit Web Audio erzeugt) ---------- */
   let ctx = null;
   ZI.ton = {

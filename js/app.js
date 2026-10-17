@@ -312,7 +312,7 @@
      ZWERGENPASS EINGEBEN
      ========================================================= */
   function zeigePassEingabe() {
-    const eingabe = h('input', { class: 'eingabe', maxlength: '14', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', inputmode: 'text', placeholder: 'XXXX-XXXX-XXXX', 'aria-label': 'Zwergenpass-Code' });
+    const eingabe = h('input', { class: 'eingabe', maxlength: '14', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'characters', spellcheck: 'false', inputmode: 'text', placeholder: 'XXXX-XXXX-XXXX', 'aria-label': 'Zwergenpass-Code' });
     const hinweis = h('div', { class: 'rueckmeldung tipp', style: { display: 'none' } });
     eingabe.addEventListener('input', () => {
       eingabe.value = ZI.formatiereCode(eingabe.value);
@@ -1669,7 +1669,7 @@
       h('button', { class: 'knopf holz klein', onclick: stammesratEingeben }, 'Stammesrat'));
   }
   function botschaftEingeben(danach) {
-    const eingabe = h('input', { class: 'eingabe botschaft-eingabe', maxlength: '12', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'z. B. BOKAMI', 'aria-label': 'Inselbotschaft' });
+    const eingabe = h('input', { class: 'eingabe botschaft-eingabe', maxlength: '12', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'z. B. BOKAMI', 'aria-label': 'Inselbotschaft' });
     const hinweis = h('div');
     const pruefen = () => {
       const roh = eingabe.value.trim().toUpperCase().replace(/[^A-Z]/g, '');
@@ -1711,7 +1711,7 @@
   function stammesratEingeben() {
     const alt = sitzung.lesen('zi-stamm', null);
     if (alt && Date.now() - alt.zeit < 90 * 60 * 1000) { zeigeStammesrat(alt); return; }
-    const eingabe = h('input', { class: 'eingabe botschaft-eingabe', maxlength: '12', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'z. B. KOMIDA', 'aria-label': 'Stammescode' });
+    const eingabe = h('input', { class: 'eingabe botschaft-eingabe', maxlength: '12', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'z. B. KOMIDA', 'aria-label': 'Stammescode' });
     const hinweis = h('div');
     const pruefen = () => {
       const roh = eingabe.value.trim().toUpperCase().replace(/[^A-Z]/g, '');
@@ -1940,7 +1940,8 @@
   /* ---------- Los ---------- */
   zeigeStart();
 
-  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
+    ZI.vorladen(false);
   }
 })();
