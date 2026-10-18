@@ -673,3 +673,14 @@ img.truhe-klein, .platzhalter.truhe-klein { width: 110px; height: auto; max-heig
 @media (max-width: 900px) {
   .halle-leiste .rohstoff-reihe { display: flex; gap: 8px; order: 2; flex-basis: 100%; justify-content: center; }
 }
+
+/* ---------- Lehrkraftbereich ---------- */
+.lk-raster { max-width: 900px; margin: 24px auto; padding: 0 16px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.lk-kachel { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px; text-decoration: none; color: var(--tinte); min-height: 110px; border: 3px solid #8a6438; }
+.lk-kachel b { font-family: var(--titel); font-weight: 400; font-size: 26px; }
+.lk-kachel span { font-size: 18px; color: var(--tinte-hell); }
+a.lk-kachel:active { transform: translateY(2px); }
+.lk-test { grid-column: 1 / -1; }
+.lk-test.an { border-color: var(--moos); background: #eef6dd; }
+@media (max-width: 700px) { .lk-raster { grid-template-columns: 1fr; } }
+.logo { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }

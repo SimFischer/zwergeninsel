@@ -12,6 +12,7 @@
   body { margin: 0; font-family: 'Insel Text', sans-serif; color: var(--tinte); background: #efe6d6; font-size: 15px; line-height: 1.45; }
   .leiste { position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 10px 16px; background: #3a2617; color: #fff4dc; }
   .leiste a, .leiste button { font: inherit; font-weight: 700; color: var(--tinte); background: #e8b23a; border: 0; border-radius: 8px; padding: 7px 14px; text-decoration: none; cursor: pointer; }
+  .leiste a.zurueck { background: #fff4dc; }
   .leiste span { margin-right: auto; font-family: 'Insel Titel', sans-serif; font-size: 20px; }
   .blatt { max-width: 186mm; margin: 16px auto; background: var(--papier); border-radius: 10px; padding: 12mm 13mm; box-shadow: 0 2px 10px rgba(0,0,0,.12); }
   h1 { font-family: 'Insel Titel', sans-serif; font-weight: 400; color: var(--holz); font-size: 28px; margin: 0 0 2px; }
@@ -43,7 +44,7 @@
 </style>
 </head>
 <body>
-<div class="leiste"><span>Zwergeninsel · Für Lehrkräfte</span><a href="#s1">Stunde 1</a><a href="#s2">Stunde 2</a><a href="#s3">Stunde 3</a><a href="#spick">Spickzettel</a><button onclick="window.print()">Drucken</button></div>
+<div class="leiste"><a class="zurueck" href="index.html#lehrkraft" aria-label="Zurück zum Lehrkraftbereich">← Zurück</a><span>Zwergeninsel · Für Lehrkräfte</span><a href="#s1">Stunde 1</a><a href="#s2">Stunde 2</a><a href="#s3">Stunde 3</a><a href="#spick">Spickzettel</a><button onclick="window.print()">Drucken</button></div>
 
 <!-- ===================== STUNDE 1 ===================== -->
 <section class="blatt" id="s1">

@@ -21,10 +21,15 @@
   .codes { display: grid; grid-template-columns: auto 1fr; gap: 1mm 2mm; font-size: 9pt; align-items: end; }
   .codes span:nth-child(even) { border-bottom: 0.3mm dotted #8a6438; height: 5mm; }
   .klein { font-size: 7.5pt; color: #6b5442; }
-  @media print { body { background: #fff; } .hinweis { display: none; } .blatt { padding: 0; } }
+  .leiste { position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; align-items: center; padding: 10px 16px; background: #3a2617; color: #fff4dc; }
+  .leiste span { margin-right: auto; font-family: 'Insel Titel', sans-serif; font-size: 20px; }
+  .leiste a, .leiste button { font: inherit; font-weight: 700; color: #3a2617; background: #e8b23a; border: 0; border-radius: 8px; padding: 10px 16px; min-height: 44px; text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; }
+  .leiste a.zurueck { background: #fff4dc; }
+  @media print { body { background: #fff; } .hinweis, .leiste { display: none; } .blatt { padding: 0; } }
 </style>
 </head>
 <body>
+<div class="leiste"><a class="zurueck" href="index.html#lehrkraft">← Zurück</a><span>Zwergenpass-Karten</span><button onclick="window.print()">Drucken</button></div>
 <div class="hinweis">
   Jede Karte hat eine feste Nummer. Mit dieser Nummer kommt das Material auf die Insel. Gebt jedem Kind eine Karte und lasst es dieselbe Nummer behalten. Gedruckt werden so viele Karten, wie die Klasse Kinder hat, plus 3 Ersatzkarten (10 Karten pro Blatt). Anzahl: <input id="anzahl" type="number" min="1" max="32" value="27" style="width:60px;font:inherit">
   <button onclick="window.print()">Drucken</button>
@@ -58,7 +63,8 @@
     }
     ziel.innerHTML = html;
   }
-  feld.addEventListener('input', zeichne);
+  try { const alt = localStorage.getItem('zi-karten-anzahl'); if (alt) feld.value = alt; } catch (e) { /* egal */ }
+  feld.addEventListener('input', () => { try { localStorage.setItem('zi-karten-anzahl', feld.value); } catch (e) { /* egal */ } zeichne(); });
   zeichne();
 </script>
 </body>

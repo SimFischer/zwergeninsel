@@ -256,26 +256,49 @@
       ZI.hintergrund('titel-hintergrund', 'hg-ersatz-titel', 'rgba(20,12,8,0.15)'),
       vollbildKnopf('vollbild-start'),
       h('div', { class: 'start-mitte' },
-        h('div', { class: 'logo' }, 'Zwergeninsel'),
+        langDruecken(h('div', { class: 'logo' }, 'Zwergeninsel'), 5000, () => { sitzungLehrkraft(true); zeigeLehrkraft(); }),
         h('div', { class: 'logo-unter' }, 'Schmiede Argumente – baut gemeinsam euer Dorf!'),
-        weiter, knoepfe),
-      h('div', { class: 'fusszeile' },
-        h('button', { onclick: zeigeTestmodus }, testmodus ? 'Testmodus ist an (antippen zum Ausschalten)' : 'Für Lehrkräfte: Testmodus'))));
+        weiter, knoepfe)));
   }
 
-  function zeigeTestmodus() {
-    if (testmodus) { testmodus = false; sessionStorage.removeItem('zi-test'); zeigeStart(); return; }
-    const f = ZI.fenster([
-      h('h2', null, 'Testmodus'),
-      h('p', null, 'Im Testmodus sind alle Stollen und das Bonusspiel sofort offen, damit Sie alles ausprobieren können. Der Modus gilt nur, bis die App geschlossen wird.'),
-      h('div', { class: 'knopf-reihe' },
-        h('a', { class: 'knopf moos klein', href: 'insel.html', style: { textDecoration: 'none' } }, 'Zur Insel (Board)'),
-        h('a', { class: 'knopf moos klein', href: 'karten.html', style: { textDecoration: 'none' } }, 'Zwergenpass-Karten drucken'),
-        h('a', { class: 'knopf moos klein', href: 'lehrkraft.html', style: { textDecoration: 'none' } }, 'Stundenverlauf & Spickzettel')),
-      h('div', { class: 'knopf-reihe' },
-        h('button', { class: 'knopf holz', onclick: () => f.schliessen() }, 'Abbrechen'),
-        h('button', { class: 'knopf', onclick: () => { testmodus = true; sessionStorage.setItem('zi-test', '1'); f.schliessen(); zeigeStart(); } }, 'Testmodus an')),
-    ]);
+  /* Versteckter Zugang: nur langes Gedrückthalten (Touch und Maus) löst aus, kurzes Tippen nichts */
+  function langDruecken(el, ms, aktion) {
+    let uhr = null;
+    const stopp = () => { if (uhr) { clearTimeout(uhr); uhr = null; } };
+    el.addEventListener('pointerdown', (e) => { stopp(); uhr = setTimeout(() => { uhr = null; aktion(); }, ms); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((t) => el.addEventListener(t, stopp));
+    el.addEventListener('contextmenu', (e) => e.preventDefault());
+    el.style.touchAction = 'none';
+    return el;
+  }
+  const sitzungLehrkraft = (an) => { try { if (an) sessionStorage.setItem('zi-lehrkraft', '1'); return sessionStorage.getItem('zi-lehrkraft') === '1'; } catch (e) { return !!an; } };
+
+  /* =========================================================
+     LEHRKRAFTBEREICH (nur über den versteckten Zugang erreichbar)
+     ========================================================= */
+  function zeigeLehrkraft() {
+    const kachel = (titel, text, href) => h('a', { class: 'lk-kachel pergament auf-pergament', href }, h('b', null, titel), h('span', null, text));
+    const testKnopf = h('button', { class: 'knopf' + (testmodus ? ' holz' : ''), onclick: () => {
+      testmodus = !testmodus;
+      try { if (testmodus) sessionStorage.setItem('zi-test', '1'); else sessionStorage.removeItem('zi-test'); } catch (e) { /* egal */ }
+      zeigeLehrkraft();
+    } }, testmodus ? 'Testmodus ausschalten' : 'Testmodus einschalten');
+    zeige(h('div', { class: 'screen' },
+      ZI.hintergrund('titel-hintergrund', 'hg-ersatz-titel', 'rgba(20,12,8,0.55)'),
+      h('div', { class: 'leiste' },
+        h('button', { class: 'rund', 'aria-label': 'Zurück zum Start', onclick: zeigeStart }, icon.zurueck()),
+        h('div', null, h('div', { class: 'titel' }, 'Lehrkraftbereich'), h('div', { class: 'untertitel' }, 'Nur für Lehrkräfte')),
+        h('div', { class: 'spacer' }), vollbildKnopf()),
+      h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2 } },
+        h('div', { class: 'lk-raster' },
+          kachel('Zur Insel (Board)', 'Lieferungen, Stammesräte, Zwergenrat, Inselrätsel', 'insel.html?von=lehrkraft'),
+          kachel('Zwergenpass-Karten drucken', 'Eine Karte pro Kind, mit fester Nummer', 'karten.html?von=lehrkraft'),
+          kachel('Stundenverlauf & Spickzettel', 'Ablauf der drei Stunden, Hilfe bei Problemen', 'lehrkraft.html?von=lehrkraft'),
+          h('div', { class: 'lk-kachel pergament auf-pergament lk-test' + (testmodus ? ' an' : '') },
+            h('b', null, 'Testmodus ' + (testmodus ? 'ist an' : 'ist aus')),
+            h('span', null, 'Alle Stollen und Bonusspiele sind sofort offen. Gilt nur in diesem Tab.'),
+            h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-start' } }, testKnopf,
+              testmodus ? h('button', { class: 'knopf moos', onclick: zeigeStart }, 'Zur Schmiede') : null))))));
   }
 
   /* =========================================================
@@ -1960,7 +1983,10 @@
   }
 
   /* ---------- Los ---------- */
-  zeigeStart();
+  if (location.hash === '#lehrkraft') {
+    history.replaceState(null, '', location.pathname);
+    if (sitzungLehrkraft()) zeigeLehrkraft(); else zeigeStart();
+  } else zeigeStart();
 
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
