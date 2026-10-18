@@ -146,7 +146,25 @@
   const tiere = h('div', { class: 'tiere', 'aria-hidden': 'true' }, TIERE.map((t) =>
     h('div', { class: 'tier ' + t.klasse, style: { left: t.x + '%', top: t.y + '%', width: t.w + '%' } }, ZI.bildOder(t.datei, '', null))));
   const nachtSchicht = h('div', { class: 'nacht-schicht', 'aria-hidden': 'true' });
-  buehne.append(schmuckSchicht, sonderSchicht, tiere, zwergSchicht, moewen, wolken, nachtSchicht);
+  // Lichter liegen ÜBER der Nachtabdunklung: nur wiederaufgebaute Orte leuchten nachts
+  const lichtSchicht = h('div', { class: 'licht-schicht', 'aria-hidden': 'true' });
+  buehne.append(schmuckSchicht, sonderSchicht, tiere, zwergSchicht, moewen, wolken, nachtSchicht, lichtSchicht);
+  const LICHT_ART = { lagerfeuer: 'feuer', werkstatt: 'glut', leuchtturm: 'leuchtfeuer', brunnen: 'laterne', steg: 'laterne', schiff: 'laterne' };
+  function zeigeLichter() {
+    const hoehe = (w) => w * 16 / 9; // Bühne ist 16:9, Gebäudebilder quadratisch
+    const lichter = [];
+    ZI.GEBAEUDE.forEach((g) => {
+      if (!insel.gebaut.includes(g.id)) return; // Ruine: dunkel
+      const art = LICHT_ART[g.id] || 'fensterlicht';
+      const hh = hoehe(g.w);
+      const y = art === 'leuchtfeuer' ? g.y - hh * 0.86 : art === 'feuer' ? g.y - hh * 0.25 : g.y - hh * 0.42;
+      lichter.push(h('span', { class: 'licht ' + art, style: { left: g.x + '%', top: y + '%', width: (art === 'fensterlicht' ? g.w * 0.9 : g.w * 1.1) + '%' } }));
+    });
+    schmuckSchicht.querySelectorAll('.schmuck.lampe').forEach((el) => {
+      lichter.push(h('span', { class: 'licht laterne', style: { left: el.style.left, top: 'calc(' + el.style.top + ' - ' + (parseFloat(el.style.width) * 1.2) + '%)', width: (parseFloat(el.style.width) * 2.2) + '%' } }));
+    });
+    ZI.setze(lichtSchicht, ...lichter);
+  }
   function moeweSvg(geschenk) {
     const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     s.setAttribute('viewBox', '0 0 60 40'); s.setAttribute('class', 'moewe-svg');
@@ -169,10 +187,20 @@
     }
     return box;
   }
+  /* Möwe bringt ein Geschenk: fliegt von rechts nach links (Blickrichtung gespiegelt),
+     lässt das Geschenk über der Insel fallen und fliegt ohne Geschenk weiter */
   function moeweMitGeschenk(behaelter) {
+    const ziel = behaelter || buehne;
     const m = h('div', { class: 'moewe-flug', 'aria-hidden': 'true' }, moewe(true));
-    (behaelter || buehne).appendChild(m);
-    setTimeout(() => { ZI.ton.plopp(); }, 2600);
+    ziel.appendChild(m);
+    setTimeout(() => {
+      ZI.ton.plopp();
+      const r = m.getBoundingClientRect(); const z = ziel.getBoundingClientRect();
+      const g = h('div', { class: 'geschenk-fall', 'aria-hidden': 'true', style: { left: (r.left - z.left + r.width * 0.35) + 'px', top: (r.top - z.top + r.height * 0.6) + 'px', width: (r.width * 0.35) + 'px' } },
+        ZI.bildOder('geschenk', '', null));
+      ziel.appendChild(g); setTimeout(() => g.remove(), 1600);
+      ZI.setze(m, moewe(false));
+    }, 2600);
     setTimeout(() => m.remove(), 4200);
   }
 
@@ -222,14 +250,14 @@
       el.classList.toggle('gesperrt', g.kapitel > kap() + 1);
       el.classList.toggle('mit-rauch', ist);
     });
-    if (!animiert) { insel.gebaut = soll.slice(); sichern(); return; }
+    if (!animiert) { insel.gebaut = soll.slice(); sichern(); zeigeLichter(); return; }
     neu.forEach((id, i) => setTimeout(() => baue(id), 900 * i + 300));
     if (kapitelFertig() && !insel.gefeiert.includes(kap())) {
       insel.gefeiert.push(kap());
       setTimeout(feiern, 900 * neu.length + 2200);
     }
     insel.gebaut = Array.from(new Set([...insel.gebaut, ...soll]));
-    sichern();
+    sichern(); zeigeLichter();
   }
 
   function baue(id) {
@@ -254,6 +282,7 @@
       ZI.meldung(g.name + ' steht!' + (u ? ' Neue Übung in der Schmiede: „' + u.name + '“' : ''), u ? 5000 : 3200);
       zeigeTafel();
     }, 450);
+    setTimeout(zeigeLichter, 1200);
   }
 
   function zeigeSchmuck(animiert) {
@@ -293,7 +322,14 @@
     }));
   }
 
-  function tafelZu() { return !!ZI.speicher.lesen('zi-tafel-zu', true); }
+  /* Tafel: 'offen' | 'kompakt' | 'versteckt' (nur ein kleiner Reiter am Rand) */
+  function tafelZustand() {
+    const z = ZI.speicher.lesen('zi-tafel', null);
+    if (z === 'offen' || z === 'kompakt' || z === 'versteckt') return z;
+    return ZI.speicher.lesen('zi-tafel-zu', true) ? 'kompakt' : 'offen';
+  }
+  function tafelSetzen(z) { ZI.speicher.schreiben('zi-tafel', z); zeigeTafel(); }
+  function tafelZu() { return tafelZustand() !== 'offen'; }
   function zeigeTafel() {
     const k = kap();
     const m = material(); const zl = ziel();
@@ -316,13 +352,24 @@
     else if (nk) status = h('div', { class: 'klein' }, h('b', null, 'Kapitel ' + ZI.KAPITEL[k].nr + ' geschafft! '), 'Mit der Inselbotschaft öffnet sich in der Schmiede Kapitel ' + nk.nr + '.',
       naechstesKapitelBereit() ? h('div', { style: { marginTop: '8px' } }, h('button', { class: 'knopf klein', onclick: kapitelWeiter }, 'Kapitel ' + nk.nr + ' beginnen')) : null);
     else status = h('div', { class: 'klein' }, h('b', null, 'Das ganze Dorf steht!'));
-    const zu = tafelZu();
+    const zustand = tafelZustand();
+    const zu = zustand !== 'offen';
     tafel.classList.toggle('zu', zu);
+    tafel.classList.toggle('versteckt', zustand === 'versteckt');
+    if (zustand === 'versteckt') {
+      // ganz eingeklappt: nur ein kleiner Reiter – die Insel ist frei
+      ZI.setze(tafel, h('button', { class: 'tafel-reiter' + (rfFaellig ? ' achtung' : ''), 'aria-label': 'Baumaterial-Tafel öffnen', onclick: () => tafelSetzen('kompakt') },
+        h('span', { class: 'tafel-reiter-pfeil', 'aria-hidden': 'true' }, '◂'),
+        h('span', null, h('b', null, m + '/' + zl), rfFaellig ? ' · Rat!' : '')));
+      return;
+    }
     ZI.setze(tafel,
       h('div', { class: 'tafel-kopf' },
-        h('h2', { style: { fontSize: '26px' } }, 'Baumaterial'),
-        h('button', { class: 'tafel-klapp', 'aria-label': zu ? 'Tafel aufklappen' : 'Tafel einklappen', 'aria-expanded': String(!zu),
-          onclick: () => { ZI.speicher.schreiben('zi-tafel-zu', !zu); zeigeTafel(); } }, zu ? '▾' : '▴')),
+        h('h2', { style: { fontSize: '24px' } }, 'Baumaterial'),
+        h('div', { class: 'tafel-kopf-knoepfe' },
+          h('button', { class: 'tafel-klapp', 'aria-label': zu ? 'Tafel aufklappen' : 'Tafel kleiner machen', 'aria-expanded': String(!zu),
+            onclick: () => tafelSetzen(zu ? 'offen' : 'kompakt') }, zu ? '▾' : '▴'),
+          h('button', { class: 'tafel-klapp', 'aria-label': 'Tafel ganz einklappen', title: 'Ganz einklappen', onclick: () => tafelSetzen('versteckt') }, '▸'))),
       h('div', null, h('span', { class: 'zahl' }, String(m)), h('span', { style: { fontSize: '22px' } }, ' von ' + zl)),
       h('div', { class: 'balken', role: 'progressbar', 'aria-valuenow': String(anteil), 'aria-valuemin': '0', 'aria-valuemax': '100' }, h('div', { style: { width: anteil + '%' } })),
       status,
@@ -351,7 +398,7 @@
     zeigeTafel();
     zeigeNacht();
   }
-  function zeigeNacht() { screen.classList.toggle('nacht', !!insel.nacht); }
+  function zeigeNacht() { screen.classList.toggle('nacht', !!insel.nacht); zeigeLichter(); }
 
   /* ---------- Auftrag des Tages ---------- */
   const heute = () => new Date().toISOString().slice(0, 10);
@@ -772,7 +819,11 @@
       const aendern = (d) => { stimmen[g.id] = Math.max(0, stimmen[g.id] + d); zahl.textContent = String(stimmen[g.id]); ZI.ton.plopp(); };
       const gewaehlt = insel.rat[RF.id] === g.id;
       return h('div', { class: 'rat-option pergament auf-pergament' + (gewaehlt ? ' gewaehlt' : '') },
-        h('div', { class: 'bild' }, bild(g.id, g.name)),
+        // Ruine heute → so sieht es nach dem Wiederaufbau aus (Schiff: das Wrack ist im Inselbild)
+        h('div', { class: 'bild rat-vorher-nachher' + (gewaehlt ? ' gebaut' : '') },
+          g.id === 'schiff' ? null : h('figure', { class: 'rat-ruine' }, bild([g.id + '-ruine', g.id], g.name + ' als Ruine'), h('figcaption', null, 'Jetzt: Ruine')),
+          g.id === 'schiff' ? null : h('span', { class: 'rat-pfeil', 'aria-hidden': 'true' }, '➜'),
+          h('figure', { class: 'rat-neu' }, bild(g.id, g.name), h('figcaption', null, g.id === 'schiff' ? 'Wird repariert' : 'Wird wieder aufgebaut'))),
         h('h3', null, g.name),
         u ? h('div', { class: 'rat-freischalt' },
           h('div', { class: 'rat-freischalt-kopf' }, 'Schaltet in der Schmiede frei:'),

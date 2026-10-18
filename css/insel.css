@@ -355,3 +355,60 @@ button.stamm-code { text-align: center; }
 .gross-code-zu { font-size: clamp(16px, 2vh, 26px); opacity: 0.6; }
 .tafel-botschaft, .tafel.zu .tafel-botschaft { flex-wrap: wrap; }
 .tafel.zu .tafel-botschaft b { font-size: clamp(28px, 2.4vw, 44px); }
+
+/* ---------- Mehr Insel, weniger UI ---------- */
+.tafel { width: clamp(250px, 20vw, 360px); padding: 14px 16px; gap: 8px; }
+.tafel.zu { width: clamp(220px, 16vw, 300px); padding: 10px 14px; }
+.tafel-kopf-knoepfe { display: flex; gap: 6px; }
+.tafel-klapp { width: 44px; height: 44px; }
+.tafel.versteckt { width: auto; padding: 0; background: none; box-shadow: none; border: 0; right: 0; }
+.tafel.versteckt::before, .tafel.versteckt::after { display: none; }
+.tafel-reiter { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 8px 14px 8px 10px; border-radius: 14px 0 0 14px; border: 0; cursor: pointer;
+  font: inherit; font-size: 20px; color: var(--tinte); background: linear-gradient(180deg, #fff4dc, #f4e6c8); box-shadow: 0 4px 12px rgba(0,0,0,0.35); }
+.tafel-reiter b { font-family: var(--titel); font-weight: 400; font-size: 24px; }
+.tafel-reiter-pfeil { font-size: 18px; color: var(--tinte-hell); }
+.tafel-reiter.achtung { background: linear-gradient(180deg, #ffe7a6, #e8b23a); animation: aufploppen 0.6s ease-out 2; }
+/* Leiste unten: niedriger, weiterhin gut antippbar (mind. 48 px) */
+.insel-knoepfe { gap: 10px; bottom: 1.6vh; }
+.insel-knoepfe .knopf { min-height: 48px; padding: 6px 16px; font-size: 20px; }
+.insel-knoepfe .rund { width: 50px; height: 50px; }
+.insel-knoepfe .rund svg { width: 24px; height: 24px; }
+
+/* Zwergenrat: Ruine → Wiederaufbau in jeder Gebäudekarte */
+.rat-option .bild.rat-vorher-nachher { display: flex; align-items: center; justify-content: center; gap: 4px; }
+.rat-vorher-nachher figure { margin: 0; position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.rat-vorher-nachher .rat-ruine { flex: 1.25 1 0; }
+.rat-vorher-nachher .rat-neu { flex: 1 1 0; }
+.rat-vorher-nachher figure img, .rat-vorher-nachher figure .platzhalter { position: static !important; width: 100%; height: auto !important; flex: 1 1 0; min-height: 0; object-fit: contain; }
+.rat-vorher-nachher .rat-neu img { opacity: 0.75; filter: saturate(0.85); }
+.rat-vorher-nachher.gebaut .rat-neu img { opacity: 1; filter: none; }
+.rat-vorher-nachher figcaption { font-size: calc(14px * var(--ui, 1)); color: var(--tinte-hell); font-weight: 700; white-space: nowrap; }
+.rat-pfeil { font-size: calc(30px * var(--ui, 1)); color: #8a6438; flex: none; }
+
+/* Inselrätsel: sicher zentrieren – bei langem Inhalt beginnt er immer unterhalb der Kopfzeile und bleibt scrollbar */
+.raetsel-inhalt { align-items: flex-start; justify-content: flex-start; min-height: 0; scroll-padding-top: 16px; }
+.raetsel-inhalt > * { margin: auto; }
+
+/* Geschenk-Möwe fliegt nach links und schaut auch nach links */
+.moewe-flug .moewe { transform: scaleX(-1); }
+.geschenk-fall { position: absolute; z-index: 51; pointer-events: none; animation: geschenk-fall 1.5s ease-in forwards; }
+.geschenk-fall img { width: 100%; display: block; }
+@keyframes geschenk-fall { from { transform: translateY(0) rotate(0); opacity: 1; } 80% { opacity: 1; } to { transform: translateY(22vh) rotate(18deg); opacity: 0; } }
+
+/* ---------- Nachtmodus: Wolken und Dunst passen sich an, Gebäude leuchten ---------- */
+.insel-screen.nacht .wolken span img { filter: brightness(0.38) saturate(0.45) hue-rotate(190deg); opacity: 0.55; transition: filter 2.5s, opacity 2.5s; }
+.wolken span img { transition: filter 2.5s, opacity 2.5s; }
+.insel-screen.nacht .rauch { opacity: 0.35; }
+.insel-screen.nacht .wellen { opacity: 0.35; }
+.licht-schicht { position: absolute; inset: 0; z-index: 8; pointer-events: none; opacity: 0; transition: opacity 2.5s; }
+.insel-screen.nacht .licht-schicht { opacity: 1; }
+.licht { position: absolute; transform: translate(-50%, -50%); aspect-ratio: 1; border-radius: 50%; mix-blend-mode: screen; }
+.licht.fensterlicht { background: radial-gradient(circle, rgba(255, 214, 130, 0.75) 0 8%, rgba(255, 190, 90, 0.35) 22%, rgba(255, 170, 70, 0) 62%); animation: fenster-flackern 4s ease-in-out infinite; }
+.licht.feuer { background: radial-gradient(circle, rgba(255, 230, 150, 0.95) 0 10%, rgba(255, 140, 40, 0.55) 30%, rgba(255, 110, 30, 0) 66%); animation: feuer-flackern 0.9s ease-in-out infinite alternate; }
+.licht.glut { background: radial-gradient(circle, rgba(255, 170, 80, 0.85) 0 9%, rgba(240, 90, 30, 0.45) 30%, rgba(220, 70, 20, 0) 64%); animation: feuer-flackern 1.6s ease-in-out infinite alternate; }
+.licht.laterne { background: radial-gradient(circle, rgba(255, 230, 160, 0.9) 0 7%, rgba(255, 200, 110, 0.35) 25%, rgba(255, 190, 90, 0) 60%); }
+.licht.leuchtfeuer { background: radial-gradient(circle, rgba(255, 250, 210, 1) 0 9%, rgba(255, 230, 150, 0.55) 26%, rgba(255, 220, 120, 0) 64%); animation: leuchtfeuer 3s ease-in-out infinite; }
+@keyframes fenster-flackern { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.7; } }
+@keyframes feuer-flackern { from { opacity: 0.75; transform: translate(-50%, -50%) scale(0.95); } to { opacity: 1; transform: translate(-50%, -50%) scale(1.06); } }
+@keyframes leuchtfeuer { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .licht { animation: none !important; } }
