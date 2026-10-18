@@ -42,7 +42,7 @@ Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden ke
 
 1. *Argument-Puzzle* – Meinung, Begründung und Beispiel zusammensetzen (Farben wie im Arbeitsblatt: rot, gelb, grün)
 2. *Motor oder Bremse?* – Beiträge aus Klassengesprächen sortieren: Gesprächsmotor oder Gesprächsbremse
-3. *Hör-Stollen* – das iPad liest ein Argument vor, ohne Text; danach Fragen zu Meinung, Begründung und Beispiel
+3. *Hör-Stollen* – zu zweit: Der Partner liest ein Argument vor, man selbst hört nur zu; danach Fragen zu Meinung, Begründung und Beispiel
 
 **Tiefe Stollen**
 
@@ -101,7 +101,7 @@ Jede Gebäude-Übung bringt einen Rangpunkt und eine Seite im Wissensbuch (insge
 ## Lernhilfen in allen Kapiteln
 
 - **Meisterin Hammerlind macht es vor:** Vor jeder Station im Hauptstollen löst die Meisterin ein Beispiel Schritt für Schritt und denkt dabei laut. Die Kinder können das überspringen.
-- **Zwergen-Wissensbuch:** Jede geschaffte Station schaltet einen Merksatz mit Beispiel frei (18 Seiten). Das Buch-Symbol in der Halle öffnet es jederzeit, jede Seite lässt sich vorlesen.
+- **Zwergen-Wissensbuch:** Jede geschaffte Station schaltet einen Merksatz mit Beispiel frei (18 Seiten). Das Buch-Symbol in der Halle öffnet es jederzeit.
 - **Abwechslung:** Jede Station zieht zufällig aus einem größeren Aufgabenpool. Nachbarn haben deshalb meist andere Aufgaben, und erneutes Spielen bleibt spannend.
 
 ## Spielelemente
@@ -122,7 +122,7 @@ Jede Gebäude-Übung bringt einen Rangpunkt und eine Seite im Wissensbuch (insge
 
 - Das Dorf wird nur aus dem **Hauptstollen** gebaut. Jedes Kind zählt gleich viel, egal wie schnell es ist.
 - Schnelle Kinder bekommen Edelsteine. Die machen das Dorf **schöner**, aber nicht schneller fertig.
-- Fehler kosten nichts. Nach zwei Fehlern hilft Meisterin Hammerlind. Jede Aufgabe lässt sich vorlesen.
+- Fehler kosten nichts. Nach zwei Fehlern hilft Meisterin Hammerlind.
 
 ## Koffer-iPads
 

@@ -79,7 +79,6 @@
   };
   ZI.icon = {
     zurueck: () => svg('<path d="M15 5 L8 12 L15 19"/>'),
-    vorlesen: () => svg('<path d="M4 9 H8 L13 5 V19 L8 15 H4 Z"/><path d="M16 9 Q18 12 16 15"/><path d="M18.5 6.5 Q22.5 12 18.5 17.5"/>'),
     laterne: () => svg('<path d="M9 3 H15"/><path d="M12 3 V5"/><path d="M7 8 Q12 4 17 8 V17 Q12 21 7 17 Z"/><path d="M12 10 Q10 13 12 15 Q14 13 12 10 Z"/>'),
     haken: () => svg('<path d="M5 12.5 L10 17 L19 7"/>'),
     ton: () => svg('<path d="M4 9 H8 L13 5 V19 L8 15 H4 Z"/><path d="M16.5 9.5 Q18 12 16.5 14.5"/>'),
@@ -192,19 +191,6 @@
     falsch() { this.klang(196, 0.25, 'triangle', 0.15); this.klang(165, 0.3, 'triangle', 0.12, 0.12); },
     fanfare() { [523, 659, 784, 1047, 784, 1047].forEach((f, i) => this.klang(f, 0.3, 'triangle', 0.15, i * 0.12)); },
     plopp() { this.klang(880, 0.12, 'sine', 0.15); },
-  };
-
-  /* ---------- Vorlesen ---------- */
-  ZI.vorlesen = function (text) {
-    try {
-      const s = window.speechSynthesis; if (!s) return;
-      s.cancel();
-      const u = new SpeechSynthesisUtterance(String(text).replace(/…/g, ' '));
-      u.lang = 'de-DE'; u.rate = 0.92;
-      const stimme = s.getVoices().find((v) => v.lang && v.lang.startsWith('de'));
-      if (stimme) u.voice = stimme;
-      s.speak(u);
-    } catch (e) { /* kein Vorlesen möglich */ }
   };
 
   /* ---------- Kurze Meldung unten ---------- */

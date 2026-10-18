@@ -85,9 +85,9 @@
       { text: 'Wir lüften den Raum, denn die Luft ist stickig.', ok: true },
       { text: 'Wir lüften den Raum denn die Luft ist stickig.', ok: false, info: 'Vor „denn“ fehlt das Komma.' }] },
     { saetze: [
-      { text: 'Emma übt jeden Tag da sie bald einen Auftritt hat.', ok: false, info: 'Vor „da“ fehlt das Komma.' },
-      { text: 'Emma übt jeden Tag, da sie hat bald einen Auftritt.', ok: false, info: 'Nach „da“ steht das Verb am Ende: da sie bald einen Auftritt hat.' },
-      { text: 'Emma übt jeden Tag, da sie bald einen Auftritt hat.', ok: true }] },
+      { text: 'Merle übt jeden Tag da sie bald einen Auftritt hat.', ok: false, info: 'Vor „da“ fehlt das Komma.' },
+      { text: 'Merle übt jeden Tag, da sie hat bald einen Auftritt.', ok: false, info: 'Nach „da“ steht das Verb am Ende: da sie bald einen Auftritt hat.' },
+      { text: 'Merle übt jeden Tag, da sie bald einen Auftritt hat.', ok: true }] },
   );
 
   ZI.BEISPIELE.push(
@@ -134,7 +134,7 @@
   ZI.MOTOR_BREMSE.push(
     { thema: 'Gespräch: Sollen wir in der Klasse eine Leseecke einrichten?',
       beitraege: [
-        { text: 'Mia: „Ich bin für eine Leseecke, weil man dort in Ruhe lesen kann.“', motor: true, info: 'Motor! Eine Meinung mit Begründung.' },
+        { text: 'Selin: „Ich bin für eine Leseecke, weil man dort in Ruhe lesen kann.“', motor: true, info: 'Motor! Eine Meinung mit Begründung.' },
         { text: 'Finn ruft dazwischen: „Lesen ist langweilig!“', motor: false, info: 'Bremse! Dazwischenrufen ohne Grund.' },
         { text: 'Sara: „Du sagst, dass man dort in Ruhe lesen kann. Wir könnten auch Kissen hineinlegen.“', motor: true, info: 'Motor! Sara wiederholt und ergänzt.' },
         { text: 'Tom dreht sich weg und malt in sein Heft.', motor: false, info: 'Bremse! Wer nicht mitmacht, hilft dem Gespräch nicht.' },
@@ -144,21 +144,21 @@
       beitraege: [
         { text: 'Karim: „Ich schlage einen Waffelstand vor, denn Waffeln mögen fast alle.“', motor: true, info: 'Motor! Ein Vorschlag mit Begründung.' },
         { text: 'Lea: „Immer will Karim bestimmen.“', motor: false, info: 'Bremse! Lea greift Karim an statt seinen Vorschlag.' },
-        { text: 'Emma: „Ich habe eine Frage: Wer würde den Teig mitbringen?“', motor: true, info: 'Motor! Nachfragen bringt das Gespräch weiter.' },
+        { text: 'Merle: „Ich habe eine Frage: Wer würde den Teig mitbringen?“', motor: true, info: 'Motor! Nachfragen bringt das Gespräch weiter.' },
         { text: 'Ali tippt die ganze Zeit mit dem Stift auf den Tisch.', motor: false, info: 'Bremse! Das stört alle beim Zuhören.' },
-        { text: 'Hannah: „Ich habe noch eine Idee: Dosenwerfen. Das kostet fast nichts.“', motor: true, info: 'Motor! Eine neue Idee mit Grund.' },
+        { text: 'Clara: „Ich habe noch eine Idee: Dosenwerfen. Das kostet fast nichts.“', motor: true, info: 'Motor! Eine neue Idee mit Grund.' },
         { text: 'Paul: „Ist mir egal, macht doch, was ihr wollt.“', motor: false, info: 'Bremse! So hilft Paul nicht bei der Entscheidung.' }] },
     { thema: 'Gespräch: Wie schmücken wir unseren Klassenraum?',
       beitraege: [
         { text: 'Lotta: „Ich finde, wir sollten unsere eigenen Bilder aufhängen, weil der Raum dann zu uns passt.“', motor: true, info: 'Motor! Eine Meinung mit Begründung.' },
         { text: 'Milan lacht: „Deine Bilder will doch keiner sehen.“', motor: false, info: 'Bremse! Auslachen verletzt und bringt nichts.' },
-        { text: 'Jonas: „Ich stimme Lotta zu. Wir könnten jeden Monat neue Bilder aufhängen.“', motor: true, info: 'Motor! Jonas stimmt zu und ergänzt.' },
-        { text: 'Mia erzählt ihrer Nachbarin laut vom Wochenende.', motor: false, info: 'Bremse! Nebengespräche lenken alle ab.' },
-        { text: 'Tim: „Lasst uns abstimmen, damit alle mitentscheiden.“', motor: true, info: 'Motor! Tim hilft, zu einer Lösung zu kommen.' },
+        { text: 'Mats: „Ich stimme Lotta zu. Wir könnten jeden Monat neue Bilder aufhängen.“', motor: true, info: 'Motor! Mats stimmt zu und ergänzt.' },
+        { text: 'Selin erzählt ihrer Nachbarin laut vom Wochenende.', motor: false, info: 'Bremse! Nebengespräche lenken alle ab.' },
+        { text: 'Anton: „Lasst uns abstimmen, damit alle mitentscheiden.“', motor: true, info: 'Motor! Anton hilft, zu einer Lösung zu kommen.' },
         { text: 'Finn: „Nein! Nein! Nein!“', motor: false, info: 'Bremse! Nur „Nein“ sagen ist kein Argument.' }] },
     { thema: 'Gespräch: Brauchen wir eine Regel fürs Ausleihen von Stiften?',
       beitraege: [
-        { text: 'Emma: „Ja, denn oft bekommt man ausgeliehene Stifte nicht zurück.“', motor: true, info: 'Motor! Eine Meinung mit Begründung.' },
+        { text: 'Merle: „Ja, denn oft bekommt man ausgeliehene Stifte nicht zurück.“', motor: true, info: 'Motor! Eine Meinung mit Begründung.' },
         { text: 'Noah: „Ich verleihe meine Stifte nie, fertig.“', motor: false, info: 'Bremse! „Fertig“ beendet das Gespräch, statt etwas zu erklären.' },
         { text: 'Leonie: „Du meinst also, dass Stifte verloren gehen. Wir könnten eine Ausleihliste machen.“', motor: true, info: 'Motor! Leonie wiederholt und macht einen Vorschlag.' },
         { text: 'Karim unterbricht Leonie mitten im Satz.', motor: false, info: 'Bremse! Unterbrechen stört das Gespräch.' },
@@ -235,11 +235,11 @@
   /* ---------- KAPITEL 3 ---------- */
 
   ZI.JA_UND.push(
-    { vorher: 'Emma: „Wir sollten eine Leseecke einrichten, weil man dort in Ruhe lesen kann.“',
+    { vorher: 'Merle: „Wir sollten eine Leseecke einrichten, weil man dort in Ruhe lesen kann.“',
       antwort: 'Finn: „Ja, und wir könnten dort jede Woche ein Buch der Woche vorstellen.“', art: 'Ja, und …' },
-    { vorher: 'Emma: „Wir sollten eine Leseecke einrichten, weil man dort in Ruhe lesen kann.“',
+    { vorher: 'Merle: „Wir sollten eine Leseecke einrichten, weil man dort in Ruhe lesen kann.“',
       antwort: 'Lotta: „Das stimmt, aber dann haben wir weniger Platz für die Gruppentische.“', art: 'Ja, aber …' },
-    { vorher: 'Emma: „Wir sollten eine Leseecke einrichten, weil man dort in Ruhe lesen kann.“',
+    { vorher: 'Merle: „Wir sollten eine Leseecke einrichten, weil man dort in Ruhe lesen kann.“',
       antwort: 'Noah: „Habt ihr gestern das Fußballspiel gesehen?“', art: 'Themenwechsel' },
   );
 
@@ -254,11 +254,11 @@
         { text: '„Malen findest du also doof?“', ok: false, info: 'Das unterstellt Karim etwas, das er nicht gesagt hat.' },
         { text: '„Ton macht doch nur Dreck.“', ok: false, info: 'Die Antwort geht nicht auf Karims Grund ein.' },
         { text: '„Du sagst, dass man mit Ton etwas zum Anfassen herstellt. Dazu denke ich, dass …“', ok: true, info: 'Richtig! Erst wiederholen, dann die eigene Meinung.' }] },
-    { vorher: 'Mia: „Wir sollten die Klassendienste jede Woche wechseln, weil sonst immer dieselben den unbeliebten Dienst haben.“',
+    { vorher: 'Selin: „Wir sollten die Klassendienste jede Woche wechseln, weil sonst immer dieselben den unbeliebten Dienst haben.“',
       optionen: [
-        { text: '„Du sagst, dass sonst immer dieselben den unbeliebten Dienst haben. Ich finde, alle zwei Wochen reicht auch.“', ok: true, info: 'Richtig! Du zeigst, dass du Mia verstanden hast.' },
-        { text: '„Du willst also gar keine Dienste mehr machen?“', ok: false, info: 'Das hat Mia nicht gesagt. Ihre Aussage wird verdreht.' },
-        { text: '„Mia, du machst deinen Dienst doch eh nie richtig.“', ok: false, info: 'Das ist ein Angriff auf Mia und kein Argument.' }] },
+        { text: '„Du sagst, dass sonst immer dieselben den unbeliebten Dienst haben. Ich finde, alle zwei Wochen reicht auch.“', ok: true, info: 'Richtig! Du zeigst, dass du Selin verstanden hast.' },
+        { text: '„Du willst also gar keine Dienste mehr machen?“', ok: false, info: 'Das hat Selin nicht gesagt. Ihre Aussage wird verdreht.' },
+        { text: '„Selin, du machst deinen Dienst doch eh nie richtig.“', ok: false, info: 'Das ist ein Angriff auf Selin und kein Argument.' }] },
   );
 
   ZI.INSELRAT.push(
@@ -560,7 +560,7 @@
       { text: 'Wir nehmen gar nichts, dann gibt es keinen Streit.', ok: false, info: 'Dann verlieren alle.' },
       { text: 'Jetzt stellen wir Pflanzen auf, und im nächsten Halbjahr kommt ein kleines Aquarium dazu.', ok: true, info: 'Richtig! Beide Seiten bekommen etwas.' },
       { text: 'Die Lauteren bekommen ihren Willen.', ok: false, info: 'Das ist nicht fair.' }] },
-    { kopf: 'Emma und Noah möchten beide beim Vortrag als Erste drankommen.', optionen: [
+    { kopf: 'Merle und Noah möchten beide beim Vortrag als Erste drankommen.', optionen: [
       { text: 'Beide reden gleichzeitig.', ok: false, info: 'Dann versteht niemand etwas.' },
       { text: 'Wer schneller zur Tafel rennt, fängt an.', ok: false, info: 'Das ist unfair und gefährlich.' },
       { text: 'Sie werfen eine Münze, und wer verliert, darf beim nächsten Mal zuerst.', ok: true, info: 'Richtig! Fair für beide.' }] },

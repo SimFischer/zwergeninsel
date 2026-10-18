@@ -69,7 +69,7 @@
       loesungen: [['die Sonne', 'scheint', 'endlich.']] },
     { haupt: 'Ich bleibe heute drinnen,', bindewort: 'da', kacheln: ['es', 'stark', 'regnet.'], verb: 'regnet.',
       loesungen: [['es', 'stark', 'regnet.']] },
-    { haupt: 'Lena übt jeden Tag Flöte,', bindewort: 'weil', kacheln: ['sie', 'im Konzert', 'spielen', 'möchte.'], verb: 'möchte.',
+    { haupt: 'Frida übt jeden Tag Flöte,', bindewort: 'weil', kacheln: ['sie', 'im Konzert', 'spielen', 'möchte.'], verb: 'möchte.',
       loesungen: [['sie', 'im Konzert', 'spielen', 'möchte.']] },
     { haupt: 'Wir brauchen eine neue Regel,', bindewort: 'denn', kacheln: ['es', 'gibt', 'oft', 'Streit.'], verb: 'gibt',
       loesungen: [['es', 'gibt', 'oft', 'Streit.']] },
@@ -83,9 +83,9 @@
       { text: 'Ich gehe früh ins Bett, weil ich morgen fit sein will.', ok: true },
       { text: 'Ich gehe früh ins Bett weil ich morgen fit sein will.', ok: false, info: 'Vor „weil“ fehlt das Komma.' }] },
     { saetze: [
-      { text: 'Mia lacht, denn der Witz ist lustig.', ok: true },
-      { text: 'Mia lacht, denn ist der Witz lustig.', ok: false, info: 'Nach „denn“ kommt ein normaler Satz: denn der Witz ist lustig.' },
-      { text: 'Mia lacht denn der Witz ist lustig.', ok: false, info: 'Vor „denn“ fehlt das Komma.' }] },
+      { text: 'Selin lacht, denn der Witz ist lustig.', ok: true },
+      { text: 'Selin lacht, denn ist der Witz lustig.', ok: false, info: 'Nach „denn“ kommt ein normaler Satz: denn der Witz ist lustig.' },
+      { text: 'Selin lacht denn der Witz ist lustig.', ok: false, info: 'Vor „denn“ fehlt das Komma.' }] },
     { saetze: [
       { text: 'Wir brauchen Regeln da sonst Streit entsteht.', ok: false, info: 'Vor „da“ fehlt das Komma.' },
       { text: 'Wir brauchen Regeln, da entsteht sonst Streit.', ok: false, info: 'Nach „da“ gehört das Verb ans Ende.' },
@@ -144,9 +144,9 @@
         info: 'Bremse! Tom macht den Vorschlag lächerlich, ohne Grund.' },
       { text: 'Ali meldet sich: „Darf ich etwas ergänzen? Der Kletterpark ist auch nicht weit weg.“', motor: true,
         info: 'Motor! Ali meldet sich und ergänzt einen Grund.' },
-      { text: 'Lisa flüstert mit ihrer Nachbarin und kichert.', motor: false,
+      { text: 'Greta flüstert mit ihrer Nachbarin und kichert.', motor: false,
         info: 'Bremse! Nebengespräche lenken alle ab.' },
-      { text: 'Jan: „Wer war noch nicht dran? Emma, möchtest du etwas sagen?“', motor: true,
+      { text: 'Jan: „Wer war noch nicht dran? Merle, möchtest du etwas sagen?“', motor: true,
         info: 'Motor! Jan achtet darauf, dass alle zu Wort kommen.' },
       { text: 'Max: „Ich höre gar nicht zu, ich bin sowieso dagegen.“', motor: false,
         info: 'Bremse! Wer nicht zuhört, kann nicht mitdiskutieren.' },
@@ -187,13 +187,13 @@
           { text: 'Weil Wasser billig ist.', ok: false },
           { text: 'Weil Flaschen so schwer sind.', ok: false }] },
       ] },
-    { text: 'Ich finde, dass wir öfter in Gruppen arbeiten sollten, denn dabei lernen wir voneinander. Zum Beispiel hat mir Jonas in der Gruppenarbeit gezeigt, wie man eine Tabelle anlegt.',
+    { text: 'Ich finde, dass wir öfter in Gruppen arbeiten sollten, denn dabei lernen wir voneinander. Zum Beispiel hat mir Mats in der Gruppenarbeit gezeigt, wie man eine Tabelle anlegt.',
       fragen: [
         { frage: 'Welche Begründung hast du gehört?', optionen: [
           { text: 'Denn Gruppenarbeit ist leise.', ok: false },
           { text: 'Denn dabei lernen wir voneinander.', ok: true },
           { text: 'Denn dann muss man weniger tun.', ok: false }] },
-        { frage: 'Was hat Jonas gezeigt?', optionen: [
+        { frage: 'Was hat Mats gezeigt?', optionen: [
           { text: 'Wie man ein Bild malt.', ok: false },
           { text: 'Wie man eine Geschichte vorliest.', ok: false },
           { text: 'Wie man eine Tabelle anlegt.', ok: true }] },
@@ -225,20 +225,20 @@
   );
 
   ZI.JA_UND.push(
-    { vorher: 'Hannah: „Wir sollten einen Waldausflug machen, weil wir dort viele Tiere sehen.“',
+    { vorher: 'Clara: „Wir sollten einen Waldausflug machen, weil wir dort viele Tiere sehen.“',
       antwort: 'Noah: „Ja, und wir könnten dort auch Blätter für ein Herbstplakat sammeln.“', art: 'Ja, und …' },
-    { vorher: 'Hannah: „Wir sollten einen Waldausflug machen, weil wir dort viele Tiere sehen.“',
+    { vorher: 'Clara: „Wir sollten einen Waldausflug machen, weil wir dort viele Tiere sehen.“',
       antwort: 'Paul: „Das klingt schön, aber im Herbst ist es im Wald oft sehr matschig.“', art: 'Ja, aber …' },
-    { vorher: 'Hannah: „Wir sollten einen Waldausflug machen, weil wir dort viele Tiere sehen.“',
-      antwort: 'Emma: „Mein Lieblingstier ist übrigens der Delfin.“', art: 'Themenwechsel' },
-    { vorher: 'Tim: „Wir sollten einen Kreativtag machen, weil jeder zeigen kann, was er kann.“',
+    { vorher: 'Clara: „Wir sollten einen Waldausflug machen, weil wir dort viele Tiere sehen.“',
+      antwort: 'Merle: „Mein Lieblingstier ist übrigens der Delfin.“', art: 'Themenwechsel' },
+    { vorher: 'Anton: „Wir sollten einen Kreativtag machen, weil jeder zeigen kann, was er kann.“',
       antwort: 'Sara: „Genau, und am Ende könnten wir eine Ausstellung für die Eltern machen.“', art: 'Ja, und …' },
   );
 
   ZI.ZUHOEREN.push(
-    { vorher: 'Hannah: „Wir sollten weniger Hausaufgaben bekommen, weil wir nachmittags auch Zeit für Hobbys brauchen.“',
+    { vorher: 'Clara: „Wir sollten weniger Hausaufgaben bekommen, weil wir nachmittags auch Zeit für Hobbys brauchen.“',
       optionen: [
-        { text: '„Du willst also gar nicht mehr lernen?“', ok: false, info: 'Das hat Hannah nicht gesagt. Ihre Aussage wird verdreht.' },
+        { text: '„Du willst also gar nicht mehr lernen?“', ok: false, info: 'Das hat Clara nicht gesagt. Ihre Aussage wird verdreht.' },
         { text: '„Du sagst, dass wir Zeit für Hobbys brauchen. Welche Hobbys meinst du?“', ok: true, info: 'Genau! Wiederholen und nachfragen zeigt echtes Zuhören.' },
         { text: '„Ich habe gestern Klavier gespielt.“', ok: false, info: 'Das ist ein Themenwechsel.' }] },
     { vorher: 'Noah: „Ich möchte, dass wir in Musik mehr singen, weil Singen gute Laune macht.“',
@@ -378,9 +378,9 @@
       titel: 'Hör-Stollen',
       kopf: 'So höre ich gut zu:',
       schritte: [
-        { sagt: 'Bei „Ich finde, dass …“ kommt die Meinung.', zeigt: { text: '„Ich finde, dass …“', art: 'these', marke: 'Meinung' } },
+        { sagt: 'Hier arbeitest du mit einem Partner. Er liest vor, du hörst zu. Bei „Ich finde, dass …“ kommt die Meinung.', zeigt: { text: '„Ich finde, dass …“', art: 'these', marke: 'Meinung' } },
         { sagt: 'Bei „weil“ oder „denn“ spitze ich die Ohren. Jetzt kommt die Begründung.', zeigt: { text: '„… weil …“ oder „… denn …“', art: 'begruendung', marke: 'Begründung' } },
-        { sagt: 'Bei „zum Beispiel“ kommt das Beispiel. Und wenn ich unsicher bin, höre ich einfach noch einmal.', zeigt: { text: '„Zum Beispiel …“', art: 'beispiel', marke: 'Beispiel' } },
+        { sagt: 'Bei „zum Beispiel“ kommt das Beispiel. Bin ich unsicher, bitte ich meinen Partner: „Lies es bitte noch einmal vor.“', zeigt: { text: '„Zum Beispiel …“', art: 'beispiel', marke: 'Beispiel' } },
       ] },
     k3s1: {
       titel: 'Ja, und – ja, aber?',
@@ -388,8 +388,8 @@
       schritte: [
         { sagt: 'Tom sagt: „Ja, und wir lernen dabei auch etwas.“ Er stimmt zu und ergänzt. Das ist „Ja, und“.',
           zeigt: { text: 'Tom: „Ja, und wir lernen dabei auch etwas.“', art: 'gut', marke: 'Ja, und' } },
-        { sagt: 'Emma sagt: „Das stimmt, aber Ausflüge kosten Geld.“ Sie nimmt Lea ernst und widerspricht. Das ist „Ja, aber“.',
-          zeigt: { text: 'Emma: „Das stimmt, aber Ausflüge kosten Geld.“', art: 'begruendung', marke: 'Ja, aber' } },
+        { sagt: 'Merle sagt: „Das stimmt, aber Ausflüge kosten Geld.“ Sie nimmt Lea ernst und widerspricht. Das ist „Ja, aber“.',
+          zeigt: { text: 'Merle: „Das stimmt, aber Ausflüge kosten Geld.“', art: 'begruendung', marke: 'Ja, aber' } },
         { sagt: 'Und wer über etwas ganz anderes redet, wechselt das Thema.' },
       ] },
     k3s2: {

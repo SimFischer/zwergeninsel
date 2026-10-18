@@ -433,9 +433,6 @@ h1, h2, h3 { font-family: var(--titel); font-weight: 400; margin: 0; letter-spac
 .boss-leiste { display: flex; align-items: center; gap: 12px; font-family: var(--titel); font-size: 20px; }
 .boss-leiste .balken { flex: 1; height: 22px; border-radius: 11px; border: 3px solid #5a2a1e; background: #fffaf0; overflow: hidden; }
 .boss-leiste .balken div { height: 100%; background: linear-gradient(180deg, #e0683f, #a8381f); transition: width 0.6s ease-out; }
-.knopf.gross-hoeren { min-height: 76px; font-size: 28px; padding-inline: 34px; }
-.knopf.gross-hoeren svg { width: 36px; height: 36px; }
-.knopf.gross-hoeren.gehoert { background: linear-gradient(180deg, #8db04c, var(--moos)); box-shadow: inset 0 -6px 0 var(--moos-dunkel), 0 4px 0 rgba(0, 0, 0, 0.35); color: #fff8e6; }
 .stollen h2 svg { width: 30px; height: 30px; flex: none; }
 .reiter button svg { width: 18px; height: 18px; vertical-align: -2px; margin-right: 6px; }
 
@@ -463,8 +460,6 @@ h1, h2, h3 { font-family: var(--titel); font-weight: 400; margin: 0; letter-spac
 .seite-kopf svg { width: 28px; height: 28px; flex: none; color: var(--gold-dunkel); }
 .seite-kopf h3 { font-size: 24px; }
 .seite-beispiel { white-space: pre-line; font-size: 18px; line-height: 1.45; padding: 10px 12px; border-radius: 10px; background: rgba(232, 178, 58, 0.18); font-style: italic; }
-.seite .klein-rund { position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; }
-.seite .klein-rund svg { width: 22px; height: 22px; }
 .seite.gesperrt { opacity: 0.6; background: rgba(255, 250, 240, 0.5); border-style: dashed; }
 .seite.gesperrt .seite-kopf svg { color: var(--tinte-hell); }
 
@@ -684,3 +679,7 @@ a.lk-kachel:active { transform: translateY(2px); }
 .lk-test.an { border-color: var(--moos); background: #eef6dd; }
 @media (max-width: 700px) { .lk-raster { grid-template-columns: 1fr; } }
 .logo { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+
+/* Hör-Stollen: Partner liest vor */
+.hoer-schritt { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.hoer-hinweis { margin: 0; font-size: 20px; line-height: 1.4; }

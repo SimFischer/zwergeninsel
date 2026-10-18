@@ -199,9 +199,9 @@
           { text: 'Ich rufe meine Idee schnell dazwischen.', ok: false, info: 'Dazwischenrufen unterbricht Paul.' },
           { text: 'Ich melde mich und warte, bis Paul fertig ist.', ok: true, info: 'Genau! So kommen alle zu Wort.' },
           { text: 'Ich flüstere sie meiner Nachbarin zu.', ok: false, info: 'Nebengespräche lenken alle ab.' }] },
-        { kopf: 'Hannah sagt etwas, das du nicht verstanden hast.', optionen: [
-          { text: '„Hannah, kannst du das noch einmal erklären?“', ok: true, info: 'Richtig! Nachfragen bringt das Gespräch weiter.' },
-          { text: '„Das versteht doch keiner!“', ok: false, info: 'Das macht Hannah schlecht.' },
+        { kopf: 'Clara sagt etwas, das du nicht verstanden hast.', optionen: [
+          { text: '„Clara, kannst du das noch einmal erklären?“', ok: true, info: 'Richtig! Nachfragen bringt das Gespräch weiter.' },
+          { text: '„Das versteht doch keiner!“', ok: false, info: 'Das macht Clara schlecht.' },
           { text: 'Ich sage nichts und denke an etwas anderes.', ok: false, info: 'So verpasst du das Gespräch.' }] },
         { kopf: 'Du bist anderer Meinung als Karim.', optionen: [
           { text: 'Ich verdrehe die Augen.', ok: false, info: 'Das ist unfreundlich und erklärt nichts.' },
@@ -220,7 +220,7 @@
           { text: '„Noah, sag lieber nichts mehr.“', ok: false, info: 'Das schließt Noah aus.' },
           { text: '„Lasst Noah bitte ausreden. Ich will seine Gründe hören.“', ok: true, info: 'Stark! Du hältst die Regeln ein und stärkst Noah.' }] },
       ],
-      wissen: { titel: 'Gesprächsregeln', text: 'Ein gutes Gespräch braucht Regeln: ausreden lassen, melden, nachfragen, begründen und alle einbeziehen.', beispiel: '„Lina, was denkst du darüber?“' },
+      wissen: { titel: 'Gesprächsregeln', text: 'Ein gutes Gespräch braucht Regeln: ausreden lassen, melden, nachfragen, begründen und alle einbeziehen.', beispiel: '„Svea, was denkst du darüber?“' },
     },
     {
       id: 'brunnen', bit: 6, kapitel: 1, name: 'Satzanfänge aus dem Brunnen',
@@ -323,10 +323,10 @@
           { text: '„Jungs sind eben so.“', ok: false, info: 'Das ist ein Vorurteil.' },
           { text: '„Ich wünsche mir, dass in der Pause auch andere Spiele drankommen.“', ok: true, info: 'Richtig! Ein Wunsch ohne Vorurteil.' },
           { text: '„Mit euch kann man nicht reden.“', ok: false, info: 'Das stoppt das Gespräch.' }] },
-        { kopf: '„Lisa will sowieso immer bestimmen!“', optionen: [
-          { text: '„Lisa ist eine Bestimmerin.“', ok: false, info: 'Ein Etikett für die Person, kein Argument.' },
+        { kopf: '„Greta will sowieso immer bestimmen!“', optionen: [
+          { text: '„Greta ist eine Bestimmerin.“', ok: false, info: 'Ein Etikett für die Person, kein Argument.' },
           { text: '„Ich fände es gut, wenn heute auch jemand anderes entscheiden darf.“', ok: true, info: 'Genau! Ein fairer Vorschlag.' },
-          { text: '„Lisa, du bist so gemein.“', ok: false, info: 'Ein Angriff auf Lisa.' }] },
+          { text: '„Greta, du bist so gemein.“', ok: false, info: 'Ein Angriff auf Greta.' }] },
       ],
       wissen: { titel: 'Sachlich bleiben', text: 'Rede über die Sache, nicht über die Person. Sag, was dich stört oder was du anders siehst – und warum.', beispiel: 'Unfair: „Deine Idee ist dumm!“\nSachlich: „Ich finde die Idee nicht gut, weil …“' },
     },
@@ -345,17 +345,17 @@
           { text: 'Wir machen gar keinen Ausflug.', ok: false, info: 'Dann verlieren alle.' },
           { text: 'Die Lehrerin entscheidet allein, dann ist Ruhe.', ok: false, info: 'Damit wird der Streit nur beendet, nicht gelöst.' },
           { text: 'Jetzt geht es in den Zoo, beim nächsten Ausflug in den Kletterpark.', ok: true, info: 'Richtig! Beide Wünsche kommen dran.' }] },
-        { kopf: 'Mia möchte bei Gruppenarbeit mit ihrer Freundin arbeiten. Der Lehrer möchte gemischte Gruppen.', optionen: [
+        { kopf: 'Selin möchte bei Gruppenarbeit mit ihrer Freundin arbeiten. Der Lehrer möchte gemischte Gruppen.', optionen: [
           { text: 'Mal dürfen wir die Gruppen selbst wählen, mal werden sie gemischt.', ok: true, info: 'Genau! Beide Seiten werden berücksichtigt.' },
-          { text: 'Mia arbeitet allein.', ok: false, info: 'Das löst nichts.' },
+          { text: 'Selin arbeitet allein.', ok: false, info: 'Das löst nichts.' },
           { text: 'Alle arbeiten immer mit ihren Freunden.', ok: false, info: 'Hier gewinnt nur eine Seite.' }] },
-        { kopf: 'Jonas will im Klassenraum laute Musik. Emma braucht beim Arbeiten Ruhe.', optionen: [
-          { text: 'Die Musik läuft immer laut.', ok: false, info: 'Emmas Wunsch wird nicht beachtet.' },
+        { kopf: 'Mats will im Klassenraum laute Musik. Merle braucht beim Arbeiten Ruhe.', optionen: [
+          { text: 'Die Musik läuft immer laut.', ok: false, info: 'Merles Wunsch wird nicht beachtet.' },
           { text: 'In der Pause läuft Musik, beim Arbeiten bleibt es leise.', ok: true, info: 'Richtig! Beide bekommen ihre Zeit.' },
-          { text: 'Emma soll im Flur arbeiten.', ok: false, info: 'Emma wird ausgeschlossen.' }] },
-        { kopf: 'Tim möchte ein Meerschweinchen in der Klasse. Lea ist allergisch gegen Tierhaare.', optionen: [
+          { text: 'Merle soll im Flur arbeiten.', ok: false, info: 'Merle wird ausgeschlossen.' }] },
+        { kopf: 'Anton möchte ein Meerschweinchen in der Klasse. Lea ist allergisch gegen Tierhaare.', optionen: [
           { text: 'Lea soll die Klasse wechseln.', ok: false, info: 'Das ist unfair gegenüber Lea.' },
-          { text: 'Tim bekommt das Meerschweinchen trotzdem.', ok: false, info: 'Leas Gesundheit wird nicht beachtet.' },
+          { text: 'Anton bekommt das Meerschweinchen trotzdem.', ok: false, info: 'Leas Gesundheit wird nicht beachtet.' },
           { text: 'Statt eines Meerschweinchens holen wir Fische in einem Aquarium.', ok: true, info: 'Super! Ein Tier für die Klasse – ohne Tierhaare.' }] },
         { kopf: 'Die Hälfte will im Klassenrat zuerst über die Klassenfahrt reden, die andere Hälfte über die Pausenregeln.', optionen: [
           { text: 'Heute reden wir zehn Minuten über jedes Thema.', ok: true, info: 'Genau! Beide Themen kommen dran.' },

@@ -8,8 +8,8 @@ ZI.JPG = ['titel-hintergrund', 'schmiede-hintergrund', 'stollen-hintergrund', 'z
 ZI.BILD = (name) => 'bilder/' + name + (ZI.JPG.includes(name) ? '.jpg' : '.png');
 /* Alle Bilder – werden nach dem Start gestaffelt in den Offline-Speicher geladen (ZI.vorladen) */
 ZI.ALLE_BILDER = [
-  'zwerg-01-brumm', 'zwerg-02-hilda', 'zwerg-03-tarek', 'zwerg-04-lina', 'zwerg-05-kira', 'zwerg-06-ole',
-  'zwerg-07-fenno', 'zwerg-08-mira', 'zwerg-09-bodo', 'zwerg-10-amara', 'zwerg-11-grimbart', 'zwerg-12-rubina',
+  'zwerg-01-brumm', 'zwerg-02-hilda', 'zwerg-03-tarek', 'zwerg-04-svea', 'zwerg-05-kira', 'zwerg-06-ole',
+  'zwerg-07-fenno', 'zwerg-08-smaragda', 'zwerg-09-bodo', 'zwerg-10-amara', 'zwerg-11-grimbart', 'zwerg-12-rubina',
   'meisterin-erklaert', 'meisterin-jubelt', 'meisterin-tipp', 'meisterin-ermutigt', 'kobold-frech', 'kobold-chaos',
   'kobold-besiegt', 'schmiede-hintergrund', 'amboss', 'hammer', 'eisen-roh', 'eisen-gluehend',
   'axt-stumpf', 'axt-scharf', 'schleifstein', 'runenplatte', 'truhe-zu', 'truhe-offen',
@@ -28,7 +28,7 @@ ZI.ALLE_BILDER = [
   'rang-1', 'rang-2', 'rang-3', 'rang-4', 'rang-5', 'rang-6', 'rang-7',
   ...['funke', 'k1', 'k2', 'k3', 'fehler', 'kobold', 'rede', 'ohr', 'rat', 'krone1', 'krone5', 'krone9', 'stern3', 'stern9', 'gems', 'buch', 'freunde', 'clan'].map((a) => 'abzeichen-' + a),
   'icon-beispiel', 'icon-beispielregen', 'icon-erz-schlacke', 'icon-fehlerjagd', 'icon-funkenregen', 'icon-gegenargument', 'icon-hoeren', 'icon-inselrat', 'icon-ja-und', 'icon-kette', 'icon-kobold-kampf', 'icon-meisterstueck', 'icon-meisterstueck2', 'icon-motor-bremse', 'icon-puzzle', 'icon-situation', 'icon-sprecherwechsel', 'icon-streitgespraech', 'icon-stumpf-scharf', 'icon-weil-denn', 'icon-zuhoeren',
-  ...['01-brumm', '02-hilda', '03-tarek', '04-lina', '05-kira', '06-ole', '07-fenno', '08-mira', '09-bodo', '10-amara', '11-grimbart', '12-rubina'].map((z) => 'zwerg-' + z + '-jubel'),
+  ...['01-brumm', '02-hilda', '03-tarek', '04-svea', '05-kira', '06-ole', '07-fenno', '08-smaragda', '09-bodo', '10-amara', '11-grimbart', '12-rubina'].map((z) => 'zwerg-' + z + '-jubel'),
 ];
 /* Nur das Board braucht diese; die iPads laden sie nicht */
 ZI.NUR_BOARD = (n) => /-ruine$|^(insel-grund|fest-szene|schiff|fahne|laterne|kristall-laterne|blumenbeet|bank|faesser|statue|wegweiser|gemuesegarten|ziegen|moewe-|krabbe|delfin|huhn|hase|schildkroete|schmetterling|wolke-|sonder-)/.test(n);
@@ -39,7 +39,7 @@ ZI.ZWERGE = [
   { nr: 1, name: 'Brumm', datei: 'zwerg-01-brumm', rolle: 'Schmied', start: true },
   { nr: 2, name: 'Hilda', datei: 'zwerg-02-hilda', rolle: 'Schmiedin', start: true },
   { nr: 3, name: 'Tarek', datei: 'zwerg-03-tarek', rolle: 'Baumeister', start: true },
-  { nr: 4, name: 'Lina', datei: 'zwerg-04-lina', rolle: 'Schreiberin', start: true },
+  { nr: 4, name: 'Svea', datei: 'zwerg-04-svea', rolle: 'Schreiberin', start: true },
   { nr: 5, name: 'Kira', datei: 'zwerg-05-kira', rolle: 'Bergfrau',
     bedingung: 'Schaffe den Hauptstollen in Kapitel 1.',
     unlock: (s) => s.coreCount(0) === 3 },
@@ -49,7 +49,7 @@ ZI.ZWERGE = [
   { nr: 7, name: 'Fenno', datei: 'zwerg-07-fenno', rolle: 'Koch',
     bedingung: 'Sammle 10 Edelsteine.',
     unlock: (s) => s.gems() >= 10 },
-  { nr: 8, name: 'Mira', datei: 'zwerg-08-mira', rolle: 'Edelsteinschleiferin',
+  { nr: 8, name: 'Smaragda', datei: 'zwerg-08-smaragda', rolle: 'Edelsteinschleiferin',
     bedingung: 'Schaffe alle Tiefen Stollen in Kapitel 1.',
     unlock: (s) => s.deepCount(0) === 3 },
   { nr: 9, name: 'Bodo', datei: 'zwerg-09-bodo', rolle: 'Musikant',

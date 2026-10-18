@@ -441,7 +441,6 @@
       ZI.setze(inhalt,
         h('div', { class: 'raetsel-karte pergament auf-pergament' },
           h('div', { class: 'frage', style: { fontSize: 'clamp(24px, 2vw, 40px)', color: 'var(--tinte-hell)' } },
-            h('button', { class: 'rund', 'aria-label': 'Vorlesen', onclick: () => ZI.vorlesen(f.frage + ' ' + (f.kopf || '') + ' ' + f.optionen.map((o, i) => buchst[i] + ': ' + o.text).join('. ')) }, icon.vorlesen()),
             h('span', null, f.frage)),
           f.kopf ? h('div', { class: 'meinung', style: { fontSize: 'clamp(24px, 2.4vw, 38px)', whiteSpace: 'pre-line' } }, f.kopf) : null,
           h('div', { class: 'raetsel-optionen' }, opts),

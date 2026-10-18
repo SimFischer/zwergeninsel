@@ -95,7 +95,7 @@
       h('div', { class: 'seite-kopf' }, icon.buch(), h('h3', null, w.titel)),
       h('p', null, w.text),
       h('div', { class: 'seite-beispiel' }, w.beispiel),
-      h('button', { class: 'rund klein-rund', 'aria-label': 'Seite vorlesen', onclick: () => ZI.vorlesen(w.titel + '. ' + w.text + ' ' + w.beispiel.replace(/\n/g, ' ')) }, icon.vorlesen()));
+      null);
   }
   function zeigeWissensbuch() {
     const frei = wissenFrei(stand);
@@ -143,7 +143,7 @@
     knopf.addEventListener('click', () => {
       n++;
       if (n < v.schritte.length) schritt();
-      else { window.speechSynthesis && window.speechSynthesis.cancel(); f.schliessen(); weiter(); }
+      else { f.schliessen(); weiter(); }
     });
     const f = ZI.fenster([
       h('div', { class: 'vormach-kopf' },
@@ -153,12 +153,8 @@
           h('h2', { style: { fontSize: '30px' } }, v.titel))),
       h('div', { class: 'meinung', style: { alignSelf: 'stretch', textAlign: 'left' } }, v.kopf),
       liste,
-      h('div', { class: 'vormach-sagt' },
-        h('button', { class: 'rund', 'aria-label': 'Vorlesen', onclick: () => ZI.vorlesen(blase.textContent) }, icon.vorlesen()),
-        blase),
-      h('div', { class: 'knopf-reihe' },
-        h('button', { class: 'knopf holz klein', onclick: () => { window.speechSynthesis && window.speechSynthesis.cancel(); f.schliessen(); weiter(); } }, 'Überspringen'),
-        knopf),
+      h('div', { class: 'vormach-sagt' }, blase),
+      h('div', { class: 'knopf-reihe' }, knopf),
     ]);
     f.el.classList.add('vormach');
     schritt();
@@ -181,7 +177,6 @@
   }
 
   function zeige(screen) {
-    window.speechSynthesis && window.speechSynthesis.cancel();
     ZI.setze(app, screen);
     window.scrollTo(0, 0);
   }
@@ -420,7 +415,7 @@
       kern: [
         { name: 'Argument-Puzzle', info: 'Setz Meinung, Begründung und Beispiel richtig zusammen.', icon: ['icon-puzzle', 'pergament'], spiel: () => spielPuzzle(), vor: 'k2s1' },
         { name: 'Motor oder Bremse?', info: 'Was bringt ein Gespräch weiter, was stoppt es?', icon: ['icon-motor-bremse', 'schleifstein'], spiel: () => spielMotor(), vor: 'k2s2' },
-        { name: 'Hör-Stollen', info: 'Hör genau zu und finde Begründung und Beispiel.', icon: ['icon-hoeren', 'laterne'], spiel: () => spielHoeren(), vor: 'k2s3' },
+        { name: 'Hör-Stollen', info: 'Zu zweit: Dein Partner liest vor, du hörst genau zu.', icon: ['icon-hoeren', 'laterne'], spiel: () => spielHoeren(), vor: 'k2s3' },
       ],
       tief: [
         { name: 'Kobold-Kampf', info: 'Der Fehlerkobold ist zurück! Besiege ihn mit allem, was du kannst.', icon: ['icon-kobold-kampf', 'kobold-chaos'], spiel: () => spielBoss() },
@@ -431,7 +426,7 @@
     },
     { // Kapitel 3
       kern: [
-        { name: 'Ja, und – ja, aber?', info: 'Wie reagiert jemand auf einen Beitrag?', icon: ['icon-ja-und', 'zwerg-04-lina'], spiel: () => spielJaUnd(), vor: 'k3s1' },
+        { name: 'Ja, und – ja, aber?', info: 'Wie reagiert jemand auf einen Beitrag?', icon: ['icon-ja-und', 'zwerg-04-svea'], spiel: () => spielJaUnd(), vor: 'k3s1' },
         { name: 'Wer hört zu?', info: 'Finde die Antwort, die wirklich anknüpft.', icon: ['icon-zuhoeren', 'meisterin-tipp'], spiel: () => spielZuhoeren(), vor: 'k3s2' },
         { name: 'Überzeug den Inselrat', info: 'Entkräfte die Einwände des Inselrats.', icon: ['icon-inselrat', 'zwerg-11-grimbart'], spiel: () => spielInselrat(), vor: 'k3s3' },
       ],
@@ -583,7 +578,6 @@
         h('p', { style: { margin: 0, fontSize: '21px' } }, 'Am Ende der Stunde lieferst du dein Material ab und bekommst deinen Zwergenpass.'),
         h('button', { class: 'knopf', onclick: () => f.schliessen() }, 'Los geht’s!'),
       ]);
-      ZI.vorlesen('Willkommen! Ich bin Meisterin Hammerlind. Hier in der Schmiede schmieden wir Argumente. Gute Argumente sind wie gutes Werkzeug – sie funktionieren überall. Darum üben wir an Fragen aus eurer Schule.');
     }
   }
 
@@ -657,10 +651,9 @@
     return { fortschritt: setze };
   }
 
-  function aufgabenKopf(frageText, vorleseText, tippText, bue) {
+  function aufgabenKopf(frageText, tippText, bue) {
     return h('div', { class: 'frage' },
-      h('button', { class: 'rund', 'aria-label': 'Vorlesen', onclick: () => ZI.vorlesen(typeof vorleseText === 'function' ? vorleseText() : vorleseText) }, icon.vorlesen()),
-      h('button', { class: 'rund gold', 'aria-label': 'Laterne: Tipp anzeigen', onclick: () => { bue.sage(tippText, 'tipp'); ZI.vorlesen(tippText); } }, icon.laterne()),
+      h('button', { class: 'rund gold', 'aria-label': 'Laterne: Tipp anzeigen', onclick: () => bue.sage(tippText, 'tipp') }, icon.laterne()),
       h('span', null, frageText));
   }
 
@@ -801,12 +794,11 @@
         });
         optEls.push(b);
       });
-      const vorlese = () => [it.frage || '', it.vorher || '', it.kopf || '', ...opts.map((o) => o.text)].join('. ');
       const kraft = L ? h('div', { class: 'boss-leiste', 'aria-label': L.text },
         h('span', null, L.text), h('div', { class: 'balken ' + (L.wachsen ? 'ueberzeugung' : 'boss') }, h('div', { style: { width: breite(nr) } }))) : null;
       ZI.setze(box,
         kraft,
-        aufgabenKopf(it.frage || frageText, vorlese, tipp, bue),
+        aufgabenKopf(it.frage || frageText, tipp, bue),
         it.vorher ? h('div', { class: 'zitat' }, it.vorher) : null,
         it.kopf ? h('div', { class: 'meinung' }, it.kopf) : null,
         h('div', { class: 'optionen' }, optEls),
@@ -919,7 +911,7 @@
       neinKnopf.addEventListener('click', () => antwort(false));
 
       ZI.setze(box,
-        aufgabenKopf(frageText, () => rd.kopf + ' ' + karten[i].text, tipp, bue),
+        aufgabenKopf(frageText, tipp, bue),
         h('div', { class: 'meinung' }, rd.kopf),
         karteBox, knoepfe, rueck, koerbe);
       zeigeKarte();
@@ -1054,7 +1046,7 @@
       }
 
       ZI.setze(box, 
-        aufgabenKopf('Bau den Begründungssatz. Tippe die Bausteine in der richtigen Reihenfolge an.', () => it.haupt + ' ' + it.bindewort + ' … Bausteine: ' + it.kacheln.join(', '), ZI.TIPPS.weil, bue),
+        aufgabenKopf('Bau den Begründungssatz. Tippe die Bausteine in der richtigen Reihenfolge an.', ZI.TIPPS.weil, bue),
         zeile, vorratBox, rueck, weiter);
       zeichne();
     }
@@ -1078,14 +1070,14 @@
       bue.sage(drei ? 'Für das Streitgespräch braucht ihr zwei: Partner A und Partner B. Wählt zuerst ein Thema.' : 'Für ein Meisterstück brauchst du eine Partnerin oder einen Partner. Wähle zuerst ein Thema.', 'erklaert');
       const angebot = mischen(ZI.MEISTER_THEMEN).slice(0, 4);
       ZI.setze(box, 
-        aufgabenKopf('Worüber möchtest du argumentieren?', angebot.map((t) => t.frage).join(' '), tippText, bue),
+        aufgabenKopf('Worüber möchtest du argumentieren?', tippText, bue),
         h('div', { class: 'themen' }, angebot.map((t) => h('button', { class: 'option', onclick: () => { thema = t; ZI.ton.plopp(); schritt2(); } }, t.frage))));
     }
     function schritt2() {
       rahmen.fortschritt(1);
       bue.sage(drei ? 'Partner A: Bist du dafür oder dagegen? Partner B vertritt dann die andere Seite.' : 'Bist du dafür oder dagegen? Beides ist erlaubt – Hauptsache, du begründest gut.', 'erklaert');
       ZI.setze(box, 
-        aufgabenKopf('Deine Meinung:', thema.frage, tippText, bue),
+        aufgabenKopf('Deine Meinung:', tippText, bue),
         h('div', { class: 'meinung' }, thema.frage),
         h('div', { class: 'erz-knoepfe' },
           h('button', { class: 'knopf moos', onclick: () => { satz = thema.dafuer; schritt3(); } }, 'Dafür'),
@@ -1097,7 +1089,7 @@
       if (drei) {
         bue.sage('Partner A sagt die Meinung mit Begründung. Partner B hört zu, wiederholt sie und widerspricht freundlich.', 'tipp');
         ZI.setze(box,
-          aufgabenKopf('Führt das Streitgespräch. Lasst euch ausreden!', satz + ' Partner B: Du sagst, dass … Aber …', tippText, bue),
+          aufgabenKopf('Führt das Streitgespräch. Lasst euch ausreden!', tippText, bue),
           h('div', { class: 'teile' },
             h('div', { class: 'teil teil-these' }, h('span', { class: 'teil-name' }, 'A'), h('span', null, satz)),
             h('div', { class: 'teil teil-begruendung' }, h('span', { class: 'teil-name' }, 'B'), h('span', null, '„Du sagst, dass … Aber ich finde, dass …, weil …“'))),
@@ -1108,7 +1100,7 @@
       bue.sage(zwei ? 'Diesmal brauchst du alle drei Teile: deine Meinung, eine Begründung und ein passendes Beispiel („Zum Beispiel …“).'
         : 'Überlege dir eine Begründung, die erklärt, WARUM. Wenn du magst, denk dir auch ein Beispiel aus: „Zum Beispiel …“', 'tipp');
       ZI.setze(box, 
-        aufgabenKopf('Bereite dich vor. Dann sag deinen Satz laut zu deinem Partner.', satz, tippText, bue),
+        aufgabenKopf('Bereite dich vor. Dann sag deinen Satz laut zu deinem Partner.', tippText, bue),
         h('div', { class: 'sprechblase-gross' }, satz, zwei ? h('div', { style: { marginTop: '10px', color: 'var(--tinte-hell)' } }, 'Zum Beispiel …') : null),
         h('p', { style: { margin: 0, fontSize: '19px' } }, 'Sprich in ganzen Sätzen. Dein Partner hört genau zu und prüft danach ' + (zwei ? 'vier' : 'drei') + ' Dinge.'),
         h('button', { class: 'knopf', style: { alignSelf: 'flex-end' }, onclick: schritt4 }, 'Ich habe es gesagt – iPad weitergeben'));
@@ -1150,7 +1142,7 @@
         }
       }, { once: true });
       ZI.setze(box, 
-        aufgabenKopf(drei ? 'Gemeinsamer Check: Tippt an, was geklappt hat.' : 'Partner-Check: Tippe an, was du gehört hast.', punkte.join(' '), 'Hör genau hin. Fehlt etwas, sag es freundlich: „Mir hat noch gefehlt, …“', bue),
+        aufgabenKopf(drei ? 'Gemeinsamer Check: Tippt an, was geklappt hat.' : 'Partner-Check: Tippe an, was du gehört hast.', 'Hör genau hin. Fehlt etwas, sag es freundlich: „Mir hat noch gefehlt, …“', bue),
         h('div', { class: 'sprechblase-gross', style: { fontSize: '20px' } }, satz),
         liste, fertigKnopf);
     }
@@ -1230,10 +1222,8 @@
           }
         } });
         ZI.setze(bereich, h('div', { class: 'frage', style: { fontWeight: 700 } }, frage), liste.el);
-        kopf.vorlese = () => arg.these + ' ' + frage + ' ' + liste.texte.join('. ');
       }
-      const kopf = { vorlese: () => arg.these };
-      ZI.setze(box, aufgabenKopf('Setz das Argument zusammen.', () => kopf.vorlese(), ZI.TIPPS.puzzle, bue), teile, bereich, rueck, weiter);
+      ZI.setze(box, aufgabenKopf('Setz das Argument zusammen.', ZI.TIPPS.puzzle, bue), teile, bereich, rueck, weiter);
       waehle('begruendung');
     }
     function ende() {
@@ -1248,8 +1238,7 @@
     const bue = buehne('eisen-roh');
     const box = h('div', { class: 'aufgabe pergament auf-pergament' });
     const rahmen = spielRahmen({ titel: 'Hör-Stollen', anzahl: items.length, aufgabe: box, bue });
-    const kannVorlesen = 'speechSynthesis' in window;
-    bue.sage(kannVorlesen ? 'Hier unten im Stollen ist es dunkel. Du kannst nichts lesen – nur hören. Tippe auf „Anhören“.' : 'Bitte deinen Partner, dir den Text vorzulesen. Schau dabei nicht hin!', 'erklaert');
+    bue.sage('Im Hör-Stollen ist es dunkel. Dein Partner liest dir vor. Du schaust nicht auf den Text – du hörst nur zu.', 'erklaert');
     let nr = 0;
 
     function item() {
@@ -1259,16 +1248,20 @@
       const rueck = h('div');
       const bereich = h('div', { style: { display: 'flex', flexDirection: 'column', gap: '12px' } });
       const textBox = h('div', { class: 'sprechblase-gross', hidden: true }, it.text);
-      const anhoeren = h('button', { class: 'knopf gross-hoeren' }, icon.vorlesen(), 'Anhören');
-      anhoeren.addEventListener('click', () => { ZI.vorlesen(it.text); anhoeren.classList.add('gehoert'); });
-      const textZeigen = h('button', { class: 'knopf holz klein' }, kannVorlesen ? 'Kein Ton? Text zeigen' : 'Text für den Partner zeigen');
-      textZeigen.addEventListener('click', () => { textBox.hidden = !textBox.hidden; });
+      const schritt = h('div', { class: 'hoer-schritt' });
+      const vorlesenLassen = () => ZI.setze(schritt,
+        h('p', { class: 'hoer-hinweis' }, '1. Gib das iPad deinem Partner. 2. Dein Partner liest den Text laut vor. 3. Du hörst zu.'),
+        h('button', { class: 'knopf holz', onclick: () => { textBox.hidden = false; ZI.setze(schritt,
+          h('p', { class: 'hoer-hinweis' }, 'Partner: Lies langsam und deutlich vor. Danach tippst du auf „Fertig vorgelesen“.'),
+          h('button', { class: 'knopf', onclick: () => { textBox.hidden = true; ZI.setze(schritt,
+            h('button', { class: 'knopf holz klein', onclick: () => { vorlesenLassen(); } }, 'Noch einmal vorlesen lassen')); frage(); } }, 'Fertig vorgelesen')); } },
+          'Text zeigen (nur für den Partner)'));
       const weiter = h('button', { class: 'knopf', style: { display: 'none', alignSelf: 'flex-end' } }, nr + 1 < items.length ? 'Weiter' : 'Fertig!');
       weiter.addEventListener('click', () => { nr++; rahmen.fortschritt(nr); if (nr < items.length) item(); else ende(); });
 
       function frage() {
         const f = it.fragen[q];
-        const liste = optionenListe(f.optionen, { bue, rueck, falschText: 'Das hast du so nicht gehört. Hör noch einmal hin!', fertig: () => {
+        const liste = optionenListe(f.optionen, { bue, rueck, falschText: 'Das hast du so nicht gehört. Lass dir den Text noch einmal vorlesen!', fertig: () => {
           ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, zufall(ZI.LOB)));
           q++;
           if (q < it.fragen.length) { bue.sage('Gut zugehört! Noch eine Frage.', 'jubelt'); setTimeout(() => { ZI.setze(rueck); frage(); }, 900); }
@@ -1277,10 +1270,9 @@
         ZI.setze(bereich, h('div', { class: 'frage', style: { fontWeight: 700, fontSize: '22px' } }, f.frage), liste.el);
       }
       ZI.setze(box,
-        aufgabenKopf('Hör dir das Argument an. Danach beantwortest du Fragen dazu.', () => it.text, ZI.TIPPS.hoeren, bue),
-        h('div', { style: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' } }, anhoeren, textZeigen),
-        textBox, bereich, rueck, weiter);
-      frage();
+        aufgabenKopf('Dein Partner liest dir ein Argument vor. Danach beantwortest du Fragen dazu.', ZI.TIPPS.hoeren, bue),
+        schritt, textBox, bereich, rueck, weiter);
+      vorlesenLassen();
     }
     function ende() {
       geschafft({ titel: 'Station geschafft!', text: 'Du bist ein echter Zuhör-Zwerg. Dafür bekommt das Dorf Eisen.', datei: 'eisen', alt: 'Eisen', eintragen: (s) => s.setzeKern(K, 2) });
@@ -1369,7 +1361,7 @@
         zeichne();
       });
       ZI.setze(box,
-        aufgabenKopf('Welche zwei Sätze stützen das Hauptargument?', () => it.meinung + ' ' + it.haupt + ' ' + karten.map((k) => k.text).join('. '), ZI.TIPPS.kette, bue),
+        aufgabenKopf('Welche zwei Sätze stützen das Hauptargument?', ZI.TIPPS.kette, bue),
         h('div', { class: 'teile' }, teilZeile('these', it.meinung), teilZeile('begruendung', it.haupt)),
         liste, pruefKnopf, rueck, weiter);
       zeichne();
@@ -1803,7 +1795,7 @@
               h('div', { class: 'klein' }, 'Deine Rolle'),
               h('h2', { style: { margin: 0, color: g.farbe } }, rolle.name),
               h('p', { style: { margin: '4px 0 0', fontSize: '20px' } }, rolle.aufgabe + (dreier && rolle.id === 'aelteste' ? ' Ihr seid nur drei – achte auch auf die Zeit.' : '')),
-              h('button', { class: 'knopf-link', onclick: () => ZI.vorlesen(rolle.name + '. ' + rolle.aufgabe) }, 'Vorlesen'))),
+              )),
           h('div', { class: 'pergament auf-pergament stamm-box' },
             h('h3', null, 'Euer Thema ', h('span', { class: 'herkunft' + (t.frage ? ' insel' : '') }, ZI.themaHerkunft(t))),
             h('div', { class: 'meinung' }, ZI.themaText(t)),
@@ -1879,7 +1871,7 @@
         zeichne();
       });
       ZI.setze(box,
-        aufgabenKopf(u.frage, () => it.meinung + ' ' + karten.map((k, i) => (i + 1) + '. ' + k.text).join(' '), u.tipp, bue),
+        aufgabenKopf(u.frage, u.tipp, bue),
         h('div', { class: 'hand-kopf' }, h('span', { class: 'hand-symbol', 'aria-hidden': 'true' }, '✋'), h('div', { class: 'meinung' }, it.meinung)),
         liste, rueck, pruefKnopf, weiter);
       zeichne();
