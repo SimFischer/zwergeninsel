@@ -22,26 +22,26 @@
         { kopf: '„Man sollte beim Radfahren einen Helm tragen, weil Helme wichtig sind.“', optionen: [
           { text: '… weil Helme eben wichtig sind.', ok: false, info: 'Das dreht sich im Kreis.' },
           { text: '… weil ein Helm den Kopf bei einem Sturz schützt.', ok: true, info: 'Genau! Jetzt weiß man, wofür der Helm gut ist.' },
-          { text: '… weil es Helme in vielen Farben gibt.', ok: false, info: 'Das hat mit Sicherheit nichts zu tun.' }] },
+          { text: '… weil viele Kinder einen Helm haben.', ok: false, info: 'Dass viele einen haben, erklärt nicht, wofür er gut ist.' }] },
         { kopf: '„Wir brauchen eine Klassenbücherei, weil Bücher gut sind.“', optionen: [
-          { text: '… weil Bücher Seiten haben.', ok: false, info: 'Das stimmt, erklärt aber nichts.' },
+          { text: '… weil es in der Stadtbücherei auch viele Bücher gibt.', ok: false, info: 'Das erklärt nicht, warum WIR eine Klassenbücherei brauchen.' },
           { text: '… weil Bücher richtig gut sind.', ok: false, info: 'Immer noch stumpf: Wofür sind Bücher gut?' },
           { text: '… weil dann jeder in der Pause etwas Spannendes zum Lesen findet.', ok: true, info: 'Stark! Du nennst, was die Bücherei bringt.' }] },
         { kopf: '„Man sollte genug Wasser trinken, weil das gesund ist.“', optionen: [
           { text: '… weil der Kopf mit genug Wasser besser denken kann.', ok: true, info: 'Richtig! Jetzt steht da, was Wasser im Körper bewirkt.' },
           { text: '… weil Wasser gesund ist.', ok: false, info: 'Das sagt dasselbe noch einmal.' },
-          { text: '… weil Wasser durchsichtig ist.', ok: false, info: 'Das stimmt, ist aber kein Grund.' }] },
+          { text: '… weil Wasser keine Kalorien hat.', ok: false, info: 'Das stimmt, erklärt aber nicht, wofür der Körper Wasser braucht.' }] },
         { kopf: '„Wir sollten Müll trennen, weil das besser ist.“', optionen: [
-          { text: '… weil man das halt so macht.', ok: false, info: 'Das ist keine Erklärung.' },
+          { text: '… weil es dafür bunte Tonnen gibt.', ok: false, info: 'Die Tonnen gibt es – aber warum ist Trennen sinnvoll?' },
           { text: '… weil aus altem Papier und Glas neue Dinge gemacht werden können.', ok: true, info: 'Genau! Du erklärst, was Mülltrennen bringt.' },
           { text: '… weil Trennen besser ist.', ok: false, info: '„Besser“ – aber warum? Das fehlt noch.' }] },
         { kopf: '„Haustiere sind gut für Kinder, weil Tiere toll sind.“', optionen: [
-          { text: '… weil meine Nachbarin eine Katze hat.', ok: false, info: 'Das ist kein Grund für alle Kinder.' },
+          { text: '… weil viele Familien ein Haustier haben.', ok: false, info: 'Dass es viele haben, erklärt nicht, warum es für Kinder gut ist.' },
           { text: '… weil Haustiere total toll sind.', ok: false, info: 'Immer noch stumpf.' },
           { text: '… weil Kinder lernen, sich jeden Tag um ein Lebewesen zu kümmern.', ok: true, info: 'Stark! Jetzt ist die Begründung scharf.' }] },
         { kopf: '„Kinder sollten abends früh schlafen gehen, weil Schlaf wichtig ist.“', optionen: [
           { text: '… weil man ausgeschlafen in der Schule besser aufpassen kann.', ok: true, info: 'Richtig! Du erklärst, wozu Schlaf gut ist.' },
-          { text: '… weil es abends dunkel ist.', ok: false, info: 'Das stimmt, erklärt aber nicht, warum früh schlafen gut ist.' },
+          { text: '… weil Kinder abends oft müde sind.', ok: false, info: 'Müde sein ist kein Grund – wofür ist der Schlaf gut?' },
           { text: '… weil Schlafen wichtig ist.', ok: false, info: 'Das dreht sich im Kreis.' }] },
       ],
       wissen: { titel: 'Nachschärfen', text: 'Eine stumpfe Begründung kannst du schärfen: Frag „Warum?“ und schreib die Antwort hinein.', beispiel: 'Stumpf: … weil Helme wichtig sind.\nScharf: … weil ein Helm den Kopf schützt.' },
@@ -128,26 +128,26 @@
         { kopf: 'Ich finde, dass wir einen Schulgarten anlegen sollten, weil wir dort lernen, wie Pflanzen wachsen. Zum Beispiel könnten wir Tomaten ziehen.', optionen: [
           { text: 'Deshalb bin ich für einen Schulgarten.', ok: true, info: 'Genau! Der Schluss sagt die Meinung noch einmal.' },
           { text: 'Deshalb sollten wir mehr Sport machen.', ok: false, info: 'Das passt nicht zum Thema.' },
-          { text: 'Tomaten sind rot.', ok: false, info: 'Das ist kein Schlusssatz, sondern nur eine Bemerkung.' }] },
+          { text: 'Deshalb sollten wir Tomaten pflanzen.', ok: false, info: 'Das greift nur das Beispiel auf – die Meinung war: ein ganzer Schulgarten.' }] },
         { kopf: 'Ich finde, dass es einen Kreativtag geben sollte, weil jeder zeigen kann, was er gut kann. Zum Beispiel könnte jemand ein Lied vorspielen.', optionen: [
           { text: 'Deshalb bin ich gegen einen Kreativtag.', ok: false, info: 'Der Schluss widerspricht der eigenen Meinung.' },
           { text: 'Darum wünsche ich mir einen Kreativtag an unserer Schule.', ok: true, info: 'Richtig! Klar und passend.' },
-          { text: 'Außerdem gibt es Kleber.', ok: false, info: 'Das rundet nichts ab.' }] },
+          { text: 'Deshalb sollte jemand ein Lied vorspielen.', ok: false, info: 'Das ist nur das Beispiel – nicht die Meinung.' }] },
         { kopf: 'Ich finde, dass die Pause länger sein sollte, weil wir uns dann besser erholen. Zum Beispiel könnte ich nach dem Fangenspielen noch in Ruhe frühstücken.', optionen: [
-          { text: 'Fangen ist mein Lieblingsspiel.', ok: false, info: 'Das ist kein Schluss.' },
+          { text: 'Deshalb sollten wir in der Pause Fangen spielen.', ok: false, info: 'Das ist nur das Beispiel – die Meinung war: eine längere Pause.' },
           { text: 'Deshalb sollte es gar keine Pause geben.', ok: false, info: 'Das widerspricht der Meinung.' },
           { text: 'Deshalb sollte die Pause länger sein.', ok: true, info: 'Genau! So weiß jeder am Ende, was du willst.' }] },
         { kopf: 'Ich finde, dass wir eine Leseecke einrichten sollten, weil man sich dort in Ruhe zurückziehen kann. Zum Beispiel könnte man dort lesen, wenn es draußen regnet.', optionen: [
           { text: 'Deshalb wünsche ich mir eine Leseecke in unserer Klasse.', ok: true, info: 'Richtig! Der Schluss passt genau.' },
-          { text: 'Bücher haben viele Seiten.', ok: false, info: 'Das ist kein Schlusssatz.' },
+          { text: 'Deshalb sollten wir lesen, wenn es regnet.', ok: false, info: 'Das greift nur das Beispiel auf – die Meinung war: eine Leseecke.' },
           { text: 'Deshalb sollten wir weniger lesen.', ok: false, info: 'Das widerspricht der Meinung.' }] },
         { kopf: 'Ich finde, dass Kinder im Haushalt helfen sollten, weil sie dabei selbstständig werden. Zum Beispiel lerne ich beim Kochen, wie man Nudeln zubereitet.', optionen: [
-          { text: 'Nudeln esse ich am liebsten.', ok: false, info: 'Das ist nur eine Bemerkung.' },
+          { text: 'Deshalb sollten Kinder Nudeln kochen lernen.', ok: false, info: 'Das ist nur das Beispiel – die Meinung war: im Haushalt helfen.' },
           { text: 'Darum finde ich: Kinder sollten im Haushalt mithelfen.', ok: true, info: 'Genau! Die Meinung wird noch einmal klar.' },
           { text: 'Deshalb sollten nur Erwachsene kochen.', ok: false, info: 'Das widerspricht der Meinung.' }] },
         { kopf: 'Ich finde, dass wir einen Waldausflug machen sollten, weil wir dort viel über Tiere lernen. Zum Beispiel könnten wir Spuren suchen.', optionen: [
           { text: 'Deshalb bin ich für einen Waldausflug.', ok: true, info: 'Richtig! Kurz und klar.' },
-          { text: 'Im Wald gibt es Bäume.', ok: false, info: 'Das ist kein Schluss.' },
+          { text: 'Deshalb sollten wir Spuren suchen.', ok: false, info: 'Das ist nur das Beispiel – die Meinung war: ein Waldausflug.' },
           { text: 'Deshalb bleiben wir lieber in der Klasse.', ok: false, info: 'Das widerspricht der Meinung.' }] },
       ],
       wissen: { titel: 'Der Schlusssatz', text: 'Am Ende sagst du deine Meinung noch einmal kurz. So weiß jeder, was du willst.', beispiel: '„Deshalb bin ich für einen Schulgarten.“' },

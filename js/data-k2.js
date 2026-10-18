@@ -160,13 +160,13 @@
       stuetzen: [
         { text: 'Das Füttern braucht vor und nach der Schule viel Zeit.', ok: true },
         { text: 'Auch am Wochenende und in den Ferien muss jemand zum Füttern kommen.', ok: true },
-        { text: 'Kaninchen haben lange Ohren.', ok: false, info: 'Das stimmt, stützt das Argument aber nicht.' },
+        { text: 'Kaninchen sind sehr beliebte Haustiere.', ok: false, info: 'Das stimmt, sagt aber nichts über das viele Füttern.' },
         { text: 'Außerdem brauchen Kaninchen Auslauf auf der Wiese.', ok: false, info: 'Das ist ein neues Argument und keine Stütze für das Füttern.' },
       ] },
     { meinung: 'Wir sollten eine Schulübernachtung machen,',
       haupt: '… weil wir uns als neue Klasse besser kennenlernen.',
       stuetzen: [
-        { text: 'Die Turnhalle ist sehr groß.', ok: false, info: 'Das hat mit dem Kennenlernen nichts zu tun.' },
+        { text: 'In der Turnhalle ist genug Platz für alle Schlafsäcke.', ok: false, info: 'Das zeigt, dass es möglich ist – aber nicht, dass wir uns kennenlernen.' },
         { text: 'Beim Abendessen erzählt jeder etwas von sich.', ok: true },
         { text: 'Bei Spielen am Abend arbeiten Kinder zusammen, die sonst wenig miteinander reden.', ok: true },
         { text: 'Außerdem macht so eine Nacht einfach Spaß.', ok: false, info: 'Das ist ein neues Argument und keine Stütze für das Kennenlernen.' },
@@ -176,7 +176,7 @@
       stuetzen: [
         { text: 'Das Herz wird durch Bewegung kräftiger.', ok: true },
         { text: 'Außerdem lernt man im Team, fair zu sein.', ok: false, info: 'Das ist ein neues Argument (Fairness) und keine Stütze für die Gesundheit.' },
-        { text: 'Fußball ist mein Lieblingssport.', ok: false, info: 'Das ist nur deine Vorliebe und stützt das Argument nicht.' },
+        { text: 'Viele Kinder spielen nachmittags im Verein.', ok: false, info: 'Das zeigt nicht, dass Bewegung gesund ist.' },
         { text: 'Wer sich viel bewegt, schläft nachts besser.', ok: true },
       ] },
   ];
@@ -188,18 +188,18 @@
     { meinung: 'Wir sollten einen Schulgarten anlegen, weil wir dort viel über Pflanzen lernen.',
       scharf: ['zum Beispiel, wie aus Samen Sonnenblumen wachsen', 'zum Beispiel, welche Blumen Bienen mögen',
                'zum Beispiel, wie viel Wasser Tomaten brauchen', 'zum Beispiel, wann man Möhren erntet'],
-      stumpf: ['zum Beispiel ist Grün meine Lieblingsfarbe', 'zum Beispiel hat mein Opa einen Rasenmäher',
-               'zum Beispiel spiele ich gern draußen', 'zum Beispiel ist die Schule alt'] },
+      stumpf: ['zum Beispiel macht Gärtnern Spaß', 'zum Beispiel hat mein Opa einen großen Garten',
+               'zum Beispiel kann man Gemüse im Laden kaufen', 'zum Beispiel braucht ein Garten viel Platz'] },
     { meinung: 'Wir sollten weniger Plastik benutzen, weil Plastikmüll der Natur schadet.',
       scharf: ['zum Beispiel landen Plastiktüten im Meer', 'zum Beispiel verschlucken Vögel kleine Plastikteile',
                'zum Beispiel liegen Plastikflaschen im Wald herum', 'zum Beispiel verrottet eine Plastikflasche jahrhundertelang nicht'],
-      stumpf: ['zum Beispiel ist meine Trinkflasche blau', 'zum Beispiel gibt es Spielzeug aus Plastik',
-               'zum Beispiel mag ich Eis', 'zum Beispiel ist Plastik leicht'] },
+      stumpf: ['zum Beispiel ist meine Trinkflasche aus Plastik', 'zum Beispiel ist Plastik sehr leicht',
+               'zum Beispiel gibt es Plastik in vielen Farben', 'zum Beispiel ist Plastik billig'] },
     { meinung: 'Wir sollten in der Pause draußen sein, weil Bewegung beim Lernen hilft.',
       scharf: ['zum Beispiel kann ich nach dem Fangen besser aufpassen', 'zum Beispiel bin ich nach dem Toben wieder wach',
                'zum Beispiel ist mein Kopf nach frischer Luft klarer', 'zum Beispiel arbeitet unsere Klasse nach dem Hofspiel ruhiger'],
-      stumpf: ['zum Beispiel ist der Schulhof groß', 'zum Beispiel regnet es oft im Herbst',
-               'zum Beispiel habe ich neue Schuhe', 'zum Beispiel klingelt die Glocke laut'] },
+      stumpf: ['zum Beispiel ist der Schulhof groß', 'zum Beispiel spielen viele gern Fußball',
+               'zum Beispiel gibt es auf dem Hof eine Tischtennisplatte', 'zum Beispiel dauert die Pause 20 Minuten'] },
   ];
 
   /* =========================================================

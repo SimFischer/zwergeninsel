@@ -13,30 +13,30 @@
       optionen: [
         { text: '… weil Ausflüge toll sind.', scharf: false, info: '„Toll“ – aber warum? Die Begründung dreht sich im Kreis.' },
         { text: '… weil wir dabei Dinge sehen, die wir sonst nur aus Büchern kennen.', scharf: true, info: 'Genau! Du erklärst, was ein Ausflug bringt.' },
-        { text: '… weil morgen Dienstag ist.', scharf: false, info: 'Das hat mit der Meinung nichts zu tun.' }] },
+        { text: '… weil wir schon lange keinen Ausflug mehr gemacht haben.', scharf: false, info: 'Das sagt nur, wann der letzte war – nicht, warum Ausflüge gut sind.' }] },
     { meinung: 'Ich finde, dass man sein Zimmer aufräumen sollte, …',
       optionen: [
         { text: '… weil Aufräumen wichtig ist.', scharf: false, info: 'Warum ist es wichtig? Genau das fehlt.' },
-        { text: '… weil meine Mutter das will.', scharf: false, info: 'Das ist nur eine Regel von außen. Warum ist sie sinnvoll?' },
+        { text: '… weil Erwachsene das oft sagen.', scharf: false, info: 'Dass andere es sagen, erklärt noch nicht, warum es sinnvoll ist.' },
         { text: '… weil man seine Sachen dann schneller wiederfindet.', scharf: true, info: 'Richtig! Diese Begründung erklärt den Nutzen.' }] },
     { meinung: 'Ich finde, dass Kinder viel Obst essen sollten, …',
       optionen: [
         { text: '… weil Obst Vitamine hat, die uns vor Erkältungen schützen.', scharf: true, info: 'Stark! Du erklärst, was Obst im Körper bewirkt.' },
         { text: '… weil Obst gut ist.', scharf: false, info: '„Gut“ erklärt nichts. Wofür ist Obst gut?' },
-        { text: '… weil Bananen gelb sind.', scharf: false, info: 'Das stimmt, ist aber kein Grund.' }] },
+        { text: '… weil Obst gut schmeckt.', scharf: false, info: 'Das stimmt oft – aber der Geschmack sagt nichts über die Gesundheit.' }] },
     { meinung: 'Ich finde, dass wir in der Klasse leise arbeiten sollten, …',
       optionen: [
         { text: '… weil leise besser ist.', scharf: false, info: 'Besser – aber warum? Die Begründung bleibt stumpf.' },
-        { text: '… weil es so ist.', scharf: false, info: 'Das ist gar keine Begründung.' },
+        { text: '… weil die Lehrerin dann zufrieden ist.', scharf: false, info: 'Das erklärt nicht, warum Ruhe beim Arbeiten hilft.' },
         { text: '… weil sich dann alle besser konzentrieren können.', scharf: true, info: 'Genau! Das erklärt, warum Ruhe hilft.' }] },
     { meinung: 'Ich finde, dass man Tiere gut behandeln sollte, …',
       optionen: [
         { text: '… weil Tiere genau wie wir Schmerzen und Angst spüren.', scharf: true, info: 'Richtig! Diese Begründung erklärt, warum Tiere Rücksicht brauchen.' },
         { text: '… weil man das so macht.', scharf: false, info: 'Das erklärt nicht, warum.' },
-        { text: '… weil ich Tiere mag.', scharf: false, info: 'Das ist nur dein Gefühl. Warum sollten alle Tiere gut behandeln?' }] },
+        { text: '… weil es auf der Welt viele Tiere gibt.', scharf: false, info: 'Das ist eine Tatsache, aber kein Grund für gutes Behandeln.' }] },
     { meinung: 'Ich finde, dass man im Bus älteren Menschen seinen Platz anbieten sollte, …',
       optionen: [
-        { text: '… weil der Bus blau ist.', scharf: false, info: 'Das hat mit der Meinung nichts zu tun.' },
+        { text: '… weil im Bus oft viele Leute stehen.', scharf: false, info: 'Das beschreibt den Bus – aber warum gerade ältere Menschen?' },
         { text: '… weil ältere Menschen beim Bremsen leichter stürzen können.', scharf: true, info: 'Stark! Du nennst einen echten Grund.' },
         { text: '… weil man das eben so macht.', scharf: false, info: 'Warum macht man das? Das fehlt noch.' }] },
   );
@@ -45,19 +45,19 @@
     { meinung: 'Es sollte einen Kuscheltiertag geben, …',
       gruende: [
         { text: '… weil sich manche Kinder mit ihrem Kuscheltier wohler fühlen.', erz: true, info: 'Erz! Ein Grund, der zur Meinung passt.' },
-        { text: '… weil Kuscheltiere weich sind.', erz: false, info: 'Schlacke. Das stimmt, ist aber kein Grund für einen Kuscheltiertag.' },
+        { text: '… weil Kuscheltiere in jedem Laden verkauft werden.', erz: false, info: 'Schlacke. Das stimmt, ist aber kein Grund für einen Kuscheltiertag.' },
         { text: '… weil wir uns unsere Kuscheltiere vorstellen und dabei viel erzählen können.', erz: true, info: 'Erz! So lernen wir uns besser kennen.' },
         { text: '… weil meine Schwester auch eins hat.', erz: false, info: 'Schlacke. Was deine Schwester hat, ist kein Grund für die Klasse.' }] },
     { meinung: 'In der Pause sollten wir Fußball und andere Spiele abwechseln, …',
       gruende: [
-        { text: '… weil Bälle rund sind.', erz: false, info: 'Schlacke. Das hat nichts mit der Frage zu tun.' },
+        { text: '… weil Fußball das beliebteste Spiel ist.', erz: false, info: 'Schlacke. Das spricht eher dafür, NUR Fußball zu spielen.' },
         { text: '… weil dann auch Kinder mitspielen, die Fußball nicht mögen.', erz: true, info: 'Erz! So können alle mitmachen.' },
         { text: '… weil es dann weniger Streit um den Platz gibt.', erz: true, info: 'Erz! Ein Grund, der allen hilft.' },
         { text: '… weil ich lieber Basketball spiele.', erz: false, info: 'Schlacke. Das ist nur deine Vorliebe.' }] },
     { meinung: 'Unsere Klassenfahrt sollte an den Weißenhäuser Strand gehen, …',
       gruende: [
         { text: '… weil wir dort viel draußen erleben können.', erz: true, info: 'Erz! Das passt gut zur Meinung.' },
-        { text: '… weil der Strand Sand hat.', erz: false, info: 'Schlacke. Jeder Strand hat Sand – das ist kein Grund.' },
+        { text: '… weil es dort ein Eiscafé gibt.', erz: false, info: 'Schlacke. Ein Eiscafé ist nett, aber kein Grund für eine Klassenfahrt.' },
         { text: '… weil mein Nachbar dort Urlaub gemacht hat.', erz: false, info: 'Schlacke. Das ist kein Grund für unsere Klasse.' },
         { text: '… weil die Fahrt nicht lange dauert und wir mehr Zeit vor Ort haben.', erz: true, info: 'Erz! Ein guter, sachlicher Grund.' }] },
   );
@@ -103,24 +103,24 @@
   ZI.BEISPIELE.push(
     { argument: 'Ich finde, dass wir mehr vorlesen sollten, weil man dabei neue Wörter lernt.',
       optionen: [
-        { text: 'Zum Beispiel habe ich ein rotes Buch.', ok: false, info: 'Die Farbe des Buchs zeigt nichts über neue Wörter.' },
+        { text: 'Zum Beispiel hören alle beim Vorlesen ganz still zu.', ok: false, info: 'Das zeigt Ruhe – nicht, dass man neue Wörter lernt.' },
         { text: 'Zum Beispiel habe ich beim Vorlesen das Wort „Leuchtturm“ kennengelernt.', ok: true, info: 'Genau! Das Beispiel zeigt, dass man neue Wörter lernt.' },
-        { text: 'Zum Beispiel lese ich gern im Bett.', ok: false, info: 'Schön, aber das stützt die Begründung nicht.' }] },
+        { text: 'Zum Beispiel macht Vorlesen allen in der Klasse Spaß.', ok: false, info: 'Spaß ist schön, aber die Begründung sagt: neue Wörter lernen.' }] },
     { argument: 'Ich finde, dass Kinder Fahrrad fahren lernen sollten, weil sie dann selbstständiger sind.',
       optionen: [
         { text: 'Zum Beispiel kann ich jetzt allein zu meinem Freund fahren.', ok: true, info: 'Richtig! So sieht Selbstständigkeit aus.' },
-        { text: 'Zum Beispiel hat mein Fahrrad eine Klingel.', ok: false, info: 'Das hat nichts mit Selbstständigkeit zu tun.' },
-        { text: 'Zum Beispiel ist Rot meine Lieblingsfarbe.', ok: false, info: 'Das passt nicht zur Begründung.' }] },
+        { text: 'Zum Beispiel macht mir Fahrradfahren viel Spaß.', ok: false, info: 'Spaß zeigt nicht, dass man selbstständiger wird.' },
+        { text: 'Zum Beispiel lernen viele Kinder mit fünf Jahren Fahrrad fahren.', ok: false, info: 'Das sagt, wann man es lernt – nicht, dass man selbstständiger wird.' }] },
     { argument: 'Ich finde, dass wir Klassenregeln brauchen, weil dann alle wissen, was gilt.',
       optionen: [
-        { text: 'Zum Beispiel ist unser Klassenraum hell.', ok: false, info: 'Das zeigt nichts über Regeln.' },
-        { text: 'Zum Beispiel haben wir dienstags Sport.', ok: false, info: 'Das ist ein Stundenplan, keine Regel.' },
+        { text: 'Zum Beispiel hängen unsere Regeln an der Tür.', ok: false, info: 'Das sagt, wo die Regeln hängen – nicht, dass alle wissen, was gilt.' },
+        { text: 'Zum Beispiel gibt es in jeder Klasse andere Regeln.', ok: false, info: 'Das stimmt, zeigt aber nicht, dass alle bei uns wissen, was gilt.' },
         { text: 'Zum Beispiel weiß dann jeder, dass man sich meldet, bevor man spricht.', ok: true, info: 'Genau! Ein Beispiel, das zur Begründung passt.' }] },
     { argument: 'Ich finde, dass man Müll trennen sollte, weil man daraus Neues herstellen kann.',
       optionen: [
         { text: 'Zum Beispiel wird aus altem Papier neues Heftpapier gemacht.', ok: true, info: 'Richtig! So sieht Wiederverwerten aus.' },
-        { text: 'Zum Beispiel ist unsere Mülltonne grün.', ok: false, info: 'Die Farbe der Tonne zeigt nichts.' },
-        { text: 'Zum Beispiel stinkt Müll.', ok: false, info: 'Das stimmt, passt aber nicht zur Begründung.' }] },
+        { text: 'Zum Beispiel haben wir in der Klasse drei verschiedene Mülleimer.', ok: false, info: 'Das zeigt, dass wir trennen – nicht, dass daraus Neues entsteht.' },
+        { text: 'Zum Beispiel macht die Müllabfuhr jeden Dienstag die Tonnen leer.', ok: false, info: 'Das beschreibt die Abholung – nicht, dass Neues hergestellt wird.' }] },
   );
 
   ZI.PUZZLE.push([
@@ -205,11 +205,11 @@
       stuetzen: [
         { text: 'Wir sehen, wie aus einem kleinen Samen eine große Pflanze wird.', ok: true },
         { text: 'Außerdem können wir das Gemüse später selbst essen.', ok: false, info: 'Das ist ein neues Argument und keine Stütze für das Lernen.' },
-        { text: 'Die Gießkanne ist grün.', ok: false, info: 'Das stützt das Argument nicht.' },
+        { text: 'Im Garten muss man regelmäßig Unkraut zupfen.', ok: false, info: 'Das ist Arbeit im Garten – aber was lernen wir dabei über Pflanzen?' },
         { text: 'Wir lernen, welche Pflanzen viel Wasser und Sonne brauchen.', ok: true }] },
     { meinung: 'Wir sollten keine Schuluniformen tragen,', haupt: '… weil jeder zeigen möchte, was ihm gefällt.',
       stuetzen: [
-        { text: 'Meine Jacke hat eine Kapuze.', ok: false, info: 'Das stützt das Argument nicht.' },
+        { text: 'Kleidung kann man in vielen Läden kaufen.', ok: false, info: 'Das stimmt, zeigt aber nicht, dass man zeigen will, was einem gefällt.' },
         { text: 'Mit der eigenen Kleidung zeigt man, welche Farben man mag.', ok: true },
         { text: 'Manche zeigen mit einem T-Shirt ihrer Lieblingsband, wer sie sind.', ok: true },
         { text: 'Außerdem sind Uniformen teuer.', ok: false, info: 'Das ist ein neues Argument (Kosten) und keine Stütze.' }] },
@@ -284,7 +284,7 @@
       optionen: [
         { text: '„Und außerdem macht Sport Spaß.“', ok: false, info: 'Das stützt die Meinung – es ist kein Gegenargument.' },
         { text: '„Aber dann bleibt weniger Zeit für andere Fächer wie Kunst oder Musik.“', ok: true, info: 'Genau! Ein Nachteil, den man bedenken muss.' },
-        { text: '„Ich habe neue Turnschuhe.“', ok: false, info: 'Das hat mit der Frage nichts zu tun.' }] },
+        { text: '„Aber ich mag Sport nicht so gern.“', ok: false, info: 'Das ist nur deine Meinung über Sport – kein Nachteil für alle.' }] },
     { argument: '„Wir sollten einen Schulhund haben, weil er die Klasse beruhigt.“',
       optionen: [
         { text: '„Aber manche Kinder haben Angst vor Hunden.“', ok: true, info: 'Richtig! Ein Gegenargument, das man ernst nehmen muss.' },
@@ -292,14 +292,14 @@
         { text: '„Du hast doch selbst keinen Hund!“', ok: false, info: 'Das ist ein Angriff auf die Person.' }] },
     { argument: '„In der Mensa sollte es jeden Tag Pizza geben, weil alle Pizza mögen.“',
       optionen: [
-        { text: '„Pizza kommt aus Italien.“', ok: false, info: 'Das spricht weder dafür noch dagegen.' },
+        { text: '„Aber ich mag lieber Nudeln.“', ok: false, info: 'Das ist nur dein Geschmack – kein echtes Gegenargument.' },
         { text: '„Und Pizza ist schnell gemacht.“', ok: false, info: 'Das stützt die Meinung.' },
         { text: '„Aber wer jeden Tag dasselbe isst, ernährt sich nicht gesund.“', ok: true, info: 'Stark! Ein sachliches Gegenargument.' }] },
     { argument: '„In der Pause sollten Handys erlaubt sein, weil man dann Fotos machen kann.“',
       optionen: [
         { text: '„Aber dann spielen viele nur noch am Handy und reden weniger miteinander.“', ok: true, info: 'Genau! Ein wichtiger Nachteil.' },
         { text: '„Und man kann Musik hören.“', ok: false, info: 'Das stützt die Meinung.' },
-        { text: '„Mein Handy ist neu.“', ok: false, info: 'Das hat mit der Frage nichts zu tun.' }] },
+        { text: '„Aber ich habe noch gar kein Handy.“', ok: false, info: 'Das betrifft nur dich – kein Nachteil für die ganze Schule.' }] },
   );
 
   ZI.SITUATIONEN.push(
@@ -421,7 +421,7 @@
       beispiel: 'Stumpf: … weil Sport wichtig ist.\nScharf: … weil Bewegung das Herz stärkt.' },
     { k: 0, art: 'kern', i: 1, titel: 'Passende Begründungen',
       text: 'Eine Begründung muss zur Meinung passen. Was zwar stimmt, aber nichts mit der Meinung zu tun hat, überzeugt niemanden.',
-      beispiel: 'Schulhund? „… weil Hunde vier Beine haben“ passt nicht.' },
+      beispiel: 'Schulhund? „… weil Hunde gern spielen“ stimmt – ist aber kein Grund für einen Hund in der Klasse.' },
     { k: 0, art: 'kern', i: 2, titel: 'weil, da und denn',
       text: 'Nach weil und da steht das gebeugte Verb am Ende. Nach denn steht es an zweiter Stelle. Vor weil, da und denn steht ein Komma.',
       beispiel: '…, weil es kalt ist.\n…, denn es ist kalt.' },

@@ -112,6 +112,22 @@
     return a;
   };
   ZI.zufall = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  /* Bausteine mischen, sodass der Satz NIE schon fertig oder fast fertig dasteht.
+     loesungen: Liste richtiger Reihenfolgen. Höchstens die Hälfte (bei 3 Bausteinen: einer) darf schon richtig liegen. */
+  ZI.mischenSatz = function (teile, loesungen) {
+    const n = teile.length;
+    if (n < 2) return teile.slice();
+    const erlaubt = n <= 3 ? 1 : Math.floor(n / 2);
+    let beste = null; let besteTreffer = Infinity;
+    for (let versuch = 0; versuch < 200; versuch++) {
+      const a = ZI.mischen(teile);
+      if (loesungen.some((l) => l.join('|') === a.join('|'))) continue;
+      const treffer = Math.max(...loesungen.map((l) => a.filter((w, i) => l[i] === w).length));
+      if (treffer <= erlaubt) return a;
+      if (treffer < besteTreffer) { beste = a; besteTreffer = treffer; }
+    }
+    return beste || teile.slice().reverse();
+  };
 
   /* Speicher, der nie abstürzt (privater Modus o. ä.) */
   ZI.speicher = {

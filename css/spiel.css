@@ -683,3 +683,97 @@ a.lk-kachel:active { transform: translateY(2px); }
 /* Hör-Stollen: Partner liest vor */
 .hoer-schritt { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
 .hoer-hinweis { margin: 0; font-size: 20px; line-height: 1.4; }
+
+/* Erz oder Schlacke: Begriffe direkt bei der Aufgabe */
+.begriffe { display: grid; gap: 4px; padding: 10px 14px; border-radius: 12px; background: rgba(58, 38, 23, 0.06); border: 2px dashed rgba(58, 38, 23, 0.25); font-size: 18px; line-height: 1.35; }
+.begriff b { font-family: var(--titel); font-weight: 400; font-size: 20px; }
+.begriff.erz b { color: #8a4b1c; } .begriff.schlacke b { color: var(--eisen); }
+.begriff.bild { font-style: italic; color: var(--tinte-hell); }
+.knopf .knopf-unter { display: block; font-family: var(--schrift); font-size: 15px; font-weight: 700; opacity: 0.8; line-height: 1.1; }
+
+/* Satzzeichen steht fest am Satzende, nicht auf einem Baustein */
+.satzpunkt { align-self: flex-end; font-family: var(--titel); font-size: 34px; line-height: 1; padding: 0 4px 6px; color: var(--tinte); }
+
+/* Funkenregen: neue Meinung zuerst in Ruhe lesen */
+.arena-meinung.neu { animation: lesen-puls 1s ease-in-out 3; box-shadow: 0 0 0 4px var(--gold); }
+@keyframes lesen-puls { 50% { transform: scale(1.03); } }
+
+/* ---------- Gemeinschaftsstollen ---------- */
+.st-marke { display: inline-block; margin-bottom: 3px; padding: 1px 9px; border-radius: 999px; font-size: 13px; font-weight: 700; background: #6b4a1e; color: #fff4dc; letter-spacing: .02em; }
+.st-marke.gemeinschaft { background: #2f6f8f; }
+.st-gemeinsam { font-weight: 700; color: #2f5f78; margin-top: 2px; }
+.gem-kopf { align-self: flex-start; padding: 3px 12px; border-radius: 999px; font-weight: 700; font-size: 16px; background: rgba(58,38,23,0.1); }
+.gem-kopf.marke { background: #2f6f8f; color: #fff; }
+.gem-kopf.sprechen { background: #8a4b1c; color: #fff4dc; }
+.gem-kopf.pruefen { background: var(--moos-dunkel); color: #fff; }
+.gem-titel { font-size: 30px; }
+.gem-liste { margin: 0; padding-left: 28px; font-size: 22px; line-height: 1.6; }
+.gem-text { margin: 0; font-size: 20px; line-height: 1.4; }
+.gem-hinweis { margin: 0; font-size: 18px; color: var(--tinte-hell); font-weight: 700; }
+.gem-rollen { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.gem-rolle { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px; border: 3px solid #8a6438; color: var(--tinte); font: inherit; cursor: pointer; text-align: center; }
+.gem-rolle b { font-family: var(--titel); font-weight: 400; font-size: 24px; }
+.gem-rolle span:last-child { font-size: 18px; color: var(--tinte-hell); }
+.gem-rolle-buchstabe { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--titel); font-size: 38px; background: #8a4b1c; color: #fff4dc; }
+.gem-ansage { font-family: var(--titel); font-size: 34px; color: #8a4b1c; text-align: center; padding: 8px 0; }
+.gem-zusatz { margin-top: 10px; color: var(--tinte-hell); }
+@media (max-width: 700px) { .gem-rollen { grid-template-columns: 1fr; } }
+
+/* ---------- Ortswechsel-Szene ---------- */
+.uebergang { position: fixed; inset: 0; z-index: 80; overflow: hidden; background: #120b07; animation: einblenden 0.25s ease-out; }
+.uebergang.aus { opacity: 0; transition: opacity 0.4s; pointer-events: none; }
+.ue-hg, .ue-hg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ue-hg img { animation: ue-zoom 1.8s ease-out forwards; }
+@keyframes ue-zoom { from { transform: scale(1.05); } to { transform: scale(1.18); } }
+.ue-dunkel { position: absolute; inset: 0; background: radial-gradient(circle at 50% 55%, rgba(18,11,7,0.15), rgba(18,11,7,0.85) 70%); }
+.ue-figuren { position: absolute; left: 50%; bottom: 14%; transform: translateX(-50%); display: flex; gap: 2vw; align-items: flex-end; }
+.ue-zwerg { width: min(24vh, 22vw); filter: drop-shadow(0 10px 14px rgba(0,0,0,0.6)); }
+.ue-zwerg img { width: 100%; display: block; }
+.ue-eigen { animation: ue-laufen 1.6s ease-out both; }
+.ue-partner { animation: ue-laufen 1.6s ease-out 0.15s both; }
+@keyframes ue-laufen { from { transform: translateX(-30vw) translateY(4px); } 60% { transform: translateX(0) translateY(-6px); } to { transform: translateX(0); } }
+.ue-stollen .ue-figuren { animation: ue-abstieg 1.8s ease-in forwards; }
+@keyframes ue-abstieg { 0%, 45% { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) translateY(10vh) scale(0.55); opacity: 0.2; } }
+.ue-laterne { position: absolute; top: 18%; width: min(14vh, 12vw); filter: drop-shadow(0 0 0 rgba(255,190,90,0)); animation: ue-licht 1.2s ease-out 0.2s forwards; }
+.ue-laterne img { width: 100%; display: block; }
+.ue-laterne.links { left: 14%; } .ue-laterne.rechts { right: 14%; }
+@keyframes ue-licht { to { filter: drop-shadow(0 0 28px rgba(255,190,90,0.95)); } }
+.ue-tor { position: absolute; left: 50%; bottom: 10%; transform: translateX(-50%); width: min(60vh, 52vw); height: min(62vh, 60vw); border-radius: 50% 50% 0 0 / 30% 30% 0 0; overflow: hidden; box-shadow: 0 0 0 10px #4a3220, 0 0 0 16px #2c1d12; }
+.ue-torlicht { position: absolute; inset: 0; background: radial-gradient(circle at 50% 70%, #ffd98a, #c9782a 45%, #3a2014 80%); }
+.ue-torflügel { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 1; background: repeating-linear-gradient(90deg, #6b4226 0 22px, #5a3720 22px 26px); box-shadow: inset 0 0 0 4px #3a2417; transition: transform 1s ease-in 0.35s; }
+.ue-torflügel.links { left: 0; animation: ue-auf-l 1s ease-in 0.35s forwards; } .ue-torflügel.rechts { right: 0; animation: ue-auf-r 1s ease-in 0.35s forwards; }
+@keyframes ue-auf-l { to { transform: perspective(600px) rotateY(75deg); transform-origin: left; } }
+@keyframes ue-auf-r { to { transform: perspective(600px) rotateY(-75deg); transform-origin: right; } }
+.ue-gemeinsam .ue-figuren { z-index: 2; }
+.ue-feuer { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); width: min(26vh, 24vw); filter: drop-shadow(0 0 30px rgba(255,150,60,0.8)); }
+.ue-feuer img { width: 100%; display: block; }
+.ue-rat .ue-figuren { bottom: 18%; }
+.ue-funken span { position: absolute; bottom: -10px; width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle, #fff7d6, #ffc261 50%, transparent 70%); animation: ue-funke 1.4s ease-out infinite; }
+@keyframes ue-funke { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-70vh) translateX(4vw); opacity: 0; } }
+.ue-text { position: absolute; left: 0; right: 0; bottom: 4%; text-align: center; font-family: var(--titel); font-size: clamp(28px, 4.4vh, 46px); color: #fff4dc; text-shadow: 0 3px 10px rgba(0,0,0,0.85); animation: einblenden 0.5s ease-out 0.2s both; padding: 0 16px; }
+.uebergang.ruhig *, .uebergang.ruhig .ue-hg img { animation: none !important; transition: none !important; }
+
+/* ---------- Schmiede-Bühne: klare Komposition ----------
+   Werkstück und Hammer sind Kinder des Ambosses und werden relativ zu ihm gesetzt.
+   Metall liegt klein auf der Amboss-Bahn. Werkzeug, Truhe und Edelstein liegen links daneben auf dem Boden.
+   Figuren stehen links neben dem Amboss. Der Hammer lehnt rechts am Amboss und schlägt nur kurz zu. */
+.amboss-platz { overflow: visible; }
+.amboss-platz .amboss { position: absolute; bottom: 0; left: auto; right: 4%; transform: none; width: 56%; max-width: 230px; aspect-ratio: 1; z-index: 1; transition: width 0.3s; }
+.amboss-platz .amboss > img, .amboss-platz .amboss > .platzhalter { width: 100%; display: block; }
+.amboss-platz .werkstueck { position: absolute; left: 24%; bottom: 70%; width: 34%; max-width: none; transform: none; z-index: 2; }
+.amboss-platz .hammer { position: absolute; left: auto; right: -2%; bottom: 2%; width: 40%; max-width: none; z-index: 3; transform: rotate(-16deg); transform-origin: 70% 92%; transition: none; }
+.amboss-platz .hammer.schlag { animation: schlag-neu 0.5s ease-in-out; }
+@keyframes schlag-neu {
+  0% { transform: rotate(-16deg); }
+  35% { transform: translate(-30%, -120%) rotate(-65deg); }
+  62% { transform: translate(-62%, -78%) rotate(6deg); }
+  100% { transform: rotate(-16deg); }
+}
+/* Werkzeug, Truhe, Edelstein: links neben dem Amboss, maßstäblich */
+.amboss-platz[data-art='objekt'] .werkstueck { left: -64%; bottom: 0; width: 56%; }
+/* Figuren (Kobold, Ratsmitglied): stehen links neben dem Amboss, Hammer ruht unsichtbar */
+.amboss-platz[data-art='figur'] .amboss, .amboss-platz.person .amboss { display: block; width: 44%; }
+.amboss-platz[data-art='figur'] .werkstueck, .amboss-platz.person .werkstueck { left: -118%; bottom: 0; width: 112%; }
+.amboss-platz[data-art='figur'] .hammer, .amboss-platz.person .hammer { display: none; }
+.amboss-platz .werkstueck.neu { animation: aufploppen-neu 0.45s ease-out; }
+@keyframes aufploppen-neu { from { opacity: 0; scale: 0.8; } to { opacity: 1; scale: 1; } }

@@ -17,16 +17,16 @@
       optionen: [
         { text: '… weil man ausgeschlafen besser lernen kann.', scharf: true, info: 'Stark! Du sagst, WARUM Schlaf hilft.' },
         { text: '… weil Schlafen eben wichtig ist.', scharf: false, info: 'Warum ist es wichtig? Das fehlt noch.' },
-        { text: '… weil mein Bett weich ist.', scharf: false, info: 'Das hat mit der Meinung nichts zu tun.' }] },
+        { text: '… weil Kinder abends oft müde sind.', scharf: false, info: 'Das sagt nur, dass man müde ist – nicht, wofür Schlaf gut ist.' }] },
     { meinung: 'Ich finde, dass man mit dem Fahrrad zur Schule fahren sollte, …',
       optionen: [
         { text: '… weil Fahrradfahren gut ist.', scharf: false, info: 'Was genau ist daran gut? Das fehlt noch.' },
         { text: '… weil man sich dabei bewegt und fit bleibt.', scharf: true, info: 'Stark! Ein echter Grund.' },
-        { text: '… weil Fahrräder zwei Räder haben.', scharf: false, info: 'Das stimmt, ist aber kein Grund.' }] },
+        { text: '… weil die meisten Kinder ein Fahrrad haben.', scharf: false, info: 'Dass viele eins haben, ist noch kein Grund, damit zur Schule zu fahren.' }] },
     { meinung: 'Ich finde, dass wir eine Leseecke einrichten sollten, …',
       optionen: [
         { text: '… weil eine Leseecke toll wäre.', scharf: false, info: 'Das sagt nur noch einmal die Meinung.' },
-        { text: '… weil unsere Klasse Fenster hat.', scharf: false, info: 'Das hat mit der Leseecke nichts zu tun.' },
+        { text: '… weil wir viele Bücher im Regal haben.', scharf: false, info: 'Bücher gibt es schon – das erklärt nicht, wozu eine Leseecke gut ist.' },
         { text: '… weil man dort ungestört lesen kann.', scharf: true, info: 'Stark! Jetzt weiß man, wofür die Ecke gut ist.' }] },
   );
 
@@ -34,23 +34,23 @@
     { meinung: 'Wir sollten eine Leseecke einrichten, …',
       gruende: [
         { text: '… weil man sich dort in Ruhe auf ein Buch konzentrieren kann.', erz: true, info: 'Erz! Ein klarer Grund für die Leseecke.' },
-        { text: '… weil Kissen weich sind.', erz: false, info: 'Schlacke. Das stimmt, ist aber kein Grund für eine Leseecke.' },
+        { text: '… weil man dort heimlich quatschen kann.', erz: false, info: 'Schlacke. Das passt nicht zum Ziel einer Leseecke.' },
         { text: '… weil wir dann mehr Lust aufs Lesen bekommen.', erz: true, info: 'Erz! Ein guter Grund.' },
         { text: '… weil die Nachbarklasse grüne Vorhänge hat.', erz: false, info: 'Schlacke. Das hat mit unserer Leseecke nichts zu tun.' },
         { text: '… weil man dort nach einer anstrengenden Stunde zur Ruhe kommt.', erz: true, info: 'Erz! Auch das ist ein echter Grund.' }] },
     { meinung: 'Es sollte Wasserspender in der Schule geben, …',
       gruende: [
         { text: '… weil viele Kinder sonst zu wenig trinken.', erz: true, info: 'Erz! Ein klarer Grund.' },
-        { text: '… weil Wasser keine Farbe hat.', erz: false, info: 'Schlacke. Das stimmt, ist aber kein Grund.' },
+        { text: '… weil Wasser billiger ist als Saft.', erz: false, info: 'Schlacke. Das stimmt, erklärt aber nicht, warum die Schule Spender braucht.' },
         { text: '… weil wir dann weniger Plastikflaschen brauchen.', erz: true, info: 'Erz! Gut für die Umwelt.' },
         { text: '… weil man mit genug Wasser besser denken kann.', erz: true, info: 'Erz! Trinken hilft beim Lernen.' },
-        { text: '… weil mein Onkel Klempner ist.', erz: false, info: 'Schlacke. Das ist kein Grund für die Schule.' }] },
+        { text: '… weil es zu Hause auch einen Wasserhahn gibt.', erz: false, info: 'Schlacke. Das ist kein Grund für Wasserspender in der Schule.' }] },
     { meinung: 'Wir sollten einmal im Monat draußen Unterricht machen, …',
       gruende: [
-        { text: '… weil der Himmel blau ist.', erz: false, info: 'Schlacke. Das ist er nicht immer – und es ist kein Grund.' },
+        { text: '… weil wir draußen nicht still sitzen müssen.', erz: false, info: 'Schlacke. Das klingt nach Pause, nicht nach Lernen.' },
         { text: '… weil frische Luft uns wach macht.', erz: true, info: 'Erz! Ein guter Grund.' },
         { text: '… weil wir draußen Dinge direkt beobachten können.', erz: true, info: 'Erz! Draußen sieht man Pflanzen und Tiere echt.' },
-        { text: '… weil drinnen die Stühle quietschen.', erz: false, info: 'Schlacke. Dagegen hilft ein Tropfen Öl – kein Grund für Unterricht draußen.' },
+        { text: '… weil die Lehrkraft draußen nicht alles sieht.', erz: false, info: 'Schlacke. Das ist kein guter Grund für Unterricht draußen.' },
         { text: '… weil Abwechslung Spaß beim Lernen macht.', erz: true, info: 'Erz! Auch das überzeugt.' }] },
   );
 
@@ -64,13 +64,13 @@
   ZI.FUNKENREGEN.push(
     { meinung: 'Wir sollten eine Leseecke einrichten, …',
       scharf: ['weil man dort in Ruhe lesen kann', 'weil wir dann mehr Bücher entdecken', 'weil man sich dort ausruhen kann', 'weil Lesen die Fantasie anregt'],
-      stumpf: ['weil eine Leseecke gut ist', 'weil Ecken eckig sind', 'weil ich das will', 'weil es Leseecken gibt'] },
+      stumpf: ['weil eine Leseecke gut ist', 'weil dann weniger Hausaufgaben kommen', 'weil ich das will', 'weil die Nachbarklasse auch eine hat'] },
     { meinung: 'Wir sollten mit dem Fahrrad zur Schule fahren, …',
       scharf: ['weil Radfahren fit hält', 'weil man dabei frische Luft bekommt', 'weil man nicht auf den Bus warten muss', 'weil ein Fahrrad keine Abgase macht'],
-      stumpf: ['weil Fahrräder Räder haben', 'weil Radfahren eben gut ist', 'weil mein Rad rot ist', 'weil man das so macht'] },
+      stumpf: ['weil mein Rad neu ist', 'weil Radfahren eben gut ist', 'weil Fahrräder günstig sind', 'weil man das so macht'] },
     { meinung: 'Wir sollten einen Klassenrat haben, …',
       scharf: ['weil wir Streit fair klären können', 'weil jeder mitbestimmen darf', 'weil wir lernen, einander zuzuhören', 'weil dort gute Ideen gesammelt werden'],
-      stumpf: ['weil ein Klassenrat ein Rat ist', 'weil das wichtig ist', 'weil heute Freitag ist', 'weil Stühle im Kreis stehen'] },
+      stumpf: ['weil die Nachbarklasse auch einen hat', 'weil das wichtig ist', 'weil wir dann eine Stunde weniger Mathe haben', 'weil man im Kreis sitzen darf'] },
   );
 
   /* ---------- KAPITEL 2 ---------- */
@@ -94,23 +94,23 @@
     { argument: 'Ich finde, dass wir Wasserspender in der Schule brauchen, weil man beim Lernen genug trinken muss.',
       optionen: [
         { text: 'Zum Beispiel kann ich mich nach einem Glas Wasser wieder besser konzentrieren.', ok: true, info: 'Richtig! Das Beispiel zeigt, wie Trinken beim Lernen hilft.' },
-        { text: 'Zum Beispiel ist Wasser nass.', ok: false, info: 'Das stimmt, zeigt aber nichts.' },
-        { text: 'Zum Beispiel trinke ich gern Kakao.', ok: false, info: 'Das passt nicht zur Begründung.' }] },
+        { text: 'Zum Beispiel ist Leitungswasser in Deutschland sauber.', ok: false, info: 'Das stimmt, zeigt aber nicht, wie Trinken beim Lernen hilft.' },
+        { text: 'Zum Beispiel haben viele Kinder eine Trinkflasche dabei.', ok: false, info: 'Das zeigt nicht, dass Trinken beim Lernen wichtig ist.' }] },
     { argument: 'Ich finde, dass wir einen Klassenrat brauchen, weil wir dort Streit fair klären können.',
       optionen: [
-        { text: 'Zum Beispiel ist der Klassenrat am Freitag.', ok: false, info: 'Der Termin zeigt nicht, dass Streit fair geklärt wird.' },
+        { text: 'Zum Beispiel sitzen wir im Klassenrat im Kreis.', ok: false, info: 'Der Sitzkreis zeigt nicht, dass Streit fair geklärt wird.' },
         { text: 'Zum Beispiel konnten im Klassenrat beide Seiten in Ruhe erzählen, wie der Streit um den Ball war.', ok: true, info: 'Richtig! So sieht faires Klären aus.' },
-        { text: 'Zum Beispiel streiten sich meine Geschwister oft.', ok: false, info: 'Das zeigt Streit, aber nicht, wie der Klassenrat hilft.' }] },
+        { text: 'Zum Beispiel gab es letzte Woche Streit um den Fußball.', ok: false, info: 'Das zeigt nur den Streit – nicht, wie der Klassenrat ihn fair klärt.' }] },
     { argument: 'Ich finde, dass man einen Fahrradhelm tragen sollte, weil er den Kopf schützt.',
       optionen: [
-        { text: 'Zum Beispiel ist mein Helm blau.', ok: false, info: 'Die Farbe zeigt nicht, dass er schützt.' },
-        { text: 'Zum Beispiel fahre ich gern schnell.', ok: false, info: 'Das zeigt nicht, dass der Helm schützt.' },
+        { text: 'Zum Beispiel tragen viele Profi-Radfahrer einen Helm.', ok: false, info: 'Dass viele ihn tragen, zeigt noch nicht, dass er den Kopf schützt.' },
+        { text: 'Zum Beispiel muss ein Helm gut passen.', ok: false, info: 'Ein Tipp zum Helm – aber kein Beispiel dafür, dass er schützt.' },
         { text: 'Zum Beispiel ist meine Cousine gestürzt, und der Helm hat ihren Kopf geschützt.', ok: true, info: 'Richtig! Ein Erlebnis, das die Begründung zeigt.' }] },
     { argument: 'Ich finde, dass wir eine Leseecke einrichten sollten, weil man dort in Ruhe lesen kann.',
       optionen: [
         { text: 'Zum Beispiel kann man sich dort mit einem Buch zurückziehen, wenn am Gruppentisch diskutiert wird.', ok: true, info: 'Richtig! Man kann es sich genau vorstellen.' },
-        { text: 'Zum Beispiel ist unsere Klasse im zweiten Stock.', ok: false, info: 'Das hat mit Ruhe zum Lesen nichts zu tun.' },
-        { text: 'Zum Beispiel lese ich gern Comics.', ok: false, info: 'Das sagt, was du gern liest, aber nicht, warum es dort ruhig ist.' }] },
+        { text: 'Zum Beispiel gibt es in der Bücherei viele spannende Bücher.', ok: false, info: 'Das zeigt nicht, dass man in der Leseecke RUHE hat.' },
+        { text: 'Zum Beispiel könnte die Leseecke bunte Kissen haben.', ok: false, info: 'Das beschreibt die Ecke – nicht, dass man dort in Ruhe lesen kann.' }] },
   );
 
   ZI.PUZZLE.push(
@@ -203,19 +203,19 @@
     { meinung: 'Wir sollten eine Leseecke einrichten,', haupt: '… weil man dort in Ruhe lesen kann.',
       stuetzen: [
         { text: 'Am Gruppentisch ist es oft zu laut zum Lesen.', ok: true },
-        { text: 'Mein Lieblingsbuch hat 200 Seiten.', ok: false, info: 'Das stützt das Argument nicht.' },
+        { text: 'In unserem Regal stehen viele Bücher.', ok: false, info: 'Bücher gibt es schon – das zeigt nicht, dass man in der Ecke RUHE hat.' },
         { text: 'In einer gemütlichen Ecke kann man sich besser auf die Geschichte konzentrieren.', ok: true },
         { text: 'Außerdem könnten wir dort auch spielen.', ok: false, info: 'Das ist ein neues Argument (Spielen) und keine Stütze.' }] },
     { meinung: 'Wir sollten mit dem Fahrrad zur Schule fahren,', haupt: '… weil Radfahren gesund ist.',
       stuetzen: [
-        { text: 'Mein Fahrrad hat sieben Gänge.', ok: false, info: 'Das stützt das Argument nicht.' },
+        { text: 'Viele Kinder haben ein Fahrrad.', ok: false, info: 'Das zeigt nicht, dass Radfahren gesund ist.' },
         { text: 'Beim Radfahren werden die Beinmuskeln kräftiger.', ok: true },
         { text: 'Außerdem spart man Geld für den Bus.', ok: false, info: 'Das ist ein neues Argument (Geld) und keine Stütze.' },
         { text: 'Wer sich viel bewegt, ist seltener krank.', ok: true }] },
     { meinung: 'Wir brauchen Wasserspender in der Schule,', haupt: '… weil wir dann genug trinken.',
       stuetzen: [
         { text: 'Viele Kinder vergessen ihre Trinkflasche zu Hause.', ok: true },
-        { text: 'Wasser ist durchsichtig.', ok: false, info: 'Das stützt das Argument nicht.' },
+        { text: 'Leitungswasser ist in Deutschland sauber.', ok: false, info: 'Das stimmt, zeigt aber nicht, dass wir dann mehr trinken.' },
         { text: 'Außerdem gibt es dann weniger Plastikflaschen.', ok: false, info: 'Das ist ein neues Argument (Umwelt) und keine Stütze.' },
         { text: 'Am Wasserspender kann man die Flasche jederzeit auffüllen.', ok: true }] },
   );
@@ -223,13 +223,13 @@
   ZI.BEISPIELREGEN.push(
     { meinung: 'Wir sollten eine Leseecke einrichten, weil man dort zur Ruhe kommt.',
       scharf: ['zum Beispiel kann ich mich dort nach dem Sport ausruhen', 'zum Beispiel kann man dort leise ein Comic lesen', 'zum Beispiel ist es dort ruhiger als am Gruppentisch', 'zum Beispiel kann ich dort nach einem Streit durchatmen'],
-      stumpf: ['zum Beispiel ist das Regal braun', 'zum Beispiel hat unser Raum vier Ecken', 'zum Beispiel haben wir in der dritten Stunde Mathe', 'zum Beispiel habe ich einen Bruder'] },
+      stumpf: ['zum Beispiel gibt es in der Bücherei viele Bücher', 'zum Beispiel könnten wir bunte Kissen hinlegen', 'zum Beispiel lese ich gern Abenteuerbücher', 'zum Beispiel hat die Nachbarklasse auch eine'] },
     { meinung: 'Wir sollten mit dem Fahrrad zur Schule fahren, weil das gut für die Umwelt ist.',
       scharf: ['zum Beispiel macht ein Fahrrad keine Abgase', 'zum Beispiel braucht ein Rad kein Benzin', 'zum Beispiel stehen dann weniger Autos vor der Schule', 'zum Beispiel bleibt die Luft auf dem Schulweg sauberer'],
-      stumpf: ['zum Beispiel hat mein Rad eine Klingel', 'zum Beispiel ist der Himmel blau', 'zum Beispiel fährt der Bus um acht', 'zum Beispiel mag ich Eis'] },
+      stumpf: ['zum Beispiel hält Radfahren fit', 'zum Beispiel macht Radfahren Spaß', 'zum Beispiel ist man mit dem Rad oft schneller', 'zum Beispiel ist man mit dem Rad an der frischen Luft'] },
     { meinung: 'Wir brauchen einen Klassenrat, weil wir dort Streit fair klären können.',
       scharf: ['zum Beispiel darf dort jede Seite erzählen, was passiert ist', 'zum Beispiel finden wir dort zusammen eine Lösung', 'zum Beispiel hört man sich dort gegenseitig zu', 'zum Beispiel einigen wir uns dort auf neue Pausenregeln'],
-      stumpf: ['zum Beispiel ist der Stuhlkreis rund', 'zum Beispiel ist freitags Sport', 'zum Beispiel hat die Tafel drei Flügel', 'zum Beispiel regnet es heute'] },
+      stumpf: ['zum Beispiel sitzen wir dabei im Kreis', 'zum Beispiel findet er jeden Freitag statt', 'zum Beispiel gibt es viel Streit um den Ball', 'zum Beispiel leitet die Lehrerin den Rat'] },
   );
 
   /* ---------- KAPITEL 3 ---------- */
@@ -344,15 +344,15 @@
       optionen: [
         { text: '„Und außerdem ist es dort gemütlich.“', ok: false, info: 'Das stützt die Meinung – es ist kein Gegenargument.' },
         { text: '„Aber dann ist im Klassenraum weniger Platz für die Gruppentische.“', ok: true, info: 'Genau! Ein echter Nachteil.' },
-        { text: '„Ich habe zu Hause ein Bücherregal.“', ok: false, info: 'Das hat mit der Frage nichts zu tun.' }] },
+        { text: '„Aber ich lese lieber zu Hause.“', ok: false, info: 'Das ist nur deine Vorliebe – kein Nachteil für die Klasse.' }] },
     { argument: '„Wir sollten mit dem Fahrrad zur Schule fahren, weil das gesund ist.“',
       optionen: [
         { text: '„Aber im Winter ist es oft glatt, und dann ist Radfahren gefährlich.“', ok: true, info: 'Genau! Ein wichtiger Nachteil.' },
         { text: '„Und man ist an der frischen Luft.“', ok: false, info: 'Das stützt die Meinung.' },
-        { text: '„Mein Rad hat eine Klingel.“', ok: false, info: 'Das hat mit der Frage nichts zu tun.' }] },
+        { text: '„Aber ich fahre lieber mit dem Roller.“', ok: false, info: 'Das ist nur dein Wunsch – kein Gegenargument zur Gesundheit.' }] },
     { argument: '„Wir sollten im Unterricht Kaugummi kauen dürfen, weil man sich dann besser konzentriert.“',
       optionen: [
-        { text: '„Ich mag Erdbeergeschmack.“', ok: false, info: 'Das hat mit der Frage nichts zu tun.' },
+        { text: '„Aber ich kaue nicht gern Kaugummi.“', ok: false, info: 'Das betrifft nur dich – kein Nachteil für die Klasse.' },
         { text: '„Und Kaugummi schmeckt gut.“', ok: false, info: 'Das stützt eher die Meinung.' },
         { text: '„Aber dann kleben bald überall Kaugummis unter den Tischen.“', ok: true, info: 'Genau! Ein echter Nachteil.' }] },
   );
@@ -412,13 +412,13 @@
     { kopf: '„Wir sollten eine Leseecke einrichten, weil eine Leseecke schön ist.“', optionen: [
       { text: '… weil eine Leseecke sehr, sehr schön ist.', ok: false, info: 'Das dreht sich im Kreis.' },
       { text: '… weil man sich dort in Ruhe auf ein Buch konzentrieren kann.', ok: true, info: 'Genau! Jetzt steht da, WARUM.' },
-      { text: '… weil ich das so will.', ok: false, info: 'Ein Wunsch ist keine Begründung.' }] },
+      { text: '… weil es in anderen Klassen auch eine gibt.', ok: false, info: 'Das erklärt nicht, wofür die Leseecke gut ist.' }] },
     { kopf: '„Man sollte Obst essen, weil Obst gut ist.“', optionen: [
       { text: '… weil Obst Vitamine hat, die uns gesund halten.', ok: true, info: 'Genau! Jetzt weiß man, wofür Obst gut ist.' },
       { text: '… weil Obst richtig gut ist.', ok: false, info: 'Das dreht sich im Kreis.' },
-      { text: '… weil Äpfel rund sind.', ok: false, info: 'Das hat mit der Meinung nichts zu tun.' }] },
+      { text: '… weil Obst süß schmeckt.', ok: false, info: 'Der Geschmack erklärt nicht, warum Obst gesund ist.' }] },
     { kopf: '„Wir sollten mehr draußen spielen, weil draußen besser ist.“', optionen: [
-      { text: '… weil der Schulhof draußen ist.', ok: false, info: 'Das stimmt, ist aber kein Grund.' },
+      { text: '… weil der Schulhof sehr groß ist.', ok: false, info: 'Die Größe erklärt nicht, wofür draußen spielen gut ist.' },
       { text: '… weil draußen viel besser ist als drinnen.', ok: false, info: 'Das dreht sich im Kreis.' },
       { text: '… weil wir uns draußen mehr bewegen und frische Luft bekommen.', ok: true, info: 'Genau! Jetzt ist die Begründung scharf.' }] },
   ]);
@@ -459,13 +459,13 @@
     { kopf: 'Ich finde, dass wir mit dem Fahrrad zur Schule fahren sollten, weil das gesund ist. Zum Beispiel trainiert man dabei die Beine.', optionen: [
       { text: 'Deshalb fahre ich lieber mit dem Bus.', ok: false, info: 'Der Schluss widerspricht der eigenen Meinung.' },
       { text: 'Deshalb bin ich dafür, mit dem Rad zur Schule zu fahren.', ok: true, info: 'Genau! Der Schluss sagt die Meinung noch einmal.' },
-      { text: 'Mein Rad ist neu.', ok: false, info: 'Das ist kein Schlusssatz, sondern nur eine Bemerkung.' }] },
+      { text: 'Deshalb sollten wir unsere Beine trainieren.', ok: false, info: 'Das greift nur das Beispiel auf – die Meinung war: mit dem Rad zur Schule.' }] },
     { kopf: 'Ich finde, dass wir einen Klassenrat brauchen, weil wir dort Streit fair klären. Zum Beispiel haben wir so den Streit um den Fußball gelöst.', optionen: [
       { text: 'Darum wünsche ich mir jede Woche einen Klassenrat.', ok: true, info: 'Richtig! Klar und passend.' },
       { text: 'Darum sollten wir nie mehr streiten.', ok: false, info: 'Das ist eine neue Forderung und rundet das Argument nicht ab.' },
-      { text: 'Fußball spielt man mit elf Leuten.', ok: false, info: 'Das passt nicht zum Thema.' }] },
+      { text: 'Deshalb sollten wir den Streit um den Fußball lösen.', ok: false, info: 'Das ist nur das Beispiel – die Meinung war: ein Klassenrat.' }] },
     { kopf: 'Ich finde, dass es Wasserspender geben sollte, weil man beim Lernen genug trinken muss. Zum Beispiel bekommt man sonst leicht Kopfschmerzen.', optionen: [
-      { text: 'Kopfschmerzen sind doof.', ok: false, info: 'Das rundet nichts ab.' },
+      { text: 'Deshalb sollten wir keine Kopfschmerzen bekommen.', ok: false, info: 'Das greift nur das Beispiel auf – die Meinung war: Wasserspender.' },
       { text: 'Deshalb sollte es auch Limo geben.', ok: false, info: 'Das ist ein neues Thema.' },
       { text: 'Deshalb bin ich für Wasserspender an unserer Schule.', ok: true, info: 'Genau! Der Schluss sagt die Meinung noch einmal.' }] },
   ]);
@@ -519,20 +519,20 @@
     { meinung: 'Ich finde, dass wir eine Leseecke einrichten sollten.', begruendungen: [
       { text: '… weil man sich dort in Ruhe auf ein Buch konzentrieren kann.', ok: true },
       { text: '… weil ich ein Lieblingskissen habe.', ok: false, info: 'Das gilt nur für dich.' },
-      { text: '… weil der Teppich grau ist.', ok: false, info: 'Das passt nicht zur Meinung.' },
+      { text: '… weil die Nachbarklasse auch eine hat.', ok: false, info: 'Was andere haben, ist kein guter Grund.' },
       { text: '… weil wir dann mehr Lust bekommen, neue Bücher zu entdecken.', ok: true },
       { text: '… weil dort vielleicht Comics liegen.', ok: false, info: 'Das ist nebensächlich.' }] },
     { meinung: 'Ich finde, dass wir öfter draußen Unterricht machen sollten.', begruendungen: [
       { text: '… weil ich gern draußen bin.', ok: false, info: 'Das gilt nur für dich.' },
       { text: '… weil frische Luft uns wach und aufmerksam macht.', ok: true },
-      { text: '… weil der Himmel heute blau ist.', ok: false, info: 'Das gilt nur für heute.' },
+      { text: '… weil wir draußen lauter sein dürfen.', ok: false, info: 'Das ist kein guter Grund für Unterricht.' },
       { text: '… weil man dann vielleicht ein Eis kaufen könnte.', ok: false, info: 'Das ist nebensächlich.' },
       { text: '… weil wir Pflanzen und Tiere draußen direkt beobachten können.', ok: true }] },
     { meinung: 'Ich finde, dass es Wasserspender in der Schule geben sollte.', begruendungen: [
       { text: '… weil man mit genug Wasser besser denken kann.', ok: true },
       { text: '… weil ich oft Durst habe.', ok: false, info: 'Das gilt nur für dich.' },
       { text: '… weil dann keiner mehr Plastikflaschen mitbringen muss.', ok: true },
-      { text: '… weil Wasserspender aus Metall sind.', ok: false, info: 'Das passt nicht zur Meinung.' },
+      { text: '… weil Wasserspender modern aussehen.', ok: false, info: 'Das ist nebensächlich.' },
       { text: '… weil es dann vielleicht auch Sprudel gibt.', ok: false, info: 'Das ist nebensächlich.' }] },
   ]);
 

@@ -143,15 +143,15 @@
       optionen: [
         { text: '„Aber mit Uniformen kann niemand mehr zeigen, was ihm gefällt.“', ok: true, info: 'Ein echtes Gegenargument: Es spricht gegen die Meinung.' },
         { text: '„Und außerdem sieht das richtig schick aus.“', ok: false, info: 'Das stützt die Meinung – es ist kein Gegenargument.' },
-        { text: '„Uniformen sind meistens blau.“', ok: false, info: 'Das hat mit der Frage nichts zu tun.' }] },
+        { text: '„Aber ich finde Uniformen hässlich.“', ok: false, info: 'Das ist nur dein Geschmack – kein Gegenargument zur Begründung.' }] },
     { argument: '„Der Freitag sollte schulfrei sein, weil wir uns dann besser erholen können.“',
       optionen: [
         { text: '„Ja, und dann hätten wir ein langes Wochenende.“', ok: false, info: 'Das stützt die Meinung – es ist kein Gegenargument.' },
         { text: '„Aber dann müssten wir an den anderen Tagen viel länger in der Schule bleiben.“', ok: true, info: 'Genau! Ein Nachteil, an den man denken muss.' },
-        { text: '„Freitag ist mein Lieblingstag.“', ok: false, info: 'Das ist nur deine Vorliebe.' }] },
+        { text: '„Aber ich gehe freitags gern zur Schule.“', ok: false, info: 'Das sagt nur, was du magst. Ein Gegenargument zeigt einen Nachteil für alle.' }] },
     { argument: '„Wir sollten in der 5. Klasse viel mit iPads arbeiten, weil man damit gut recherchieren kann.“',
       optionen: [
-        { text: '„Mein Bruder hat auch ein iPad.“', ok: false, info: 'Das spricht weder dafür noch dagegen.' },
+        { text: '„Aber ich arbeite lieber mit Papier.“', ok: false, info: 'Das ist nur deine Vorliebe – kein Nachteil, der für alle gilt.' },
         { text: '„Und man kann damit auch Videos schauen.“', ok: false, info: 'Das ist kein Gegenargument.' },
         { text: '„Aber wer nur auf dem Bildschirm arbeitet, übt weniger, mit der Hand zu schreiben.“', ok: true, info: 'Richtig! Ein Gegenargument mit einem wichtigen Nachteil.' }] },
     { argument: '„Haustiere sollten in der Schule erlaubt sein, weil sie die Kinder beruhigen.“',
@@ -162,7 +162,7 @@
     { argument: '„Die Schule sollte erst um 9:30 Uhr beginnen, weil wir dann ausgeschlafen sind.“',
       optionen: [
         { text: '„Und dann kann man in Ruhe frühstücken.“', ok: false, info: 'Das stützt die Meinung – es ist kein Gegenargument.' },
-        { text: '„Ich stehe sowieso immer früh auf.“', ok: false, info: 'Das gilt nur für dich und spricht nicht gegen die Meinung.' },
+        { text: '„Aber ich bin morgens immer schon wach.“', ok: false, info: 'Das gilt nur für dich – viele andere sind morgens müde.' },
         { text: '„Aber dann ist die Schule erst spät aus, und für Hobbys bleibt weniger Zeit.“', ok: true, info: 'Stark! Ein Nachteil für alle Kinder.' }] },
   ];
 

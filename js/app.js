@@ -183,6 +183,46 @@
 
   function aktuellerZwerg() { return ZI.ZWERGE.find((z) => z.nr === stand.zwerg); }
 
+  /* =========================================================
+     ORTSWECHSEL – kurze Szene beim Betreten wichtiger Orte (ca. 1,8 s, kein Überspringen nötig)
+     art: 'schmiede' | 'stollen' | 'gemeinsam' | 'rat'
+     ========================================================= */
+  const SZENEN = {
+    schmiede: { hg: 'schmiede-hintergrund', deko: 'funken' },
+    stollen: { hg: 'stollen-hintergrund', deko: 'abstieg' },
+    gemeinsam: { hg: 'stollen-hintergrund', deko: 'tor' },
+    rat: { hg: 'zwergenrat-hintergrund', deko: 'feuer' },
+  };
+  function partnerZwerg() {
+    const z = aktuellerZwerg();
+    const andere = ZI.ZWERGE.filter((x) => x.nr !== (z && z.nr) && stand.zwergFrei(x.nr));
+    return andere.length ? andere[(z ? z.nr : 0) % andere.length] : ZI.ZWERGE.find((x) => x.nr !== (z && z.nr));
+  }
+  function schmiedeBetreten(begruessen) {
+    const z = aktuellerZwerg();
+    uebergang('schmiede', z ? z.name + ' betritt die Schmiede.' : 'Auf in die Schmiede!', () => zeigeHalle(begruessen));
+  }
+  function uebergang(art, text, danach) {
+    const sz = SZENEN[art] || SZENEN.stollen;
+    const ruhig = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const dauer = ruhig ? 700 : 1800;
+    const z = aktuellerZwerg();
+    const figuren = [z ? h('div', { class: 'ue-zwerg ue-eigen' }, bild(z.datei, z.name)) : null];
+    if (art === 'gemeinsam') { const p = partnerZwerg(); if (p) figuren.push(h('div', { class: 'ue-zwerg ue-partner' }, bild(p.datei, p.name))); }
+    const ov = h('div', { class: 'uebergang ue-' + art + (ruhig ? ' ruhig' : ''), 'aria-live': 'polite', role: 'status' },
+      h('div', { class: 'ue-hg' }, bild(sz.hg, '')),
+      h('div', { class: 'ue-dunkel' }),
+      sz.deko === 'tor' ? h('div', { class: 'ue-tor' }, h('span', { class: 'ue-torflügel links' }), h('span', { class: 'ue-torflügel rechts' }), h('span', { class: 'ue-torlicht' })) : null,
+      sz.deko === 'tor' || sz.deko === 'abstieg' ? [h('div', { class: 'ue-laterne links' }, bild('laterne', '')), h('div', { class: 'ue-laterne rechts' }, bild('laterne', ''))] : null,
+      sz.deko === 'feuer' ? h('div', { class: 'ue-feuer' }, bild('lagerfeuer', '')) : null,
+      sz.deko === 'funken' ? h('div', { class: 'ue-funken' }, ...Array.from({ length: 14 }, (_, i) => h('span', { style: { left: (8 + i * 6.5) + '%', animationDelay: (i % 5) * 0.15 + 's' } }))) : null,
+      h('div', { class: 'ue-figuren' }, ...figuren),
+      h('div', { class: 'ue-text' }, text));
+    document.body.append(ov);
+    ZI.ton.plopp();
+    setTimeout(() => { danach && danach(); ov.classList.add('aus'); setTimeout(() => ov.remove(), 400); }, dauer);
+  }
+
   /* ---------- Gemeinsame Bausteine ---------- */
   /* ---------- Vollbild (iPad-Safari und Laptop) ---------- */
   const kannVollbild = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
@@ -240,7 +280,7 @@
     if (alt) {
       const z = ZI.ZWERGE.find((d) => d.nr === alt.zwerg);
       weiter = h('button', { class: 'pergament weiter-karte', style: { border: '3px solid #8a6438' },
-        onclick: () => { stand = alt; zeigeHalle(); } },
+        onclick: () => { stand = alt; schmiedeBetreten(); } },
         avatar(alt.zwerg),
         h('div', { style: { textAlign: 'left' } },
           h('div', { style: { fontFamily: 'var(--titel)', fontSize: '24px' } }, 'Weiterspielen als ' + z.name),
@@ -331,7 +371,7 @@
         waehleKarte(null, (karte) => {
           stand = new ZI.Stand({ zwerg: nr, id: karte });
           speichern();
-          zeigeHalle(true);
+          schmiedeBetreten(true);
         }, () => zeigeWahl(true));
       } else {
         stand.zwerg = gewaehlt; speichern(); zeigeHalle();
@@ -373,7 +413,7 @@
         h('div', { class: 'gross-bild' }, bild(z.datei, z.name)),
         h('h2', null, 'Willkommen zurück, ' + z.name + '!'),
         h('p', { style: { margin: 0 } }, 'Dein Fortschritt ist wieder da.'),
-        h('button', { class: 'knopf', onclick: () => { f.schliessen(); zeigeHalle(); } }, 'Zur Schmiede'),
+        h('button', { class: 'knopf', onclick: () => { f.schliessen(); schmiedeBetreten(); } }, 'Zur Schmiede'),
       ]);
     };
     eingabe.addEventListener('keydown', (e) => { if (e.key === 'Enter') pruefen(); });
@@ -407,7 +447,7 @@
       tief: [
         { name: 'Fehlerjagd', info: 'Der Fehlerkobold hat Sätze verbogen. Finde den richtigen.', icon: ['icon-fehlerjagd', 'kobold-frech'], spiel: () => spielFehlerjagd() },
         { name: 'Beispiel-Edelstein', info: 'Finde das Beispiel, das die Begründung stützt.', icon: ['icon-beispiel', 'edelstein'], spiel: () => spielBeispiele() },
-        { name: 'Meisterstück', info: 'Argumentiere laut – dein Partner prüft.', icon: ['icon-meisterstueck', 'meisterin-erklaert'], spiel: () => spielMeisterstueck(1) },
+        { name: 'Meisterstück', gemeinschaft: true, info: 'Jeder sagt 3 Argumente. Der andere prüft.', icon: ['icon-meisterstueck', 'meisterin-erklaert'], spiel: () => spielMeisterstueck(1) },
       ],
       bonus: { name: 'Funkenregen', info: 'Fang die scharfen Begründungen, bevor sie verglühen! Bis zu 3 Sterne.', icon: ['icon-funkenregen', 'stern'], spiel: () => spielFunkenregen(ZI.FUNKENREGEN, 'Funkenregen', 'Oben steht eine Meinung. Von oben regnen Begründungen. Tippe nur die scharfen Begründungen an! Stumpfe kosten einen Punkt.') },
     },
@@ -415,12 +455,12 @@
       kern: [
         { name: 'Argument-Puzzle', info: 'Setz Meinung, Begründung und Beispiel richtig zusammen.', icon: ['icon-puzzle', 'pergament'], spiel: () => spielPuzzle(), vor: 'k2s1' },
         { name: 'Motor oder Bremse?', info: 'Was bringt ein Gespräch weiter, was stoppt es?', icon: ['icon-motor-bremse', 'schleifstein'], spiel: () => spielMotor(), vor: 'k2s2' },
-        { name: 'Hör-Stollen', info: 'Zu zweit: Dein Partner liest vor, du hörst genau zu.', icon: ['icon-hoeren', 'laterne'], spiel: () => spielHoeren(), vor: 'k2s3' },
+        { name: 'Hör-Stollen', zuZweit: true, info: 'Dein Partner liest vor, du hörst genau zu.', icon: ['icon-hoeren', 'laterne'], spiel: () => spielHoeren(), vor: 'k2s3' },
       ],
       tief: [
         { name: 'Kobold-Kampf', info: 'Der Fehlerkobold ist zurück! Besiege ihn mit allem, was du kannst.', icon: ['icon-kobold-kampf', 'kobold-chaos'], spiel: () => spielBoss() },
         { name: 'Argument-Kette', info: 'Welche Stützen machen ein Argument stärker?', icon: ['icon-kette', 'eisen-gluehend'], spiel: () => spielKette() },
-        { name: 'Meisterstück II', info: 'Laut argumentieren mit Meinung, Begründung und Beispiel.', icon: ['icon-meisterstueck2', 'meisterin-jubelt'], spiel: () => spielMeisterstueck(2) },
+        { name: 'Meisterstück II', gemeinschaft: true, info: 'Jeder sagt 3 Argumente mit Beispiel. Der andere prüft.', icon: ['icon-meisterstueck2', 'meisterin-jubelt'], spiel: () => spielMeisterstueck(2) },
       ],
       bonus: { name: 'Beispiel-Regen', info: 'Fang die Beispiele, die wirklich passen! Bis zu 3 Sterne.', icon: ['icon-beispielregen', 'edelstein'], spiel: () => spielFunkenregen(ZI.BEISPIELREGEN, 'Beispiel-Regen', 'Oben stehen eine Meinung und eine Begründung. Von oben regnen Beispiele. Tippe nur die Beispiele an, die zur Begründung passen! Unpassende kosten einen Punkt.') },
     },
@@ -433,7 +473,7 @@
       tief: [
         { name: 'Gegenargument-Schmiede', info: 'Finde das Argument, das dagegen spricht.', icon: ['icon-gegenargument', 'axt-scharf'], spiel: () => spielGegenargument() },
         { name: 'Wer überzeugt wen?', info: 'Das beste Argument passt zur Person.', icon: ['icon-situation', 'zwerg-10-amara'], spiel: () => spielSituation() },
-        { name: 'Streitgespräch', info: 'Zu zweit: Meinung, Zuhören und Gegenargument.', icon: ['icon-streitgespraech', 'meisterin-jubelt'], spiel: () => spielMeisterstueck(3) },
+        { name: 'Streitgespräch', gemeinschaft: true, info: 'Meinung, Zuhören und Gegenargument – mit Rollenwechsel.', icon: ['icon-streitgespraech', 'meisterin-jubelt'], spiel: () => spielMeisterstueck(3) },
       ],
       bonus: { name: 'Sprecherwechsel', info: 'Steig im richtigen Moment ein – ohne zu unterbrechen. Bis zu 3 Sterne.', icon: ['icon-sprecherwechsel', 'stern'], spiel: () => spielSprecherwechsel() },
     },
@@ -467,15 +507,21 @@
         krone ? h('div', { class: 'krone-marke', 'aria-label': 'Goldene Krone: fehlerfrei geschafft' }, ZI.bildOder('krone', 'Krone', icon.krone())) : null,
         h('div', { class: 'icon' }, bild(def.icon, def.name)),
         h('div', null,
+          def.gemeinschaft ? h('div', { class: 'st-marke gemeinschaft' }, 'Gemeinschaftsstollen') : def.zuZweit ? h('div', { class: 'st-marke' }, 'Zu zweit') : null,
           h('div', { class: 'st-name' }, (i !== undefined ? i + 1 + '. ' : '') + def.name),
           h('div', { class: 'st-info' }, gesperrt ? sperrText : def.info),
+          def.gemeinschaft && !gesperrt ? h('div', { class: 'st-info st-gemeinsam' }, 'Diesen Stollen spielst du gemeinsam mit einem anderen Zwerg. Jeder auf seinem eigenen iPad.') : null,
           rohstoff && !gesperrt ? h('div', { class: 'st-info', style: { fontWeight: 700 } }, 'Bringt: ' + rohstoff) : null),
         geschafft ? h('div', { class: 'haken' }, icon.haken()) : null,
         gesperrt ? h('div', { class: 'schloss', style: { top: '8px', right: '8px', width: '28px', height: '28px' } }, icon.schloss()) : null);
       b.addEventListener('click', () => {
         if (gesperrt) { ZI.meldung(sperrText); ZI.ton.falsch(); return; }
         K = k; letzterReiter = k; aktStation = { k, art, i: idx };
-        if (def.vor && ZI.VORMACHEN[def.vor]) zeigeVormachen(ZI.VORMACHEN[def.vor], def.spiel); else def.spiel();
+        const los = () => { if (def.vor && ZI.VORMACHEN[def.vor]) zeigeVormachen(ZI.VORMACHEN[def.vor], def.spiel); else def.spiel(); };
+        // Ortswechsel: kurze Szene beim Betreten (Gemeinschaftsstollen: zwei Zwerge; Tiefe Stollen: Abstieg)
+        if (def.gemeinschaft) uebergang('gemeinsam', 'Gemeinsam kommt ihr tiefer.', los);
+        else if (art === 'tief') uebergang('stollen', 'Tiefer in den Stollen …', los);
+        else los();
       });
       return b;
     }
@@ -590,9 +636,13 @@
     let wsDatei = werkstueck;
     const ws = h('div', { class: 'werkstueck' }, bild(werkstueck, 'Werkstück'));
     const hammer = h('div', { class: 'hammer' }, bild('hammer', 'Hammer'));
+    // Werkstück und Hammer hängen am Amboss: so passen Größe und Lage auf jedem Bildschirm
     const platz = h('div', { class: 'amboss-platz' },
-      h('div', { class: 'amboss' }, bild('amboss', 'Amboss')), ws, hammer);
+      h('div', { class: 'amboss' }, bild('amboss', 'Amboss'), ws, hammer));
     const el = h('div', { class: 'buehne' }, blase, h('div', { class: 'meisterin-reihe' }, meisterinBox, platz));
+    // Was liegt wo? Metall auf dem Amboss, Werkzeug/Truhe daneben, Figuren neben dem Amboss
+    const artVon = (d) => (/^(eisen-|runenplatte)/.test(d) ? 'metall' : /^(kobold|zwerg-|meisterin)/.test(d) ? 'figur' : 'objekt');
+    platz.dataset.art = artVon(werkstueck);
 
     return {
       el,
@@ -601,7 +651,7 @@
         ZI.setze(meisterinBox, bild('meisterin-' + (pose || 'erklaert'), 'Meisterin Hammerlind'));
       },
       person(datei) {
-        platz.classList.add('person');
+        platz.classList.add('person'); platz.dataset.art = 'figur';
         if (datei === wsDatei) return;
         wsDatei = datei;
         ws.classList.remove('neu'); void ws.offsetWidth;
@@ -609,7 +659,7 @@
         ws.classList.add('neu');
       },
       werkstueck(datei) {
-        platz.classList.remove('person');
+        platz.classList.remove('person'); platz.dataset.art = artVon(datei);
         if (datei === wsDatei) return;
         wsDatei = datei;
         ws.classList.remove('neu'); void ws.offsetWidth;
@@ -763,7 +813,7 @@
         rahmen.fortschritt(nr);
         if (nr < items.length) zeigeItem(); else ende();
       });
-      const opts = fest ? it.optionen.slice() : mischen(it.optionen);
+      const opts = (it.fest !== undefined ? it.fest : fest) ? it.optionen.slice() : mischen(it.optionen);
       opts.forEach((o) => {
         const b = h('button', { class: 'option' }, o.text);
         b.addEventListener('click', () => {
@@ -821,12 +871,28 @@
     });
   }
 
+  /* ---------- Bausteine für längere Tiefe Stollen (8–12 Aufgaben, leicht ansteigend) ---------- */
+  const TEILE = ['Meinung', 'Begründung', 'Beispiel'];
+  const aufgabeTeil = (it, frage) => ({ frage: frage || 'Welcher Teil des Arguments ist das?', kopf: it.satz, fest: true,
+    optionen: TEILE.map((t) => ({ text: t, ok: t === it.teil, info: ZI.TEIL_INFO[t] })) });
+  const aufgabeFehler = (it) => ({ frage: 'Welcher Satz ist richtig?', kopf: '', optionen: it.saetze.map((o) => ({ text: o.text, ok: o.ok, info: o.info })) });
+  const aufgabeBeispiel = (it) => ({ frage: 'Welches Beispiel stützt genau diese Begründung?', kopf: it.argument, optionen: it.optionen });
+  const aufgabeScharf = (it) => ({ frage: 'Welche Begründung ist scharf?', kopf: it.meinung, optionen: it.optionen.map((o) => ({ text: o.text, ok: o.scharf, info: o.info })) });
+  const aufgabeLuecke = (it) => ({ frage: 'Welches Wort passt in die Lücke?', kopf: it.kopf, optionen: it.optionen, fest: true });
+  const aufgabeArt = (it) => ({ frage: 'Wie reagiert die zweite Person?', vorher: it.vorher, kopf: it.antwort, fest: true,
+    optionen: ZI.ARTEN.map((a) => ({ text: a, ok: a === it.art, info: ZI.ARTEN_INFO[a] })) });
+  const aufgabeGegen = (it) => ({ frage: 'Welcher Satz ist ein echtes Gegenargument?', kopf: it.argument, optionen: it.optionen });
+  const aufgabeSituation = (it) => ({ frage: 'Welches Argument überzeugt diese Person am besten?', kopf: it.situation, optionen: it.optionen });
+  const aufgabeEinwand = (fall, e) => ({ frage: e.wer + ' hat einen Einwand. Was antwortest du?', vorher: fall.meinung, kopf: e.wer + ': ' + e.einwand, ws: e.datei, optionen: e.optionen });
+
   /* Tiefer Stollen 1 */
   function spielFehlerjagd() {
     auswahlSpiel({
       titel: 'Fehlerjagd',
       frageText: 'Der Fehlerkobold hat zwei Sätze verbogen. Welcher Satz ist richtig?',
-      items: mischen(ZI.FEHLERJAGD).slice(0, 5).map((it) => ({ kopf: '', optionen: it.saetze.map((o) => ({ text: o.text, ok: o.ok, info: o.info })) })),
+      // erst Lückenwörter (leichter), dann ganze Sätze prüfen
+      items: [...mischen(ZI.bauUebung('huette2').items).slice(0, 3).map(aufgabeLuecke),
+        ...mischen(ZI.FEHLERJAGD).slice(0, 7).map((it) => Object.assign(aufgabeFehler(it), { frage: 'Der Fehlerkobold hat zwei Sätze verbogen. Welcher Satz ist richtig?' }))],
       tipp: ZI.TIPPS.fehler,
       wsVorher: 'kobold-chaos', wsNachher: 'kobold-besiegt',
       start: 'Achtung, der Fehlerkobold war hier! Prüfe Komma und Verb.',
@@ -839,8 +905,10 @@
   function spielBeispiele() {
     auswahlSpiel({
       titel: 'Beispiel-Edelstein',
-      frageText: 'Welches Beispiel macht das Argument noch stärker?',
-      items: mischen(ZI.BEISPIELE).slice(0, 4).map((it) => ({ kopf: it.argument, optionen: it.optionen })),
+      frageText: 'Welches Beispiel stützt genau diese Begründung?',
+      // erst Beispiele erkennen, dann das passende Beispiel auswählen
+      items: [...mischen(ZI.TEIL_ERKENNEN.filter((t) => t.teil !== 'Meinung')).slice(0, 2).map((it) => aufgabeTeil(it, 'Ist das eine Begründung oder ein Beispiel?')),
+        ...mischen(ZI.BEISPIELE).slice(0, 8).map(aufgabeBeispiel)],
       tipp: ZI.TIPPS.beispiel,
       wsVorher: 'eisen-roh', wsNachher: 'edelstein',
       start: 'Ein gutes Beispiel zeigt, dass deine Begründung stimmt – wie ein Edelstein im Griff deiner Axt.',
@@ -853,7 +921,7 @@
      Sortierspiel: jede Karte in eine von zwei Gruppen
      (Erz oder Schlacke? · Motor oder Bremse?)
      ========================================================= */
-  function sortierSpiel({ titel, runden, jaText: jaT, neinText: neinT, frageText: frageT, tipp, start, wsVorher, wsNachher, rundeFertig: rundeF, falschJa: falschJ, falschNein: falschN, ende }) {
+  function sortierSpiel({ titel, runden, jaText: jaT, neinText: neinT, jaUnter: jaU, neinUnter: neinU, erklaerung: erklT, frageText: frageT, tipp, start, wsVorher, wsNachher, rundeFertig: rundeF, falschJa: falschJ, falschNein: falschN, ende }) {
     const bue = buehne(wsVorher);
     const box = h('div', { class: 'aufgabe pergament auf-pergament' });
     const rahmen = spielRahmen({ titel, anzahl: runden.length, aufgabe: box, bue });
@@ -872,8 +940,11 @@
       const rueck = h('div');
       const koerbe = h('div', { class: 'koerbe' });
       const knoepfe = h('div', { class: 'erz-knoepfe' });
-      const jaKnopf = h('button', { class: 'knopf' }, jaText);
-      const neinKnopf = h('button', { class: 'knopf schlacke' }, neinText);
+      // eigene Runden-Beschriftung ersetzt auch Unterzeile und Begriffserklärung
+      const jaUnter = rd.jaText ? rd.jaUnter : jaU; const neinUnter = rd.jaText ? rd.neinUnter : neinU;
+      const erklaerung = rd.jaText ? null : erklT;
+      const jaKnopf = h('button', { class: 'knopf' }, jaText, jaUnter ? h('small', { class: 'knopf-unter' }, jaUnter) : null);
+      const neinKnopf = h('button', { class: 'knopf schlacke' }, neinText, neinUnter ? h('small', { class: 'knopf-unter' }, neinUnter) : null);
       knoepfe.append(jaKnopf, neinKnopf);
       let sperre = false;
 
@@ -912,6 +983,7 @@
 
       ZI.setze(box,
         aufgabenKopf(frageText, tipp, bue),
+        erklaerung ? h('div', { class: 'begriffe' }, ...erklaerung.map(([wort, satz, art]) => h('div', { class: 'begriff ' + (art || '') }, h('b', null, wort), ' ', satz))) : null,
         h('div', { class: 'meinung' }, rd.kopf),
         karteBox, knoepfe, rueck, koerbe);
       zeigeKarte();
@@ -924,7 +996,12 @@
     sortierSpiel({
       titel: 'Erz oder Schlacke?',
       runden: [ZI.zufall(ZI.BEGRUENDET_RUNDEN)].concat(mischen(ZI.ERZ_SCHLACKE).slice(0, 2).map((rd) => ({ kopf: rd.meinung, karten: rd.gruende.map((g) => ({ text: g.text, ja: g.erz, info: g.info })) }))),
-      jaText: 'Erz', neinText: 'Schlacke',
+      jaText: 'Erz', neinText: 'Schlacke', jaUnter: 'passt', neinUnter: 'passt nicht',
+      erklaerung: [
+        ['Erz =', 'Die Begründung passt zur Meinung. Sie ist ein guter Grund.', 'erz'],
+        ['Schlacke =', 'Die Begründung passt nicht. Oder sie ist kein richtiger Grund.', 'schlacke'],
+        ['', 'Beim Schmieden ist Erz wertvoll. Schlacke ist der Rest.', 'bild'],
+      ],
       frageText: 'Passt die Begründung zur Meinung? Erz oder Schlacke?',
       tipp: ZI.TIPPS.erz,
       start: 'Zuerst prüfen wir: Ist eine Meinung überhaupt begründet? Danach trennen wir Erz – passende Begründungen – von Schlacke.',
@@ -966,9 +1043,14 @@
     let muendlichGesagt = false;
 
     function item() {
-      const it = items[nr];
+      // Satzzeichen gehören nicht zu einem Baustein – sonst verrät der Punkt das Satzende
+      const roh = items[nr];
+      const ohne = (w) => w.replace(/[.!?]$/, '');
+      const letzter = roh.loesungen[0][roh.loesungen[0].length - 1];
+      const punkt = /[.!?]$/.test(letzter) ? letzter.slice(-1) : '.';
+      const it = Object.assign({}, roh, { kacheln: roh.kacheln.map(ohne), verb: ohne(roh.verb), loesungen: roh.loesungen.map((l) => l.map(ohne)) });
       let gelegt = [];
-      let vorrat = mischen(it.kacheln);
+      let vorrat = ZI.mischenSatz(it.kacheln, it.loesungen);
       let fehler = 0;
       let fertig = false;
       bue.werkstueck('eisen-roh');
@@ -991,7 +1073,8 @@
             b.addEventListener('click', () => { if (fertig) return; gelegt.splice(i, 1); vorrat.push(w); ZI.ton.plopp(); ZI.setze(rueck, ); zeichne(); });
             return b;
           }),
-          ...vorrat.map(() => h('div', { class: 'platte leer', 'aria-hidden': 'true' })));
+          ...vorrat.map(() => h('div', { class: 'platte leer', 'aria-hidden': 'true' })),
+          h('div', { class: 'satzpunkt', 'aria-hidden': 'true' }, punkt));
         ZI.setze(vorratBox, ...vorrat.map((w, i) => {
           const b = h('button', { class: 'platte' }, w);
           b.addEventListener('click', () => {
@@ -1009,11 +1092,11 @@
         if (ok) {
           fertig = true;
           ZI.ton.richtig();
-          const satz = it.haupt + ' ' + it.bindewort + ' ' + gelegt.join(' ');
+          const satz = it.haupt + ' ' + it.bindewort + ' ' + gelegt.join(' ') + punkt;
           ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, h('b', null, zufall(ZI.LOB) + ' '), satz));
           bue.sage(it.bindewort === 'denn' ? 'Richtig: Nach „denn“ steht das Verb an zweiter Stelle.' : 'Richtig: Nach „' + it.bindewort + '“ steht das Verb am Ende.', 'jubelt');
           bue.werkstueck('eisen-gluehend');
-          setTimeout(() => bue.schlag(() => bue.werkstueck('hammer')), 400);
+          setTimeout(() => bue.schlag(() => bue.werkstueck('runenplatte')), 400);
           zeichne(true);
           ZI.setze(vorratBox, );
           weiter.style.display = '';
@@ -1056,97 +1139,190 @@
   /* =========================================================
      Tiefer Stollen 3: Meisterstück (mündlich mit Partner)
      ========================================================= */
+  /* =========================================================
+     GEMEINSCHAFTSSTOLLEN (Meisterstück, Meisterstück II, Streitgespräch)
+     Jedes Kind spielt auf seinem EIGENEN iPad. Keine Verbindung zwischen den Geräten nötig:
+     Beide öffnen denselben Stollen, wählen ihre Rolle und bekommen den Abschluss jeweils selbst.
+     ========================================================= */
   function spielMeisterstueck(stufe) {
     const zwei = stufe === 2;
-    const drei = stufe === 3;
-    const tippText = drei ? ZI.TIPPS.meister3 : zwei ? ZI.TIPPS.meister2 : ZI.TIPPS.meister;
+    const streit = stufe === 3;
+    const titel = streit ? 'Streitgespräch' : zwei ? 'Meisterstück II' : 'Meisterstück';
+    const tippText = streit ? ZI.TIPPS.meister3 : zwei ? ZI.TIPPS.meister2 : ZI.TIPPS.meister;
+    const PRO = streit ? 1 : 3; // Argumente pro Person
     const bue = buehne('eisen-roh');
     const box = h('div', { class: 'aufgabe pergament auf-pergament' });
-    const rahmen = spielRahmen({ titel: drei ? 'Streitgespräch' : zwei ? 'Meisterstück II' : 'Meisterstück', anzahl: 4, aufgabe: box, bue });
-    let thema = null; let satz = null;
+    const rahmen = spielRahmen({ titel, anzahl: PRO * 2, aufgabe: box, bue });
+    let rolle = null;     // 'A' spricht zuerst, 'B' prüft zuerst
+    let erledigt = 0;     // Schritte (sprechen + prüfen) insgesamt
+    const genutzt = new Set();
 
-    function schritt1() {
-      rahmen.fortschritt(0);
-      bue.sage(drei ? 'Für das Streitgespräch braucht ihr zwei: Partner A und Partner B. Wählt zuerst ein Thema.' : 'Für ein Meisterstück brauchst du eine Partnerin oder einen Partner. Wähle zuerst ein Thema.', 'erklaert');
-      const angebot = mischen(ZI.MEISTER_THEMEN).slice(0, 4);
-      ZI.setze(box, 
-        aufgabenKopf('Worüber möchtest du argumentieren?', tippText, bue),
-        h('div', { class: 'themen' }, angebot.map((t) => h('button', { class: 'option', onclick: () => { thema = t; ZI.ton.plopp(); schritt2(); } }, t.frage))));
+    const kriterien = streit ? [
+      'Die Meinung hatte eine Begründung („…, weil …“).',
+      'Die Antwort hat wiederholt, was gesagt wurde („Du sagst, dass …“).',
+      'Die Antwort hatte ein Gegenargument („Aber …“).',
+      'Wir haben uns ausreden lassen und waren freundlich.',
+    ] : [
+      'Ich habe eine Meinung gehört („Ich finde, dass …“).',
+      'Die Begründung passt zur Meinung.',
+      'Die Begründung ist verständlich. Sie erklärt, WARUM.',
+      ...(zwei ? ['Es gab ein passendes Beispiel („Zum Beispiel …“).'] : []),
+    ];
+
+    function kopfZeile(text, art) {
+      return h('div', { class: 'gem-kopf ' + (art || '') }, text);
     }
-    function schritt2() {
-      rahmen.fortschritt(1);
-      bue.sage(drei ? 'Partner A: Bist du dafür oder dagegen? Partner B vertritt dann die andere Seite.' : 'Bist du dafür oder dagegen? Beides ist erlaubt – Hauptsache, du begründest gut.', 'erklaert');
-      ZI.setze(box, 
-        aufgabenKopf('Deine Meinung:', tippText, bue),
+
+    /* 1) Vorbereitung: Partner suchen, eigenes iPad, gleicher Stollen */
+    function vorbereiten() {
+      bue.sage('Dieser Stollen wird nur zu zweit gemeistert.', 'erklaert');
+      ZI.setze(box,
+        kopfZeile('Gemeinschaftsstollen', 'marke'),
+        h('h2', { class: 'gem-titel' }, 'Bevor es losgeht'),
+        h('ol', { class: 'gem-liste' },
+          h('li', null, 'Such dir einen Partner.'),
+          h('li', null, 'Jeder nimmt sein eigenes iPad.'),
+          h('li', null, 'Ihr öffnet beide diesen Stollen: „' + titel + '“.')),
+        h('p', { class: 'gem-text' }, 'Ihr spielt gemeinsam. Aber jeder bekommt den Stollen auf seinem eigenen iPad.'),
+        h('button', { class: 'knopf', style: { alignSelf: 'flex-end' }, onclick: rolleWaehlen }, 'Wir sind bereit'));
+    }
+
+    /* 2) Rolle wählen */
+    function rolleWaehlen() {
+      bue.sage('Macht aus, wer zuerst spricht.', 'erklaert');
+      const karte = (r, kopf, text) => h('button', { class: 'gem-rolle pergament auf-pergament', onclick: () => { rolle = r; ZI.ton.plopp(); zusammen(); } },
+        h('span', { class: 'gem-rolle-buchstabe' }, r), h('b', null, kopf), h('span', null, text));
+      ZI.setze(box,
+        kopfZeile('Wer bist du?', 'marke'),
+        h('p', { class: 'gem-text' }, streit
+          ? 'Person A sagt zuerst eine Meinung. Person B antwortet mit einem Gegenargument. Danach tauscht ihr.'
+          : 'Person A spricht zuerst. Person B hört zu und prüft. Danach tauscht ihr.'),
+        h('div', { class: 'gem-rollen' },
+          karte('A', 'Ich bin Person A', streit ? 'Ich sage zuerst meine Meinung.' : 'Ich spreche zuerst.'),
+          karte('B', 'Ich bin Person B', streit ? 'Ich antworte zuerst mit „Aber …“.' : 'Ich höre zuerst zu und prüfe.')),
+        h('p', { class: 'gem-hinweis' }, 'Wichtig: Einer ist A, der andere ist B.'));
+    }
+
+    /* 3) „Ab jetzt arbeitet ihr zusammen.“ */
+    function zusammen() {
+      bue.sage('Ab jetzt arbeitet ihr zusammen.', 'jubelt');
+      ZI.setze(box,
+        h('div', { class: 'gem-ansage' }, 'Ab jetzt arbeitet ihr zusammen.'),
+        h('p', { class: 'gem-text' }, streit
+          ? 'Ihr führt zwei kurze Streitgespräche. Einmal beginnt A, einmal beginnt B.'
+          : 'Jeder sagt ' + PRO + ' Argumente. Der andere hört zu und prüft. Danach tauscht ihr.'),
+        h('button', { class: 'knopf', style: { alignSelf: 'flex-end' }, onclick: weiter }, 'Los geht’s'));
+    }
+
+    /* Ablauf: A spricht zuerst, B prüft zuerst – danach Rollenwechsel */
+    function phase() {
+      const ersteHaelfte = erledigt < PRO;
+      const ichSpreche = (rolle === 'A') === ersteHaelfte;
+      return { ichSpreche, nr: (erledigt % PRO) + 1 };
+    }
+    function weiter() {
+      rahmen.fortschritt(erledigt);
+      if (erledigt === PRO * 2) { abschluss(); return; }
+      if (erledigt === PRO) { rollenwechsel(); return; }
+      const p = phase();
+      if (p.ichSpreche) sprechen(p.nr); else pruefen(p.nr);
+    }
+    let gewechselt = false;
+    function rollenwechsel() {
+      if (gewechselt) { gewechselt = false; const p = phase(); if (p.ichSpreche) sprechen(p.nr); else pruefen(p.nr); return; }
+      gewechselt = true;
+      bue.sage('Rollenwechsel!', 'jubelt');
+      ZI.setze(box,
+        h('div', { class: 'gem-ansage' }, 'Rollenwechsel!'),
+        h('p', { class: 'gem-text' }, streit ? 'Jetzt beginnt die andere Person.' : 'Wer gesprochen hat, prüft jetzt. Wer geprüft hat, spricht jetzt.'),
+        h('button', { class: 'knopf', style: { alignSelf: 'flex-end' }, onclick: rollenwechsel }, 'Weiter'));
+    }
+
+    /* Sprechen: Thema wählen, Seite wählen, laut sagen */
+    function sprechen(nr) {
+      const zaehler = streit ? '' : ' · Argument ' + nr + ' von ' + PRO;
+      bue.sage(streit ? 'Du beginnst das Streitgespräch.' : 'Du sprichst. Dein Partner hört zu und prüft.', 'erklaert');
+      const frei = ZI.MEISTER_THEMEN.filter((t) => !genutzt.has(t.frage));
+      const angebot = mischen(frei.length >= 3 ? frei : ZI.MEISTER_THEMEN).slice(0, 3);
+      ZI.setze(box,
+        kopfZeile('Du sprichst' + zaehler, 'sprechen'),
+        aufgabenKopf('Wähle ein Thema.', tippText, bue),
+        h('div', { class: 'themen' }, angebot.map((t) => h('button', { class: 'option', onclick: () => { genutzt.add(t.frage); ZI.ton.plopp(); seite(t, nr, zaehler); } }, t.frage))));
+    }
+    function seite(thema, nr, zaehler) {
+      ZI.setze(box,
+        kopfZeile('Du sprichst' + zaehler, 'sprechen'),
+        aufgabenKopf('Bist du dafür oder dagegen?', tippText, bue),
         h('div', { class: 'meinung' }, thema.frage),
         h('div', { class: 'erz-knoepfe' },
-          h('button', { class: 'knopf moos', onclick: () => { satz = thema.dafuer; schritt3(); } }, 'Dafür'),
-          h('button', { class: 'knopf holz', onclick: () => { satz = thema.dagegen; schritt3(); } }, 'Dagegen')));
+          h('button', { class: 'knopf moos', onclick: () => sagen(thema.dafuer, zaehler) }, 'Dafür'),
+          h('button', { class: 'knopf holz', onclick: () => sagen(thema.dagegen, zaehler) }, 'Dagegen')));
     }
-    function schritt3() {
-      rahmen.fortschritt(2);
+    function sagen(satz, zaehler) {
       bue.werkstueck('eisen-gluehend');
-      if (drei) {
-        bue.sage('Partner A sagt die Meinung mit Begründung. Partner B hört zu, wiederholt sie und widerspricht freundlich.', 'tipp');
-        ZI.setze(box,
-          aufgabenKopf('Führt das Streitgespräch. Lasst euch ausreden!', tippText, bue),
-          h('div', { class: 'teile' },
-            h('div', { class: 'teil teil-these' }, h('span', { class: 'teil-name' }, 'A'), h('span', null, satz)),
-            h('div', { class: 'teil teil-begruendung' }, h('span', { class: 'teil-name' }, 'B'), h('span', null, '„Du sagst, dass … Aber ich finde, dass …, weil …“'))),
-          h('p', { style: { margin: 0, fontSize: '19px' } }, 'Wenn ihr mögt, antwortet A noch einmal: „Ja, aber …“ oder „Da hast du recht, …“'),
-          h('button', { class: 'knopf', style: { alignSelf: 'flex-end' }, onclick: schritt4 }, 'Wir haben gesprochen – jetzt prüfen'));
-        return;
-      }
-      bue.sage(zwei ? 'Diesmal brauchst du alle drei Teile: deine Meinung, eine Begründung und ein passendes Beispiel („Zum Beispiel …“).'
-        : 'Überlege dir eine Begründung, die erklärt, WARUM. Wenn du magst, denk dir auch ein Beispiel aus: „Zum Beispiel …“', 'tipp');
-      ZI.setze(box, 
-        aufgabenKopf('Bereite dich vor. Dann sag deinen Satz laut zu deinem Partner.', tippText, bue),
-        h('div', { class: 'sprechblase-gross' }, satz, zwei ? h('div', { style: { marginTop: '10px', color: 'var(--tinte-hell)' } }, 'Zum Beispiel …') : null),
-        h('p', { style: { margin: 0, fontSize: '19px' } }, 'Sprich in ganzen Sätzen. Dein Partner hört genau zu und prüft danach ' + (zwei ? 'vier' : 'drei') + ' Dinge.'),
-        h('button', { class: 'knopf', style: { alignSelf: 'flex-end' }, onclick: schritt4 }, 'Ich habe es gesagt – iPad weitergeben'));
+      bue.sage(streit ? 'Sag deine Meinung mit Begründung. Dein Partner antwortet: „Du sagst, dass … Aber …“'
+        : zwei ? 'Sag alle drei Teile: Meinung, Begründung und ein Beispiel.' : 'Sag deine Meinung und eine Begründung, die erklärt, WARUM.', 'tipp');
+      ZI.setze(box,
+        kopfZeile('Du sprichst' + zaehler, 'sprechen'),
+        aufgabenKopf('Überlege kurz. Dann sag es laut zu deinem Partner.', tippText, bue),
+        h('div', { class: 'sprechblase-gross' }, satz,
+          zwei ? h('div', { class: 'gem-zusatz' }, 'Zum Beispiel …') : null,
+          streit ? h('div', { class: 'gem-zusatz' }, 'Dein Partner: „Du sagst, dass … Aber …“') : null),
+        h('p', { class: 'gem-text' }, 'Sprich in ganzen Sätzen. Dein Partner prüft auf seinem iPad.'),
+        h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-end' } },
+          h('button', { class: 'knopf', onclick: () => warten(satz, zaehler) }, 'Ich habe es gesagt')));
     }
-    function schritt4() {
-      rahmen.fortschritt(3);
-      bue.sage(drei ? 'Prüft jetzt gemeinsam, was geklappt hat. Seid ehrlich – das hilft am meisten.' : 'Jetzt bist du dran, Partnerin oder Partner! Was hast du gehört? Sei ehrlich – das hilft am meisten.', 'erklaert');
-      const punkte = drei ? [
-        'A hat eine Meinung mit Begründung gesagt.',
-        'B hat wiederholt, was A gesagt hat („Du sagst, dass …“).',
-        'B hat ein Gegenargument gebracht („Aber …“).',
-        'Wir haben uns ausreden lassen und sind freundlich geblieben.',
-      ] : [
-        'Ich habe die Meinung gehört („Ich finde, dass …“).',
-        'Ich habe eine Begründung mit weil, da oder denn gehört.',
-        'Die Begründung hat erklärt, WARUM – sie war scharf.',
-      ];
-      if (zwei) punkte.push('Ich habe ein Beispiel gehört, das zur Begründung passt („Zum Beispiel …“).');
-      const an = punkte.map(() => false);
+    function warten(satz, zaehler) {
+      bue.sage('Dein Partner prüft jetzt. Warte kurz.', 'erklaert');
+      ZI.setze(box,
+        kopfZeile('Du sprichst' + zaehler, 'sprechen'),
+        h('p', { class: 'gem-text' }, 'Dein Partner prüft auf seinem iPad. Was sagt er?'),
+        h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-end' } },
+          h('button', { class: 'knopf holz', onclick: () => sagen(satz, zaehler) }, 'Noch einmal sagen'),
+          h('button', { class: 'knopf', onclick: () => { erledigt++; ZI.ton.richtig(); weiter(); } }, 'Mein Partner sagt: geschafft!')));
+    }
+
+    /* Prüfen: zuhören und Kriterien abhaken */
+    function pruefen(nr) {
+      const zaehler = streit ? '' : ' · Argument ' + nr + ' von ' + PRO;
+      bue.sage('Hör genau zu. Dann prüfe.', 'erklaert');
+      const an = kriterien.map(() => false);
       const liste = h('div', { class: 'checkliste' });
-      const fertigKnopf = h('button', { class: 'knopf', style: { alignSelf: 'flex-end' } }, 'Fertig geprüft');
+      const rueck = h('div');
       function zeichne() {
-        ZI.setze(liste, ...punkte.map((p, i) => h('button', { class: 'check' + (an[i] ? ' an' : ''), 'aria-pressed': String(an[i]),
+        ZI.setze(liste, ...kriterien.map((p, i) => h('button', { class: 'check' + (an[i] ? ' an' : ''), 'aria-pressed': String(an[i]),
           onclick: () => { an[i] = !an[i]; ZI.ton.plopp(); zeichne(); } }, h('span', { class: 'kasten' }, an[i] ? icon.haken() : null), p)));
       }
       zeichne();
-      fertigKnopf.addEventListener('click', () => {
+      const fertig = h('button', { class: 'knopf', style: { alignSelf: 'flex-end' }, onclick: () => {
         if (an.every(Boolean)) {
-          bue.schlag(() => bue.werkstueck('axt-scharf'));
-          setTimeout(() => geschafft({ titel: drei ? 'Starkes Streitgespräch!' : 'Meisterstück!', text: (drei ? 'Ihr habt zugehört, angeknüpft und widersprochen – wie echte Ratsmitglieder.' : 'Ein echtes Meisterstück – laut und gut begründet.') + ' Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.', datei: 'edelstein', alt: 'Edelstein',
-            eintragen: (s) => s.setzeTief(K, 2) }), 900);
+          ZI.ton.richtig(); bue.schlag(() => bue.werkstueck('axt-scharf'));
+          erledigt++;
+          ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, 'Super! Sag deinem Partner: „Geschafft!“'));
+          fertig.textContent = 'Weiter'; fertig.onclick = weiter;
         } else {
           ZI.ton.falsch();
-          bue.sage('Noch nicht ganz! Sagt euch, was gefehlt hat. Dann versucht es noch einmal.', 'ermutigt');
-          box.appendChild(h('div', { class: 'rueckmeldung tipp' }, 'Gebt das iPad zurück. Probiert den Satz noch einmal – mit dem, was gefehlt hat.'));
-          fertigKnopf.textContent = 'Noch einmal versuchen';
-          fertigKnopf.onclick = null;
-          fertigKnopf.addEventListener('click', schritt3, { once: true });
+          ZI.setze(rueck, h('div', { class: 'rueckmeldung tipp' }, 'Sag freundlich, was gefehlt hat: „Mir hat noch … gefehlt.“ Dann versucht ihr es noch einmal.'));
+          an.fill(false); zeichne();
         }
-      }, { once: true });
-      ZI.setze(box, 
-        aufgabenKopf(drei ? 'Gemeinsamer Check: Tippt an, was geklappt hat.' : 'Partner-Check: Tippe an, was du gehört hast.', 'Hör genau hin. Fehlt etwas, sag es freundlich: „Mir hat noch gefehlt, …“', bue),
-        h('div', { class: 'sprechblase-gross', style: { fontSize: '20px' } }, satz),
-        liste, fertigKnopf);
+      } }, 'Fertig geprüft');
+      ZI.setze(box,
+        kopfZeile(streit ? 'Du antwortest und prüfst' : 'Du prüfst' + zaehler, 'pruefen'),
+        streit ? h('div', { class: 'sprechblase-gross' }, 'Hör zu. Dann antwortest du: „Du sagst, dass … Aber ich finde, dass …, weil …“') : null,
+        aufgabenKopf(streit ? 'Hört euch zu. Dann tippt an, was geklappt hat.' : 'Hör zu. Tippe an, was du gehört hast.', 'Fehlt etwas, sag es freundlich: „Mir hat noch … gefehlt.“', bue),
+        liste, rueck, fertig);
     }
-    schritt1();
+
+    function abschluss() {
+      rahmen.fortschritt(PRO * 2);
+      bue.schlag(() => bue.werkstueck('axt-scharf'));
+      setTimeout(() => geschafft({
+        titel: streit ? 'Starkes Streitgespräch!' : 'Meisterstück!',
+        text: (streit ? 'Ihr habt zugehört, angeknüpft und widersprochen – wie echte Ratsmitglieder.' : 'Ihr habt beide ' + PRO + ' Argumente gesagt und geprüft.') + ' Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.',
+        datei: 'edelstein', alt: 'Edelstein', eintragen: (s) => s.setzeTief(K, 2) }), 700);
+    }
+
+    vorbereiten();
   }
 
   /* =========================================================
@@ -1282,23 +1458,19 @@
 
   /* Tiefer Stollen 1: Kobold-Kampf (gemischte Aufgaben aus Kapitel 1 und 2) */
   function spielBoss() {
-    const teile = ['Meinung', 'Begründung', 'Beispiel'];
     const aufgaben = [
-      ...mischen(ZI.STUMPF_SCHARF).slice(0, 2).map((it) => ({ frage: 'Welche Begründung ist scharf?', kopf: it.meinung,
-        optionen: it.optionen.map((o) => ({ text: o.text, ok: o.scharf, info: o.info })) })),
-      ...mischen(ZI.FEHLERJAGD).slice(0, 2).map((it) => ({ frage: 'Welcher Satz ist richtig?', kopf: '',
-        optionen: it.saetze.map((o) => ({ text: o.text, ok: o.ok, info: o.info })) })),
-      ...mischen(ZI.TEIL_ERKENNEN).slice(0, 3).map((it) => ({ frage: 'Welcher Teil des Arguments ist das?', kopf: it.satz,
-        optionen: teile.map((t) => ({ text: t, ok: t === it.teil, info: ZI.TEIL_INFO[t] })) })),
-      ...mischen(ZI.BEISPIELE).slice(0, 1).map((it) => ({ frage: 'Welches Beispiel passt?', kopf: it.argument, optionen: it.optionen })),
+      ...mischen(ZI.TEIL_ERKENNEN).slice(0, 3).map((it) => aufgabeTeil(it)),
+      ...mischen(ZI.STUMPF_SCHARF).slice(0, 2).map(aufgabeScharf),
+      ...mischen(ZI.FEHLERJAGD).slice(0, 2).map(aufgabeFehler),
+      ...mischen(ZI.BEISPIELE).slice(0, 3).map(aufgabeBeispiel),
     ];
     auswahlSpiel({
       titel: 'Kobold-Kampf',
       frageText: 'Besiege den Fehlerkobold!',
-      items: mischen(aufgaben),
+      items: aufgaben,
       tipp: ZI.TIPPS.boss,
       wsVorher: 'kobold-chaos', wsNachher: 'kobold-besiegt',
-      start: 'Da ist er wieder, der Fehlerkobold! Jede richtige Antwort ist ein Hammerschlag. Nach acht Treffern gibt er auf.',
+      start: 'Da ist er wieder, der Fehlerkobold! Jede richtige Antwort ist ein Hammerschlag. Nach zehn Treffern gibt er auf.',
       boss: true,
       ende: () => geschafft({ titel: 'Kobold besiegt!', text: 'Der Fehlerkobold gibt auf und verspricht, nie wieder Argumente durcheinanderzubringen. Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.', datei: 'kobold-besiegt', alt: 'Besiegter Kobold',
         eintragen: (s) => s.setzeTief(K, 0) }),
@@ -1307,7 +1479,7 @@
 
   /* Tiefer Stollen 2: Argument-Kette */
   function spielKette() {
-    const items = mischen(ZI.KETTEN).slice(0, 3);
+    const items = mischen(ZI.KETTEN).slice(0, 8);
     const bue = buehne('eisen-roh');
     const box = h('div', { class: 'aufgabe pergament auf-pergament' });
     const rahmen = spielRahmen({ titel: 'Argument-Kette', anzahl: items.length, aufgabe: box, bue });
@@ -1426,7 +1598,8 @@
     auswahlSpiel({
       titel: 'Gegenargument-Schmiede',
       frageText: 'Welcher Satz ist ein echtes Gegenargument?',
-      items: mischen(ZI.GEGENARGUMENTE).slice(0, 5).map((it) => ({ kopf: it.argument, optionen: it.optionen })),
+      // erst „Ja, aber“ erkennen, dann selbst das Gegenargument finden
+      items: [...mischen(ZI.JA_UND).slice(0, 2).map(aufgabeArt), ...mischen(ZI.GEGENARGUMENTE).slice(0, 8).map(aufgabeGegen)],
       tipp: ZI.TIPPS.gegen,
       wsVorher: 'eisen-gluehend', wsNachher: 'axt-scharf',
       start: 'Ein Gegenargument spricht gegen eine Meinung. Wer Gegenargumente kennt, kann besser mitdiskutieren – und seine eigene Meinung prüfen.',
@@ -1439,7 +1612,9 @@
     auswahlSpiel({
       titel: 'Wer überzeugt wen?',
       frageText: 'Welches Argument überzeugt diese Person am besten?',
-      items: mischen(ZI.SITUATIONEN).slice(0, 4).map((it) => ({ kopf: it.situation, optionen: it.optionen })),
+      // erst Situationen, zum Schluss zwei harte Einwände aus dem Inselrat
+      items: [...mischen(ZI.SITUATIONEN).slice(0, 8).map(aufgabeSituation),
+        ...(() => { const fall = ZI.zufall(ZI.INSELRAT); return mischen(fall.einwaende).slice(0, 2).map((e) => aufgabeEinwand(fall, e)); })()],
       tipp: ZI.TIPPS.situation,
       wsVorher: 'truhe-zu', wsNachher: 'truhe-offen',
       start: 'Nicht jedes Argument überzeugt jeden. Überleg, was der Person wichtig ist.',
@@ -1470,7 +1645,7 @@
       const woerter = saetze[nr].split(' ');
       let i = 0; zustand = 'spricht'; blase.textContent = '';
       knopf.disabled = false;
-      const tempo = 330 + Math.random() * 120;
+      const tempo = 520 + Math.random() * 120; // etwa Lesetempo einer 5. Klasse
       const tick = () => {
         if (!laeuft) return;
         if (i < woerter.length) {
@@ -1479,7 +1654,7 @@
         } else {
           zustand = 'fenster';
           blase.classList.add('fertig');
-          timer = setTimeout(() => { if (zustand === 'fenster') bewerte('zuspaet'); }, 1600);
+          timer = setTimeout(() => { if (zustand === 'fenster') bewerte('zuspaet'); }, 3000);
         }
       };
       blase.classList.remove('fertig');
@@ -1493,7 +1668,7 @@
       else if (art === 'frueh') { ZI.ton.falsch(); ZI.setze(ergebnis, h('div', { class: 'rueckmeldung schlecht' }, h('b', null, 'Unterbrochen! '), 'Der Satz war noch nicht fertig.')); }
       else { ZI.setze(ergebnis, h('div', { class: 'rueckmeldung tipp' }, h('b', null, 'Zu lange gewartet. '), 'Das Gespräch ist ins Stocken geraten.')); }
       nr++;
-      setTimeout(() => { if (laeuft) runde(); }, 1700);
+      setTimeout(() => { if (laeuft) runde(); }, 2600);
     }
 
     knopf.addEventListener('click', () => {
@@ -1535,7 +1710,10 @@
      BONUS: Funkenregen
      ========================================================= */
   function spielFunkenregen(pool, titel, intro) {
-    const DAUER = 60;
+    // Kindgerecht: Die Schwierigkeit liegt im Entscheiden, nicht im Lesetempo.
+    const DAUER = 90;          // Sekunden insgesamt
+    const LESEPAUSE = 4;       // so lange steht jede neue Meinung allein da, bevor Funken fallen
+    const RUHE = 1.5;          // so lange bleibt jeder Funke oben stehen, bevor er fällt
     const runden = mischen(pool);
     let punkte = 0; let zeit = DAUER; let laeuft = false;
     let timer = null; let spawner = null;
@@ -1557,8 +1735,10 @@
       const b = h('button', { class: 'spark' }, text);
       const breite = arena.clientWidth;
       b.style.left = Math.max(8, Math.random() * (breite - 280)) + 'px';
-      const fall = Math.max(4.2, 7.5 - (DAUER - zeit) * 0.05);
+      // längere Texte fallen langsamer; großzügige Mindestzeit
+      const fall = Math.min(15, Math.max(10, 7 + text.length * 0.1));
       b.style.animationDuration = fall + 's';
+      b.style.animationDelay = RUHE + 's';
       b.addEventListener('animationend', () => b.remove());
       b.addEventListener('click', () => {
         if (!laeuft || b.dataset.weg) return;
@@ -1574,7 +1754,7 @@
           b.style.top = (r.top - a.top) + 'px'; b.style.transform = 'none';
           b.classList.add('zisch');
         }
-        b.style.animationDuration = '0.45s';
+        b.style.animationDuration = '0.45s'; b.style.animationDelay = '0s';
         punktEl.textContent = String(punkte);
       });
       arena.appendChild(b);
@@ -1588,28 +1768,34 @@
         aktuelleRunde = rn;
         arena.querySelectorAll('.spark').forEach((s) => s.remove());
         meinungEl.textContent = runden[rn].meinung;
+        lesenBis = Date.now() + LESEPAUSE * 1000;
+        meinungEl.classList.add('neu'); setTimeout(() => meinungEl.classList.remove('neu'), LESEPAUSE * 1000);
       }
       if (zeit <= 0) ende();
     }
 
+    let lesenBis = 0;
     function starten() {
       laeuft = true; aktuelleRunde = 0; meinungEl.textContent = runden[0].meinung;
+      lesenBis = Date.now() + LESEPAUSE * 1000;
+      meinungEl.classList.add('neu'); setTimeout(() => meinungEl.classList.remove('neu'), LESEPAUSE * 1000);
       timer = setInterval(tick, 1000);
-      const plane = () => { if (!laeuft) return; funke(); spawner = setTimeout(plane, Math.max(650, 1250 - (DAUER - zeit) * 10)); };
-      plane();
+      // ruhiger Takt: ein Funke etwa alle 2 Sekunden, in der Lesepause keiner
+      const plane = () => { if (!laeuft) return; if (Date.now() >= lesenBis) funke(); spawner = setTimeout(plane, 2000); };
+      spawner = setTimeout(plane, 400);
     }
 
     function ende() {
       laeuft = false; clearInterval(timer); clearTimeout(spawner);
       arena.querySelectorAll('.spark').forEach((s) => s.remove());
-      const sterne = punkte >= 20 ? 3 : punkte >= 14 ? 2 : punkte >= 8 ? 1 : 0;
+      const sterne = punkte >= 14 ? 3 : punkte >= 10 ? 2 : punkte >= 6 ? 1 : 0;
       const vorher = stand.bonus[K];
       ZI.ton.fanfare();
       const f = ZI.fenster([
         h('div', { class: 'gross-bild strahlen' }, bild('stern', 'Stern')),
         h('h2', null, punkte + ' Funken gefangen!'),
         h('div', { style: { fontSize: '48px', color: 'var(--gold-dunkel)', letterSpacing: '6px' } }, '★'.repeat(sterne) + '☆'.repeat(3 - sterne)),
-        h('p', { style: { margin: 0 } }, sterne > vorher ? 'Neuer Rekord! Jeder Stern ist ein Edelstein für dein Dorf.' : 'Ab 8 Funken gibt es 1 Stern, ab 14 Funken 2 und ab 20 Funken 3 Sterne.'),
+        h('p', { style: { margin: 0 } }, sterne > vorher ? 'Neuer Rekord! Jeder Stern ist ein Edelstein für dein Dorf.' : 'Ab 6 Funken gibt es 1 Stern, ab 10 Funken 2 und ab 14 Funken 3 Sterne.'),
         h('div', { class: 'knopf-reihe' },
           h('button', { class: 'knopf holz', onclick: () => { f.schliessen(); spielFunkenregen(pool, titel, intro); } }, 'Nochmal'),
           h('button', { class: 'knopf', onclick: () => { f.schliessen(); if (sterne > vorher) fortschritt((s) => { s.bonus[K] = sterne; }, () => zeigeHalle()); else zeigeHalle(); } }, 'Zur Halle'))]);
@@ -1758,7 +1944,7 @@
       const daten = { wort: roh, ...c, zeit: Date.now() };
       sitzung.schreiben('zi-stamm', daten);
       f.schliessen(); ZI.ton.fanfare();
-      zeigeStammesrat(daten);
+      uebergang('rat', 'Dein Stamm trifft sich am Feuer.', () => zeigeStammesrat(daten));
     };
     eingabe.addEventListener('keydown', (e) => { if (e.key === 'Enter') pruefen(); });
     const f = ZI.fenster([
