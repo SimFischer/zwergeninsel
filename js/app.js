@@ -1992,12 +1992,15 @@
       h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2 } },
         h('div', { class: 'stammesrat-ipad' },
           h('div', { class: 'rollenkarte pergament auf-pergament', style: { borderColor: g.farbe } },
-            h('div', { class: 'rollenkarte-zeichen', 'aria-hidden': 'true' }, rolle.zeichen),
+            h('div', { class: 'rollenkarte-zeichen' }, ZI.rollenSymbol(rolle)),
             h('div', null,
               h('div', { class: 'klein' }, 'Deine Rolle'),
               h('h2', { style: { margin: 0, color: g.farbe } }, rolle.name),
-              h('p', { style: { margin: '4px 0 0', fontSize: '20px' } }, rolle.aufgabe + (dreier && rolle.id === 'aelteste' ? ' Ihr seid nur drei – achte auch auf die Zeit.' : '')),
-              )),
+              // drei kurze Fragen – leicht verständlich, auch für Kinder mit Deutsch als Zweitsprache
+              h('dl', { class: 'rollen-erklaerung' },
+                h('dt', null, 'Meine Aufgabe:'), h('dd', null, rolle.einfach.aufgabe),
+                h('dt', null, 'Ich achte darauf:'), h('dd', null, rolle.einfach.achten + (dreier && rolle.id === 'aelteste' ? ' Ihr seid nur drei: Achte auch auf die Zeit.' : '')),
+                h('dt', null, 'Das mache ich:'), h('dd', null, rolle.einfach.tun)))),
           h('div', { class: 'pergament auf-pergament stamm-box' },
             h('h3', null, 'Euer Thema ', h('span', { class: 'herkunft' + (t.frage ? ' insel' : '') }, ZI.themaHerkunft(t))),
             h('div', { class: 'meinung' }, ZI.themaText(t)),
@@ -2016,7 +2019,7 @@
           h('div', { class: 'pergament auf-pergament stamm-box' },
             h('h3', null, 'Dein Stamm'),
             h('div', { class: 'stamm-liste' }, g.mitglieder.map((m) => h('div', { class: 'stamm-person' + (m.karte === stand.karte ? ' ich' : '') },
-              h('b', null, 'Karte ' + m.karte), h('span', null, m.rolle.zeichen + ' ' + m.rolle.name + (m.karte === stand.karte ? ' (du)' : ''))))),
+              h('b', null, 'Karte ' + m.karte), h('span', { class: 'stamm-rolle' }, ZI.rollenSymbol(m.rolle, 'klein'), ' ' + m.rolle.name + (m.karte === stand.karte ? ' (du)' : ''))))),
             h('p', { class: 'klein', style: { margin: '8px 0 0' } }, 'Setzt euch zusammen. Jeder sagt mindestens einmal seine Meinung mit Begründung.'))))));
   }
 

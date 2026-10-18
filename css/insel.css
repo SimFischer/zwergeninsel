@@ -412,3 +412,9 @@ button.stamm-code { text-align: center; }
 @keyframes feuer-flackern { from { opacity: 0.75; transform: translate(-50%, -50%) scale(0.95); } to { opacity: 1; transform: translate(-50%, -50%) scale(1.06); } }
 @keyframes leuchtfeuer { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .licht { animation: none !important; } }
+
+/* Rollen-Symbole (Bild mit Ausweich-Zeichen) */
+.rollen-symbol { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; width: 1.4em; height: 1.4em; }
+.rollen-symbol img { width: 100%; height: 100%; object-fit: contain; }
+.rollen-symbol.klein { width: 1.2em; height: 1.2em; }
+.rollen-zeichen { font-size: 0.9em; line-height: 1; }

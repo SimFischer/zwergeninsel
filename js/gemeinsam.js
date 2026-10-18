@@ -112,6 +112,9 @@
     return a;
   };
   ZI.zufall = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  /* Rollen-Symbol: Bild aus bilder/rolle-….png, solange es fehlt ein Ausweich-Zeichen */
+  ZI.rollenSymbol = (rolle, cls) => h('span', { class: 'rollen-symbol ' + (cls || ''), 'aria-hidden': 'true' },
+    ZI.bildOder(rolle.bild, rolle.name, h('span', { class: 'rollen-zeichen' }, rolle.zeichen)));
   /* Bausteine mischen, sodass der Satz NIE schon fertig oder fast fertig dasteht.
      loesungen: Liste richtiger Reihenfolgen. Höchstens die Hälfte (bei 3 Bausteinen: einer) darf schon richtig liegen. */
   ZI.mischenSatz = function (teile, loesungen) {

@@ -725,7 +725,7 @@
       ZI.setze(raster, ...staemme.map((g) => h('div', { class: 'stamm-karte pergament auf-pergament', style: { borderTopColor: g.farbe } },
         h('h3', { style: { color: g.farbe } }, g.name),
         h('div', { class: 'stamm-mitglieder' }, g.mitglieder.map((m) => h('div', { class: 'stamm-mitglied' },
-          kartenKopf(m.karte), h('span', { class: 'stamm-rolle' }, m.rolle ? m.rolle.zeichen + ' ' + m.rolle.name : '')))),
+          kartenKopf(m.karte), h('span', { class: 'stamm-rolle' }, m.rolle ? [ZI.rollenSymbol(m.rolle, 'klein'), ' ' + m.rolle.name] : '')))),
         rf ? h('div', { class: 'stamm-wahl' }, rf.optionen.map((id) => {
           const geb = ZI.GEBAEUDE.find((x) => x.id === id);
           return h('button', { class: 'knopf klein' + (st.stimmen[g.nr] === id ? '' : ' holz'), 'aria-pressed': String(st.stimmen[g.nr] === id),

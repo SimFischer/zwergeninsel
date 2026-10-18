@@ -785,3 +785,16 @@ a.lk-kachel:active { transform: translateY(2px); }
 .begleiter-blase { position: relative; padding: 10px 14px; font-size: 19px; line-height: 1.35; border-radius: 14px; color: var(--tinte); margin-bottom: 14px; }
 .begleiter-blase::before { content: ''; position: absolute; left: -10px; bottom: 14px; border: 10px solid transparent; border-right-color: #f4e6c8; border-left: 0; }
 @media (prefers-reduced-motion: reduce) { .begleiter-bild { animation: none; } }
+
+/* Rollen-Symbole (Bild mit Ausweich-Zeichen) */
+.rollen-symbol { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; width: 1.4em; height: 1.4em; }
+.rollen-symbol img { width: 100%; height: 100%; object-fit: contain; }
+.rollen-symbol.klein { width: 1.2em; height: 1.2em; }
+.rollen-zeichen { font-size: 0.9em; line-height: 1; }
+
+.rollenkarte-zeichen .rollen-symbol { width: 100%; height: 100%; font-size: inherit; }
+.rollen-erklaerung { margin: 8px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; font-size: 19px; line-height: 1.35; }
+.rollen-erklaerung dt { font-weight: 700; color: var(--tinte-hell); white-space: nowrap; }
+.rollen-erklaerung dd { margin: 0; }
+@media (max-width: 700px) { .rollen-erklaerung { grid-template-columns: 1fr; } .rollen-erklaerung dd { margin-bottom: 4px; } }
+.rollenkarte-zeichen { width: 84px; height: 84px; flex: none; display: flex; align-items: center; justify-content: center; }
