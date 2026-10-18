@@ -169,9 +169,10 @@
       h('h2', null, 'Neuer Zwerg freigeschaltet!'),
       h('div', { class: 'gross-bild strahlen' }, bild(z.datei, z.name)),
       h('div', { style: { fontSize: '26px', fontFamily: 'var(--titel)' } }, z.name + ' · ' + z.rolle),
-      h('p', { style: { margin: 0 } }, 'Du kannst jetzt in deiner Zwergen-Sammlung zu ' + z.name + ' wechseln.'),
+      h('div', { class: 'begleiter-blase pergament auf-pergament', style: { fontSize: '20px' } }, '„Hallo! Ich bin ' + z.name + '. Nimmst du mich mit in die Schmiede?“'),
+      h('p', { style: { margin: 0 } }, 'Du kannst auch später in deiner Zwergen-Sammlung zu ' + z.name + ' wechseln.'),
       h('div', { class: 'knopf-reihe' },
-        h('button', { class: 'knopf holz', onclick: () => { stand.zwerg = z.nr; speichern(); f.schliessen(); zeigeFreischaltungen(liste.slice(1), danach); } }, 'Gleich wechseln'),
+        h('button', { class: 'knopf holz', onclick: () => { stand.zwerg = z.nr; speichern(); f.schliessen(); zeigeFreischaltungen(liste.slice(1), danach); } }, 'Ja, ' + z.name + ' kommt mit'),
         h('button', { class: 'knopf', onclick: () => { f.schliessen(); zeigeFreischaltungen(liste.slice(1), danach); } }, 'Weiter')),
     ]);
   }
@@ -592,7 +593,7 @@
       ZI.setze(kapitelBox, ...(kapitelOffen(aktiverReiter) ? kapitelInhalt(aktiverReiter) : [kapitelGesperrt(aktiverReiter)]));
     }
     zeichneReiter();
-    inhalt.append(botschaftLeiste(), reiter, kapitelBox);
+    inhalt.append(begleiter(), botschaftLeiste(), reiter, kapitelBox);
 
     const rang = ZI.rang(stand);
     const rohstoffe = ROHSTOFF.map((r, i) => zaehler(r.datei, r.name, [0, 1, 2].filter((k) => stand.hatKern(k, i)).length));
@@ -1881,6 +1882,21 @@
     if (!b) return [];
     return ZI.BAU_UEBUNGEN.filter((u) => b.bau & (1 << u.bit)).map((u) => u.id);
   }
+  /* Mein Zwerg begleitet mich: kurzer Satz zum nächsten Ziel (in der Halle) */
+  function begleiter() {
+    const z = aktuellerZwerg(); if (!z) return null;
+    const k = Math.min(stand.offen, ZI.KAPITEL.length - 1);
+    const kern = INHALT[k] ? INHALT[k].kern : [];
+    const offen = kern.findIndex((d, i) => !stand.hatKern(k, i));
+    const tief = INHALT[k] ? INHALT[k].tief.findIndex((d, i) => !stand.hatTief(k, i)) : -1;
+    const satz = offen >= 0 ? 'Als Nächstes: „' + kern[offen].name + '“. Ich komme mit!'
+      : tief >= 0 ? 'Der Hauptstollen ist geschafft! Wollen wir tiefer? „' + INHALT[k].tief[tief].name + '“ wartet.'
+        : 'Wir haben in diesem Kapitel alles geschafft. Stark!';
+    return h('div', { class: 'begleiter' },
+      h('div', { class: 'begleiter-bild' }, bild([z.datei + '-jubel', z.datei], z.name)),
+      h('div', { class: 'begleiter-blase pergament auf-pergament' }, h('b', null, z.name + ': '), satz));
+  }
+
   function botschaftLeiste() {
     const b = botschaftJetzt();
     const anzahl = b ? ZI.BAU_UEBUNGEN.filter((u) => b.bau & (1 << u.bit)).length : 0;

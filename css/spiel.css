@@ -777,3 +777,11 @@ a.lk-kachel:active { transform: translateY(2px); }
 .amboss-platz[data-art='figur'] .hammer, .amboss-platz.person .hammer { display: none; }
 .amboss-platz .werkstueck.neu { animation: aufploppen-neu 0.45s ease-out; }
 @keyframes aufploppen-neu { from { opacity: 0; scale: 0.8; } to { opacity: 1; scale: 1; } }
+
+/* Mein Zwerg als Begleiter in der Halle */
+.begleiter { display: flex; align-items: flex-end; gap: 10px; margin: 0 4px; }
+.begleiter-bild { width: 92px; flex: none; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.5)); animation: atmen 3.2s infinite ease-in-out; transform-origin: bottom center; }
+.begleiter-bild img, .begleiter-bild .platzhalter { width: 100%; display: block; }
+.begleiter-blase { position: relative; padding: 10px 14px; font-size: 19px; line-height: 1.35; border-radius: 14px; color: var(--tinte); margin-bottom: 14px; }
+.begleiter-blase::before { content: ''; position: absolute; left: -10px; bottom: 14px; border: 10px solid transparent; border-right-color: #f4e6c8; border-left: 0; }
+@media (prefers-reduced-motion: reduce) { .begleiter-bild { animation: none; } }
