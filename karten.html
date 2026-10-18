@@ -22,8 +22,7 @@
   .karte::after { right: 2.4mm; bottom: 2.4mm; border-left: 0; border-top: 0; border-radius: 0 0 2mm 0; }
   .kopf { display: flex; align-items: center; gap: 3mm; min-height: 14mm; }
   .portrait { width: 14mm; height: 14mm; border-radius: 50%; overflow: hidden; flex: none; border: 0.6mm solid #8a6438; background: #efdfbd; }
-  .portrait img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 6%; display: block; transform: scale(1.9); transform-origin: 50% 8%; }
-  .portrait img[src*='pass-motiv'] { transform: none; object-position: 50% 50%; }
+  .portrait img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; display: block; transform: scale(1.15); }
   .titel { font-family: 'Insel Titel', sans-serif; font-size: 15pt; line-height: 1.05; }
   .titel small { display: block; font-family: 'Insel Text', sans-serif; font-size: 7.5pt; color: #6b5442; letter-spacing: .02em; }
   .nr { margin-left: auto; min-width: 12mm; height: 12mm; border-radius: 3mm; background: #8a4b1c; color: #fff4dc; font-family: 'Insel Titel', sans-serif; font-size: 19pt; display: flex; align-items: center; justify-content: center; padding: 0 2mm; box-sizing: border-box; }
@@ -31,7 +30,14 @@
   .codes { display: grid; grid-template-columns: auto 1fr; column-gap: 2.5mm; grid-auto-rows: 1fr; font-size: 9pt; align-items: end; min-height: 0; }
   .codes span { line-height: 1.2; padding-bottom: 0.6mm; }
   .codes span:nth-child(even) { border-bottom: 0.3mm dotted #8a6438; height: 100%; padding: 0; }
-  .klein { font-size: 7pt; line-height: 1.25; color: #6b5442; padding: 0 6mm; text-align: center; }
+  .fuss { display: flex; align-items: center; justify-content: center; gap: 2mm; padding: 0 5mm; }
+  .klein { font-size: 7pt; line-height: 1.25; color: #6b5442; text-align: center; }
+  .siegel { width: 7mm; height: 7mm; flex: none; }
+  .titel { position: relative; }
+  .leiste-deko { display: block; width: 34mm; height: 3.4mm; object-fit: cover; object-position: 50% 50%; margin-top: 0.6mm; }
+  /* gemalter Rahmen: Ecken bleiben unverzerrt, Seiten werden gestreckt */
+  .karte { border: 3.2mm solid transparent; border-image: url('bilder/zwergenpass-rahmen.png') 9% stretch; box-shadow: none; padding: 1.5mm 2.5mm 1.2mm; border-radius: 0; background-clip: padding-box; }
+  .karte::before, .karte::after { display: none; }
   .leiste { position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; align-items: center; padding: 10px 16px; background: #3a2617; color: #fff4dc; }
   .leiste span { margin-right: auto; font-family: 'Insel Titel', sans-serif; font-size: 20px; }
   .leiste a, .leiste button { font: inherit; font-weight: 700; color: #3a2617; background: #e8b23a; border: 0; border-radius: 8px; padding: 10px 16px; min-height: 44px; text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; }
@@ -49,17 +55,16 @@
 <script>
   const ziel = document.getElementById('blaetter');
   const feld = document.getElementById('anzahl');
-  /* Motiv fest nach Kartennummer: Karte 1 → Motiv 1, … (gleich bei jedem Druck).
-     Eigene Motive bilder/pass-motiv-01.png … -12.png werden genutzt, sobald es sie gibt; sonst das Zwergenporträt. */
-  const ZWERGE = ['01-brumm', '02-hilda', '03-tarek', '04-svea', '05-kira', '06-ole', '07-fenno', '08-smaragda', '09-bodo', '10-amara', '11-grimbart', '12-rubina'];
+  /* Motiv fest nach Kartennummer: Karte 1 → Porträt 1 … Karte 9 → wieder Porträt 1 (gleich bei jedem Druck) */
+  const PORTRAITS = 8;
   function portrait(n) {
-    const i = (n - 1) % ZWERGE.length; const nr = String(i + 1).padStart(2, '0');
-    return `<img src="bilder/pass-motiv-${nr}.png" alt="" onerror="this.onerror=null;this.src='bilder/zwerg-${ZWERGE[i]}.png'">`;
+    const nr = String(((n - 1) % PORTRAITS) + 1).padStart(2, '0');
+    return `<img src="bilder/zwergenpass-portrait-${nr}.png" alt="">`;
   }
   function karte(n) {
     return `
       <div class="karte">
-        <div class="kopf"><div class="portrait">${portrait(n)}</div><div class="titel">Zwergenpass<small>Zwergeninsel · Argumente-Schmiede</small></div><div class="nr">${n}</div></div>
+        <div class="kopf"><div class="portrait">${portrait(n)}</div><div class="titel">Zwergenpass<small>Zwergeninsel</small><img class="leiste-deko" src="bilder/zwergenpass-kopfzeile.png" alt=""></div><div class="nr">${n}</div></div>
         <div class="name">Name:</div>
         <div class="codes">
           <span>1. Stunde</span><span></span>
@@ -67,7 +72,7 @@
           <span>3. Stunde</span><span></span>
           <span>4. Stunde</span><span></span>
         </div>
-        <div class="klein">Immer den neuesten Code benutzen. Keine 0, 1, I oder O.</div>
+        <div class="fuss"><span class="klein">Immer den neuesten Code nutzen. Keine 0, 1, I, O.</span><img class="siegel" src="bilder/zwergenpass-siegel.png" alt=""></div>
       </div>`;
   }
   function zeichne() {

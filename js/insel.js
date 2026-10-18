@@ -150,15 +150,25 @@
   const lichtSchicht = h('div', { class: 'licht-schicht', 'aria-hidden': 'true' });
   buehne.append(schmuckSchicht, sonderSchicht, tiere, zwergSchicht, moewen, wolken, nachtSchicht, lichtSchicht);
   const LICHT_ART = { lagerfeuer: 'feuer', werkstatt: 'glut', leuchtturm: 'leuchtfeuer', brunnen: 'laterne', steg: 'laterne', schiff: 'laterne' };
+  const LICHT_BILD = { feuer: 'nacht-lagerfeuer', glut: 'nacht-schmiedeglut', fensterlicht: 'nacht-fensterlicht' };
+  const FACKEL = ['steg', 'brunnen', 'ratsplatz', 'leuchtturm', 'bibliothek', 'festhalle'];
+  const FEUERSTELLE = ['huette1', 'huette2', 'huette3', 'muehle'];
   function zeigeLichter() {
     const hoehe = (w) => w * 16 / 9; // Bühne ist 16:9, Gebäudebilder quadratisch
     const lichter = [];
+    const sprite = (datei, cls, x, y, w) => h('span', { class: 'licht-sprite ' + cls, style: { left: x + '%', top: y + '%', width: w + '%' } }, ZI.bildOder(datei, '', null));
     ZI.GEBAEUDE.forEach((g) => {
       if (!insel.gebaut.includes(g.id)) return; // Ruine: dunkel
       const art = LICHT_ART[g.id] || 'fensterlicht';
       const hh = hoehe(g.w);
       const y = art === 'leuchtfeuer' ? g.y - hh * 0.86 : art === 'feuer' ? g.y - hh * 0.25 : g.y - hh * 0.42;
+      // weicher Lichtschein
       lichter.push(h('span', { class: 'licht ' + art, style: { left: g.x + '%', top: y + '%', width: (art === 'fensterlicht' ? g.w * 0.9 : g.w * 1.1) + '%' } }));
+      // gemaltes Licht als Kern (unscharf), passend zur Lichtart
+      if (LICHT_BILD[art]) lichter.push(sprite(LICHT_BILD[art], 'kern ' + art, g.x, y, g.w * (art === 'fensterlicht' ? 0.32 : 0.45)));
+      // Leben vor den Häusern: Fackeln und kleine Feuerstellen
+      if (FACKEL.includes(g.id)) lichter.push(sprite('nacht-fackel', 'fackel', g.x - g.w * 0.38, g.y - hh * 0.06, g.w * 0.22));
+      if (FEUERSTELLE.includes(g.id)) lichter.push(sprite('nacht-feuerstelle-klein', 'feuerstelle', g.x + g.w * 0.42, g.y - hh * 0.02, g.w * 0.26));
     });
     schmuckSchicht.querySelectorAll('.schmuck.lampe').forEach((el) => {
       lichter.push(h('span', { class: 'licht laterne', style: { left: el.style.left, top: 'calc(' + el.style.top + ' - ' + (parseFloat(el.style.width) * 1.2) + '%)', width: (parseFloat(el.style.width) * 2.2) + '%' } }));

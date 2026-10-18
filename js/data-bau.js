@@ -381,7 +381,7 @@
     { id: 'aelteste', name: 'Älteste', bild: 'rolle-aelteste', zeichen: '🔔', aufgabe: 'Du leitest das Gespräch. Achte darauf, dass jeder einmal spricht – auch die Leisen.',
       einfach: { aufgabe: 'Du leitest das Gespräch.', achten: 'Jeder sagt etwas. Auch die Leisen.', tun: 'Frag: „Wer möchte anfangen?“ Am Ende sagst du: „Lasst uns entscheiden.“' },
       saetze: ['Wer möchte anfangen?', 'Was meinst du dazu, …?', 'Hat jeder schon etwas gesagt?', 'Lasst uns jetzt entscheiden.'] },
-    { id: 'bote', name: 'Bote', bild: 'rolle-bote', zeichen: '📜', aufgabe: 'Du merkst dir das Ergebnis. Im großen Rat sagst du es in einem Satz für deinen Stamm.',
+    { id: 'bote', name: 'Bote', bild: 'auftrag-rolle', zeichen: '📜', aufgabe: 'Du merkst dir das Ergebnis. Im großen Rat sagst du es in einem Satz für deinen Stamm.',
       einfach: { aufgabe: 'Du sprichst für deinen Stamm.', achten: 'Was hat dein Stamm entschieden? Und warum?', tun: 'Im großen Rat sagst du einen Satz: „Unser Stamm ist für …, weil …“' },
       saetze: ['Unser Stamm ist für …, weil …', 'Unser stärkster Grund ist …', 'Wir waren uns nicht einig, aber die meisten finden …'] },
     { id: 'gedaechtnis', name: 'Gedächtnis', bild: 'rolle-gedaechtnis', zeichen: '🧠', aufgabe: 'Du hörst genau zu und fasst zwischendurch zusammen, was gesagt wurde.',

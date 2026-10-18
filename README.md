@@ -30,7 +30,7 @@ Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden ke
 
 1. *Fehlerjagd* – Komma- und Verbfehler finden
 2. *Beispiel-Edelstein* – das Beispiel finden, das eine Begründung stützt
-3. *Meisterstück* – laut argumentieren, die Partnerin oder der Partner prüft mit einer Checkliste
+3. *Meisterstück* (Gemeinschaftsstollen) – zu zweit, jedes Kind mit eigenem iPad: jede Person sagt 3 Argumente, die andere prüft; danach Rollenwechsel
 
 **Bonusinsel:** *Funkenregen* – scharfe Begründungen fangen, bis zu 3 Sterne
 
@@ -48,7 +48,7 @@ Die App läuft komplett im Browser, ohne Anmeldung und ohne Server. Es werden ke
 
 1. *Kobold-Kampf* – gemischte Aufgaben aus Kapitel 1 und 2 als Bosskampf
 2. *Argument-Kette* – Stützen von neuen Argumenten unterscheiden (Reihe und Kette)
-3. *Meisterstück II* – laut argumentieren mit Meinung, Begründung und Beispiel, Partner-Check mit vier Punkten
+3. *Meisterstück II* (Gemeinschaftsstollen) – wie oben, jetzt mit Beispiel; Prüfung mit vier Kriterien
 
 **Bonusinsel:** *Beispiel-Regen* – passende Beispiele fangen
 
@@ -130,7 +130,7 @@ Die Schmiede läuft im normalen Browser-Tab, es wird nichts installiert. Alles, 
 
 ## Für die Lehrkraft
 
-- **Testmodus:** Auf dem Startbildschirm unten „Für Lehrkräfte: Testmodus“. Dann sind alle Stollen sofort offen.
+- **Lehrkraftbereich:** Titel „Zwergeninsel“ auf dem Startbildschirm 5 Sekunden gedrückt halten (Touch oder Maus). Dort: Zur Insel, Karten drucken, Stundenverlauf & Spickzettel, Testmodus an/aus. Jede Unterseite hat einen Zurück-Knopf.
 - **Kartennummern:** Jede Zwergenpass-Karte hat eine feste Nummer (1–32). Das Kind tippt sie einmal beim Start an. Über diese Nummer weiß die Insel, wer geliefert hat; die Übersicht im Lieferfenster zeigt, welche Nummern heute noch fehlen.
 - **Lieferschein:** 4 Zeichen pro Kind, nach dem 4. Zeichen wird ohne Enter geliefert. Tippfehler fallen meist sofort auf; passt der Zwerg nicht zur Karte, fragt die Insel nach. Der letzte Eintrag lässt sich rückgängig machen.
 - **Klassengröße:** Insel → Zahnrad. Das Dorf ist fertig, wenn alle Kinder ihren Hauptstollen geschafft haben.

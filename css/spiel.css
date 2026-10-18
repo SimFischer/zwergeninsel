@@ -738,13 +738,7 @@ a.lk-kachel:active { transform: translateY(2px); }
 .ue-laterne img { width: 100%; display: block; }
 .ue-laterne.links { left: 14%; } .ue-laterne.rechts { right: 14%; }
 @keyframes ue-licht { to { filter: drop-shadow(0 0 28px rgba(255,190,90,0.95)); } }
-.ue-tor { position: absolute; left: 50%; bottom: 10%; transform: translateX(-50%); width: min(60vh, 52vw); height: min(62vh, 60vw); border-radius: 50% 50% 0 0 / 30% 30% 0 0; overflow: hidden; box-shadow: 0 0 0 10px #4a3220, 0 0 0 16px #2c1d12; }
-.ue-torlicht { position: absolute; inset: 0; background: radial-gradient(circle at 50% 70%, #ffd98a, #c9782a 45%, #3a2014 80%); }
-.ue-torflügel { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 1; background: repeating-linear-gradient(90deg, #6b4226 0 22px, #5a3720 22px 26px); box-shadow: inset 0 0 0 4px #3a2417; transition: transform 1s ease-in 0.35s; }
-.ue-torflügel.links { left: 0; animation: ue-auf-l 1s ease-in 0.35s forwards; } .ue-torflügel.rechts { right: 0; animation: ue-auf-r 1s ease-in 0.35s forwards; }
-@keyframes ue-auf-l { to { transform: perspective(600px) rotateY(75deg); transform-origin: left; } }
-@keyframes ue-auf-r { to { transform: perspective(600px) rotateY(-75deg); transform-origin: right; } }
-.ue-gemeinsam .ue-figuren { z-index: 2; }
+.ue-gemeinsam .ue-figuren { z-index: 2; bottom: 10%; }
 .ue-feuer { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); width: min(26vh, 24vw); filter: drop-shadow(0 0 30px rgba(255,150,60,0.8)); }
 .ue-feuer img { width: 100%; display: block; }
 .ue-rat .ue-figuren { bottom: 18%; }
@@ -798,3 +792,22 @@ a.lk-kachel:active { transform: translateY(2px); }
 .rollen-erklaerung dd { margin: 0; }
 @media (max-width: 700px) { .rollen-erklaerung { grid-template-columns: 1fr; } .rollen-erklaerung dd { margin-bottom: 4px; } }
 .rollenkarte-zeichen { width: 84px; height: 84px; flex: none; display: flex; align-items: center; justify-content: center; }
+/* Freischaltung: gemalter Glanz hinter dem Zwerg */
+.gross-bild.mit-glanz { position: relative; isolation: isolate; }
+.gross-bild.mit-glanz .glanz { position: absolute; inset: -18%; z-index: -1; animation: drehen 18s linear infinite; }
+.gross-bild.mit-glanz .glanz img { width: 100%; height: 100%; object-fit: contain; opacity: 0.85; }
+.gross-bild.mit-glanz.strahlen::before { opacity: 0.5; }
+@media (prefers-reduced-motion: reduce) { .gross-bild.mit-glanz .glanz { animation: none; } }
+/* Gemeinschaftsstollen-Symbol */
+.st-marke { display: inline-flex; align-items: center; gap: 4px; }
+.st-marke-bild { width: 22px; height: 22px; display: inline-block; }
+.st-marke-bild img { width: 100%; height: 100%; object-fit: contain; }
+.gem-kopfbild { display: flex; align-items: center; gap: 12px; }
+.gem-kopfbild > img, .gem-kopfbild > .platzhalter { width: 84px; height: 84px; object-fit: contain; }
+.amboss-platz[data-art='metall'] .werkstueck:has(img[src*='schmiede-axt']) { width: 44%; left: 20%; bottom: 66%; }
+
+.sterne-bild { display: inline-flex; gap: 6px; vertical-align: middle; }
+.sterne-bild .stern { width: 64px; height: 64px; display: inline-block; filter: grayscale(1) brightness(0.55); opacity: 0.45; }
+.sterne-bild .stern.an { filter: none; opacity: 1; }
+.sterne-bild .stern img { width: 100%; height: 100%; object-fit: contain; }
+.sterne-bild.klein .stern { width: 26px; height: 26px; }

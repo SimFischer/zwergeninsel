@@ -167,7 +167,7 @@
     const f = ZI.fenster([
       bild('truhe-offen', 'Offene Schatztruhe', 'truhe-klein'),
       h('h2', null, 'Neuer Zwerg freigeschaltet!'),
-      h('div', { class: 'gross-bild strahlen' }, bild(z.datei, z.name)),
+      h('div', { class: 'gross-bild strahlen mit-glanz' }, h('div', { class: 'glanz', 'aria-hidden': 'true' }, bild('zwerg-freigeschaltet-glanz', '')), bild([z.datei + '-jubel', z.datei], z.name)),
       h('div', { style: { fontSize: '26px', fontFamily: 'var(--titel)' } }, z.name + ' · ' + z.rolle),
       h('div', { class: 'begleiter-blase pergament auf-pergament', style: { fontSize: '20px' } }, '„Hallo! Ich bin ' + z.name + '. Nimmst du mich mit in die Schmiede?“'),
       h('p', { style: { margin: 0 } }, 'Du kannst auch später in deiner Zwergen-Sammlung zu ' + z.name + ' wechseln.'),
@@ -182,6 +182,11 @@
     window.scrollTo(0, 0);
   }
 
+  /* Sterne als gemalte Bilder: erreichte leuchten, fehlende sind blass */
+  function sterneBild(anzahl, cls) {
+    return h('span', { class: 'sterne-bild ' + (cls || ''), role: 'img', 'aria-label': anzahl + ' von 3 Sternen' },
+      ...[0, 1, 2].map((i) => h('span', { class: 'stern' + (i < anzahl ? ' an' : '') }, bild('stern', ''))));
+  }
   function aktuellerZwerg() { return ZI.ZWERGE.find((z) => z.nr === stand.zwerg); }
 
   /* =========================================================
@@ -189,9 +194,9 @@
      art: 'schmiede' | 'stollen' | 'gemeinsam' | 'rat'
      ========================================================= */
   const SZENEN = {
-    schmiede: { hg: 'schmiede-hintergrund', deko: 'funken' },
-    stollen: { hg: 'stollen-hintergrund', deko: 'abstieg' },
-    gemeinsam: { hg: 'stollen-hintergrund', deko: 'tor' },
+    schmiede: { hg: ['transition-schmiede', 'schmiede-hintergrund'], deko: 'funken' },
+    stollen: { hg: ['transition-stollen', 'stollen-hintergrund'], deko: null },
+    gemeinsam: { hg: ['transition-gemeinschaftsstollen', 'stollen-hintergrund'], deko: null },
     rat: { hg: 'zwergenrat-hintergrund', deko: 'feuer' },
   };
   function partnerZwerg() {
@@ -213,9 +218,8 @@
     const ov = h('div', { class: 'uebergang ue-' + art + (ruhig ? ' ruhig' : ''), 'aria-live': 'polite', role: 'status' },
       h('div', { class: 'ue-hg' }, bild(sz.hg, '')),
       h('div', { class: 'ue-dunkel' }),
-      sz.deko === 'tor' ? h('div', { class: 'ue-tor' }, h('span', { class: 'ue-torflügel links' }), h('span', { class: 'ue-torflügel rechts' }), h('span', { class: 'ue-torlicht' })) : null,
-      sz.deko === 'tor' || sz.deko === 'abstieg' ? [h('div', { class: 'ue-laterne links' }, bild('laterne', '')), h('div', { class: 'ue-laterne rechts' }, bild('laterne', ''))] : null,
-      sz.deko === 'feuer' ? h('div', { class: 'ue-feuer' }, bild('lagerfeuer', '')) : null,
+      sz.deko === 'laternen' || sz.deko === 'abstieg' ? [h('div', { class: 'ue-laterne links' }, bild(sz.deko === 'laternen' ? 'nacht-fackel' : 'laterne', '')), h('div', { class: 'ue-laterne rechts' }, bild(sz.deko === 'laternen' ? 'nacht-fackel' : 'laterne', ''))] : null,
+      sz.deko === 'feuer' ? h('div', { class: 'ue-feuer' }, bild('nacht-lagerfeuer', '')) : null,
       sz.deko === 'funken' ? h('div', { class: 'ue-funken' }, ...Array.from({ length: 14 }, (_, i) => h('span', { style: { left: (8 + i * 6.5) + '%', animationDelay: (i % 5) * 0.15 + 's' } }))) : null,
       h('div', { class: 'ue-figuren' }, ...figuren),
       h('div', { class: 'ue-text' }, text));
@@ -508,7 +512,7 @@
         krone ? h('div', { class: 'krone-marke', 'aria-label': 'Goldene Krone: fehlerfrei geschafft' }, ZI.bildOder('krone', 'Krone', icon.krone())) : null,
         h('div', { class: 'icon' }, bild(def.icon, def.name)),
         h('div', null,
-          def.gemeinschaft ? h('div', { class: 'st-marke gemeinschaft' }, 'Gemeinschaftsstollen') : def.zuZweit ? h('div', { class: 'st-marke' }, 'Zu zweit') : null,
+          def.gemeinschaft ? h('div', { class: 'st-marke gemeinschaft' }, h('span', { class: 'st-marke-bild', 'aria-hidden': 'true' }, bild('gemeinschaftsstollen-icon', '')), 'Gemeinschaftsstollen') : def.zuZweit ? h('div', { class: 'st-marke' }, 'Zu zweit') : null,
           h('div', { class: 'st-name' }, (i !== undefined ? i + 1 + '. ' : '') + def.name),
           h('div', { class: 'st-info' }, gesperrt ? sperrText : def.info),
           def.gemeinschaft && !gesperrt ? h('div', { class: 'st-info st-gemeinsam' }, 'Diesen Stollen spielst du gemeinsam mit einem anderen Zwerg. Jeder auf seinem eigenen iPad.') : null,
@@ -545,7 +549,7 @@
           h('h2', null, 'Bonusinsel'),
           h('div', { class: 'stationen' },
             stationKarte(inh.bonus, k, sterne > 0, !tiefOffen, 'Schaffe zuerst den Hauptstollen.', undefined, null, 'bonus', 0),
-            h('div', { class: 'st-info', style: { alignSelf: 'center', fontSize: '18px' } }, 'Deine Sterne: ' + '★'.repeat(sterne) + '☆'.repeat(3 - sterne)))),
+            h('div', { class: 'st-info', style: { alignSelf: 'center', fontSize: '18px' } }, 'Deine Sterne: ', sterneBild(sterne, 'klein')))),
         h('section', { class: 'pergament stollen auf-pergament rueckblick-abschnitt' },
           h('div', null,
             h('h2', null, 'Rückblick: Was kann ich schon?'),
@@ -642,7 +646,7 @@
       h('div', { class: 'amboss' }, bild('amboss', 'Amboss'), ws, hammer));
     const el = h('div', { class: 'buehne' }, blase, h('div', { class: 'meisterin-reihe' }, meisterinBox, platz));
     // Was liegt wo? Metall auf dem Amboss, Werkzeug/Truhe daneben, Figuren neben dem Amboss
-    const artVon = (d) => (/^(eisen-|runenplatte)/.test(d) ? 'metall' : /^(kobold|zwerg-|meisterin)/.test(d) ? 'figur' : 'objekt');
+    const artVon = (d) => (/^(eisen-|runenplatte|schmiede-)/.test(d) ? 'metall' : /^(kobold|zwerg-|meisterin)/.test(d) ? 'figur' : 'objekt');
     platz.dataset.art = artVon(werkstueck);
 
     return {
@@ -710,6 +714,7 @@
 
   /* Station oder Stollen geschafft */
   function geschafft({ titel, text, datei, alt, eintragen }) {
+    if (document.querySelector('.fenster.geschafft-fenster')) return; // schon offen (z. B. Doppeltippen)
     ZI.ton.fanfare();
     ZI.konfetti();
     const st = aktStation;
@@ -725,6 +730,7 @@
       krone ? h('div', { class: 'krone-info' }, ZI.bildOder('krone', 'Krone', icon.krone()), h('span', null, schonKrone ? 'Wieder fehlerfrei – deine goldene Krone glänzt!' : 'Ganz ohne Fehler! Dafür bekommst du eine goldene Krone.')) : null,
       h('button', { class: 'knopf', onclick: () => { f.schliessen(); fortschritt((s) => { eintragen(s); if (krone) s.setzeKrone(st.k, st.i); }, () => zeigeHalle()); } }, 'Zurück zur Halle'),
     ]);
+    f.el.classList.add('geschafft-fenster');
   }
 
   /* ---------- Ränge und Abzeichen ---------- */
@@ -865,7 +871,7 @@
       frageText: 'Welche Begründung ist scharf wie eine gute Axt?',
       items: mischen(ZI.STUMPF_SCHARF).slice(0, 6).map((it) => ({ kopf: it.meinung, optionen: it.optionen.map((o) => ({ text: o.text, ok: o.scharf, info: o.info })) })),
       tipp: ZI.TIPPS.stumpf,
-      wsVorher: 'axt-stumpf', wsNachher: 'axt-scharf',
+      wsVorher: 'schmiede-axt-werkstueck', wsNachher: 'axt-scharf',
       start: 'Eine scharfe Begründung erklärt, WARUM. Eine stumpfe sagt nur dasselbe noch einmal.',
       ende: () => geschafft({ titel: 'Station geschafft!', text: 'Du hast alle Äxte geschärft. Dafür bekommt das Dorf Holz.', datei: 'holz', alt: 'Holz',
         eintragen: (s) => s.setzeKern(K, 0) }),
@@ -1178,7 +1184,7 @@
     function vorbereiten() {
       bue.sage('Dieser Stollen wird nur zu zweit gemeistert.', 'erklaert');
       ZI.setze(box,
-        kopfZeile('Gemeinschaftsstollen', 'marke'),
+        h('div', { class: 'gem-kopfbild' }, bild('gemeinschaftsstollen-icon', 'Gemeinschaftsstollen'), kopfZeile('Gemeinschaftsstollen', 'marke')),
         h('h2', { class: 'gem-titel' }, 'Bevor es losgeht'),
         h('ol', { class: 'gem-liste' },
           h('li', null, 'Such dir einen Partner.'),
@@ -1280,7 +1286,7 @@
         h('p', { class: 'gem-text' }, 'Dein Partner prüft auf seinem iPad. Was sagt er?'),
         h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-end' } },
           h('button', { class: 'knopf holz', onclick: () => sagen(satz, zaehler) }, 'Noch einmal sagen'),
-          h('button', { class: 'knopf', onclick: () => { erledigt++; ZI.ton.richtig(); weiter(); } }, 'Mein Partner sagt: geschafft!')));
+          h('button', { class: 'knopf', onclick: (e) => { e.currentTarget.disabled = true; erledigt++; ZI.ton.richtig(); weiter(); } }, 'Mein Partner sagt: geschafft!')));
     }
 
     /* Prüfen: zuhören und Kriterien abhaken */
@@ -1295,12 +1301,15 @@
           onclick: () => { an[i] = !an[i]; ZI.ton.plopp(); zeichne(); } }, h('span', { class: 'kasten' }, an[i] ? icon.haken() : null), p)));
       }
       zeichne();
+      let geprueft = false; // nach dem Prüfen wird derselbe Knopf zu „Weiter“ – nur einmal zählen
       const fertig = h('button', { class: 'knopf', style: { alignSelf: 'flex-end' }, onclick: () => {
+        if (geprueft) { fertig.disabled = true; weiter(); return; }
         if (an.every(Boolean)) {
+          geprueft = true;
           ZI.ton.richtig(); bue.schlag(() => bue.werkstueck('axt-scharf'));
           erledigt++;
           ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, 'Super! Sag deinem Partner: „Geschafft!“'));
-          fertig.textContent = 'Weiter'; fertig.onclick = weiter;
+          fertig.textContent = 'Weiter';
         } else {
           ZI.ton.falsch();
           ZI.setze(rueck, h('div', { class: 'rueckmeldung tipp' }, 'Sag freundlich, was gefehlt hat: „Mir hat noch … gefehlt.“ Dann versucht ihr es noch einmal.'));
@@ -1314,7 +1323,10 @@
         liste, rueck, fertig);
     }
 
+    let abgeschlossen = false;
     function abschluss() {
+      if (abgeschlossen) return; // Doppeltippen darf den Abschluss nicht zweimal auslösen
+      abgeschlossen = true;
       rahmen.fortschritt(PRO * 2);
       bue.schlag(() => bue.werkstueck('axt-scharf'));
       setTimeout(() => geschafft({
@@ -1571,7 +1583,7 @@
       frageText: 'Welche Antwort zeigt, dass jemand wirklich zugehört hat?',
       items: mischen(ZI.ZUHOEREN).slice(0, 6).map((it) => ({ vorher: it.vorher, optionen: it.optionen })),
       tipp: ZI.TIPPS.zuhoeren,
-      wsVorher: 'eisen-roh', wsNachher: 'axt-scharf',
+      wsVorher: 'schmiede-axt-werkstueck', wsNachher: 'axt-scharf',
       start: 'Gute Zuhörer wiederholen richtig, was der andere gesagt hat, und gehen darauf ein. Pass auf Antworten auf, die etwas verdrehen!',
       ende: () => geschafft({ titel: 'Station geschafft!', text: 'Du bist ein echter Zuhör-Profi. Dafür bekommt das Dorf Stein.', datei: 'stein', alt: 'Stein', eintragen: (s) => s.setzeKern(K, 1) }),
     });
@@ -1602,7 +1614,7 @@
       // erst „Ja, aber“ erkennen, dann selbst das Gegenargument finden
       items: [...mischen(ZI.JA_UND).slice(0, 2).map(aufgabeArt), ...mischen(ZI.GEGENARGUMENTE).slice(0, 8).map(aufgabeGegen)],
       tipp: ZI.TIPPS.gegen,
-      wsVorher: 'eisen-gluehend', wsNachher: 'axt-scharf',
+      wsVorher: 'schmiede-axt-werkstueck', wsNachher: 'axt-scharf',
       start: 'Ein Gegenargument spricht gegen eine Meinung. Wer Gegenargumente kennt, kann besser mitdiskutieren – und seine eigene Meinung prüfen.',
       ende: () => geschafft({ titel: 'Stollen geschafft!', text: 'Du schmiedest starke Gegenargumente. Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.', datei: 'edelstein', alt: 'Edelstein', eintragen: (s) => s.setzeTief(K, 0) }),
     });
@@ -1685,7 +1697,7 @@
       const f = ZI.fenster([
         h('div', { class: 'gross-bild strahlen' }, bild('stern', 'Stern')),
         h('h2', null, treffer + ' von ' + saetze.length + ' glatten Wechseln!'),
-        h('div', { style: { fontSize: '48px', color: 'var(--gold-dunkel)', letterSpacing: '6px' } }, '★'.repeat(sterne) + '☆'.repeat(3 - sterne)),
+        sterneBild(sterne),
         h('p', { style: { margin: 0 } }, 'Im echten Gespräch zeigen wir mit Blicken, Melden oder einem kurzen „Darf ich?“, dass wir etwas sagen möchten.'),
         h('div', { class: 'knopf-reihe' },
           h('button', { class: 'knopf holz', onclick: () => { f.schliessen(); spielSprecherwechsel(); } }, 'Nochmal'),
@@ -1795,7 +1807,7 @@
       const f = ZI.fenster([
         h('div', { class: 'gross-bild strahlen' }, bild('stern', 'Stern')),
         h('h2', null, punkte + ' Funken gefangen!'),
-        h('div', { style: { fontSize: '48px', color: 'var(--gold-dunkel)', letterSpacing: '6px' } }, '★'.repeat(sterne) + '☆'.repeat(3 - sterne)),
+        sterneBild(sterne),
         h('p', { style: { margin: 0 } }, sterne > vorher ? 'Neuer Rekord! Jeder Stern ist ein Edelstein für dein Dorf.' : 'Ab 6 Funken gibt es 1 Stern, ab 10 Funken 2 und ab 14 Funken 3 Sterne.'),
         h('div', { class: 'knopf-reihe' },
           h('button', { class: 'knopf holz', onclick: () => { f.schliessen(); spielFunkenregen(pool, titel, intro); } }, 'Nochmal'),
