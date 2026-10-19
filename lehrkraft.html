@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Zwergeninsel – Stundenverlauf und Spickzettel</title>
+<title>Zwergeninsel – Einführung, Spickzettel und Stundenverlauf</title>
 <link href="schrift/schrift.css" rel="stylesheet">
 <style>
   @page { size: A4; margin: 12mm; }
@@ -40,69 +40,67 @@
     .blatt { box-shadow: none; margin: 0; padding: 0; max-width: none; border-radius: 0; break-after: page; }
     .blatt:last-child { break-after: auto; }
   }
+  .intro-kopf { display: flex; gap: 14px; align-items: flex-start; }
+  .intro-kopf img { width: 32mm; flex: none; }
+  .vorlesen p { margin: 7px 0; font-size: 1.2em; line-height: 1.5; }
+  .hell { color: var(--hell); font-weight: 400; }
   @media (max-width: 700px) { .spalten { grid-template-columns: 1fr; } .blatt { padding: 18px; } }
 </style>
 </head>
 <body>
-<div class="leiste"><a class="zurueck" href="index.html#lehrkraft" aria-label="Zurück zum Lehrkraftbereich">← Zurück</a><span>Zwergeninsel · Für Lehrkräfte</span><a href="#s1">Stunde 1</a><a href="#s2">Stunde 2</a><a href="#s3">Stunde 3</a><a href="#spick">Spickzettel</a><button onclick="window.print()">Drucken</button></div>
+<div class="leiste"><a class="zurueck" href="index.html#lehrkraft" aria-label="Zurück zum Lehrkraftbereich">← Zurück</a><span>Zwergeninsel · Für Lehrkräfte</span><a href="#intro">Einführung</a><a href="#spick">Spickzettel</a><a href="#s1">Stunde 1</a><a href="#s2">Stunde 2</a><a href="#s3">Stunde 3</a><button onclick="window.print()">Drucken</button></div>
 
-<!-- ===================== STUNDE 1 ===================== -->
-<section class="blatt" id="s1">
-  <h1>Stunde 1 · Gestrandet</h1>
-  <p class="unter">Schwerpunkt: Begründungen, die wirklich erklären – Verknüpfen mit weil, da und denn.</p>
-  <div class="kasten gold"><b>Vorbereiten:</b> Zwergenpass-Karten drucken (<span class="k">karten.html</span>) und verteilen. Insel am Board öffnen, unter Zahnrad die Klassengröße prüfen. Koffer-iPads mit der Schmiede (<span class="k">index.html</span>) bereitlegen – am besten die Seite schon vorher einmal auf jedem iPad öffnen, dann läuft sie auch bei schwachem WLAN.</div>
-  <table>
-    <tr><th>Zeit</th><th>Wer</th><th>Ablauf</th></tr>
-    <tr><td class="zeit">0–5</td><td class="wer">Plenum</td><td><b>Geschichte am Board:</b> Der Zwergenclan ist gestrandet. Die Ruinen zeigen, was wir aufbauen. „Mit jedem guten Argument bekommt das Dorf Baumaterial.“ Ziel klären: Wir lernen, unsere Meinung überzeugend zu begründen. <b>Brücke zum Unterricht:</b> „Gute Argumente sind wie gutes Werkzeug – sie funktionieren überall. Darum üben wir an Fragen aus eurer Schule.“ (So begrüßt auch Meisterin Hammerlind in der Schmiede.)</td></tr>
-    <tr><td class="zeit">5–8</td><td class="wer">iPads</td><td><b>Start:</b> „Neuer Zwerg“ → Zwerg wählen → Kartennummer antippen (steht oben auf der Karte). Name auf die Karte schreiben.</td></tr>
-    <tr><td class="zeit">8–25</td><td class="wer">iPads</td><td><b>Schmiede, Hauptstollen:</b> Stumpf oder scharf? · Erz oder Schlacke? · Weil-Denn-Amboss. Meisterin Hammerlind macht jede Station einmal vor. Danach erscheint „Stollen gemeistert!“. Wer mag: <b>„Noch tiefer graben“</b> (Tiefe 1–5, jede schwerer, freiwillig) und Funkenregen – das bringt Edelsteine für Schmuck, nicht für Gebäude.<br><i>Sie gehen herum, hören beim Meisterstück zu und helfen Kindern, die zweimal falsch lagen.</i></td></tr>
-    <tr><td class="zeit">25–29</td><td class="wer">Board</td><td><b>Lieferung:</b> „Lieferung“ antippen. Jedes Kind sagt seinen Lieferschein („Sieben: S V C U“), Sie tippen am Laptop mit. Danach schreiben die Kinder ihren Zwergenpass auf die Karte. Das Dorf wächst – und hält an: <b>Der Zwergenrat muss entscheiden.</b></td></tr>
-    <tr><td class="zeit">29–39</td><td class="wer">Stämme</td><td><b>Zwergenrat in den Stämmen:</b> Tafel → „Zwergenrat beginnen“. Sie wählen eine <b>Streitfrage</b> aus dem Schulalltag (z. B. Schule ab 9 Uhr, Hausaufgaben, Handys in der Pause) – noch ohne Gebäude. Das Board bildet Stämme zu 3–4 Zwergen, verteilt <b>Pro</b> (dafür) und <b>Contra</b> (dagegen) – 2 gegen 2 oder 2 gegen 1 – und die Rollen. Stammescode antippen, die Kinder geben ihn ein. Das iPad führt Schritt für Schritt: Frage → Seite („Du musst nicht persönlich dieser Meinung sein“) → Partner mit derselben Seite → Argumenttafel (mind. 3 Argumente) → Diskussion im Stamm → Stammesentscheidung → Bote. Redezeit am Board: 10 Minuten.</td></tr>
-    <tr><td class="zeit">39–45</td><td class="wer">Plenum</td><td><b>Klassenabstimmung:</b> „Zur Klassenabstimmung“. Die Boten melden nacheinander: „Die … stimmen für …, weil …“. Sie zählen mit +/− pro Seite, dann „Abstimmung abschließen“ – das Board fragt noch einmal nach und warnt, wenn Stimmen und Stämme nicht zusammenpassen. Gleichstand: Stichwahl per Handzeichen. Erst jetzt kommt die Spielwelt dazu: „Der Zwergenrat hat entschieden!“ – gewinnt Pro, entsteht das eine Gebäude, gewinnt Contra, das andere.</td></tr>
-  </table>
-  <div class="spalten">
-    <div class="kasten gruen"><b>Differenzierung</b><ul><li>Langsame: nur Hauptstollen, Laterne (Tipp), Hilfe nach 2 Fehlern.</li><li>Schnelle: „Noch tiefer graben“ (Tiefe 1–5, jede schwerer, Tiefe 5 zu zweit), Bonusinsel. Weitergraben ist freiwillig – nach jeder Tiefe darf man aufhören.</li><li>Das Dorf wächst nur durch den Hauptstollen – jedes Kind zählt gleich.</li></ul></div>
-    <div class="kasten"><b>Wenn die Zeit knapp wird</b><ul><li>Zweite Ratsfrage (Kapitel 1 hat zwei) zu Beginn von Stunde 2 – gleiche Stämme, neue Streitfrage.</li><li>Argumenttafel und Diskussion je 4 Minuten (die Wache achtet auf die Zeit).</li><li>Lieferung nie streichen – sonst fehlt das Material.</li></ul></div>
+<!-- ===================== EINFÜHRUNG ===================== -->
+<section class="blatt" id="intro">
+  <h1>Die Zwergeninsel</h1>
+  <p class="unter">Eine Lern-App für mündliches Argumentieren in Klasse 5 · 3 Unterrichtsstunden à 45 Minuten</p>
+  <div class="intro-kopf">
+    <img src="bilder/meisterin-erklaert.png" alt="Meisterin Hammerlind">
+    <div>
+      <p style="margin-top:0"><b>Worum geht es?</b> Ein Zwergenclan ist auf einer Insel gestrandet. Die Kinder üben auf den iPads in der <b>Schmiede</b>, ihre Meinung zu begründen, zuzuhören und auf Gegenargumente einzugehen. Jedes gute Argument bringt Baumaterial – am Board wächst daraus das gemeinsame <b>Zwergendorf</b>. Über die Reihenfolge der Gebäude entscheidet die Klasse selbst: im <b>Zwergenrat</b>, mit einer echten Diskussion über eine Frage aus dem Schulalltag.</p>
+      <p style="margin-bottom:0"><b>Das Ziel:</b> Die Kinder sprechen mehr, nicht weniger. Die App übt die Bausteine (Meinung – Begründung – Beispiel, Zuhören, Gegenargument), der Zwergenrat und die Partnerstollen bringen sie ins Gespräch.</p>
+    </div>
   </div>
-</section>
-
-<!-- ===================== STUNDE 2 ===================== -->
-<section class="blatt" id="s2">
-  <h1>Stunde 2 · Das Dorf wächst</h1>
-  <p class="unter">Schwerpunkt: Meinung – Begründung – Beispiel, Gesprächsmotoren und gutes Zuhören.</p>
-  <table>
-    <tr><th>Zeit</th><th>Wer</th><th>Ablauf</th></tr>
-    <tr><td class="zeit">0–6</td><td class="wer">Plenum</td><td><b>Inselrätsel:</b> 5 Wiederholungsfragen, die Klasse zeigt A/B/C mit den Fingern. Für jede Runde, in der die Mehrheit richtig lag, bringt eine Möwe ein Geschenk.<br>Optional: <b>Auftrag des Tages</b> wählen (z. B. „Heute graben wir zusammen 11 Tiefen tiefer“).</td></tr>
-    <tr><td class="zeit">6–9</td><td class="wer">iPads</td><td><b>Anmelden:</b> „Ich habe einen Zwergenpass“ → Code von der Karte eintippen. Dann <b>Inselbotschaft</b> eintippen (steht in der Materialtafel, drei Silben – antippen = groß für alle). Damit öffnen sich Kapitel 2 und die Gebäude-Stollen.</td></tr>
-    <tr><td class="zeit">9–28</td><td class="wer">iPads</td><td><b>Schmiede, Kapitel 2:</b> Argument-Puzzle · Motor oder Bremse? · Hör-Stollen (zu zweit: der Partner liest vor). Wer fertig ist: Gebäude-Stollen aus Kapitel 1, „Noch tiefer graben“, Beispiel-Regen. Wer Kapitel 1 noch nicht fertig hat, macht das zuerst.</td></tr>
-    <tr><td class="zeit">28–32</td><td class="wer">Board</td><td><b>Lieferung</b> wie in Stunde 1. Pässe aufschreiben lassen.</td></tr>
-    <tr><td class="zeit">32–45</td><td class="wer">Stämme + Plenum</td><td><b>Zwergenrat:</b> neue Streitfrage, gleicher Ablauf wie in Stunde 1. Mit „Neu mischen“ bekommen alle neue Stämme, Seiten und Rollen (neuer Stammescode). Auf Anknüpfen achten: „Du sagst, dass … Ich denke dazu …“. Kapitel 2 hat zwei Ratsfragen: Nach dem Ergebnis führt „Nächste Streitfrage“ direkt weiter – oder die zweite Frage zu Beginn von Stunde 3.</td></tr>
-  </table>
-  <div class="kasten gold"><b>Kapitel 2 öffnet sich nicht?</b> Ein Kapitel ist geschafft, wenn das Material der ganzen Klasse reicht (3 pro Kind). Fehlen Kinder, unter Zahnrad die Klassengröße verkleinern oder dort „Kapitel 2“ von Hand wählen. Danach zeigt die Tafel die passende Inselbotschaft.</div>
-</section>
-
-<!-- ===================== STUNDE 3 ===================== -->
-<section class="blatt" id="s3">
-  <h1>Stunde 3 · Das Inselfest</h1>
-  <p class="unter">Schwerpunkt: auf andere eingehen, Einwände entkräften, Gegenargumente – und Rückblick.</p>
-  <table>
-    <tr><th>Zeit</th><th>Wer</th><th>Ablauf</th></tr>
-    <tr><td class="zeit">0–5</td><td class="wer">Plenum</td><td><b>Inselrätsel</b> (jetzt mit Fragen aus allen Kapiteln).</td></tr>
-    <tr><td class="zeit">5–8</td><td class="wer">iPads</td><td>Zwergenpass und neue <b>Inselbotschaft</b> eintippen.</td></tr>
-    <tr><td class="zeit">8–26</td><td class="wer">iPads</td><td><b>Schmiede, Kapitel 3:</b> Ja, und – ja, aber? · Wer hört zu? · Überzeug den Inselrat (Grimbart und Amara prüfen Inselvorhaben wie Hängebrücke, Strandfest oder Ziegen). Danach Gebäude-Stollen aus Kapitel 2 und „Noch tiefer graben“ (Tiefe 5: Streitgespräch zu zweit).</td></tr>
-    <tr><td class="zeit">26–30</td><td class="wer">Board</td><td><b>Lieferung.</b> Für die Urkunden möglichst den <b>langen Zwergenpass</b> eingeben lassen (Lieferungen → „Langen Zwergenpass-Code eintippen“): Dann kennt die Insel auch Kronen und Gebäude-Stollen.</td></tr>
-    <tr><td class="zeit">30–37</td><td class="wer">Plenum</td><td><b>Letzter Zwergenrat:</b> eine letzte Streitfrage – kurz in den Stämmen (Tafel und Diskussion je 3 Minuten), dann melden die Boten. Die Siegerseite entscheidet: Leuchtturm oder Festhalle. Danach entsteht das Schiff, das Fest beginnt, das Schiff segelt los.</td></tr>
-    <tr><td class="zeit">37–45</td><td class="wer">iPads</td><td><b>Rückblick:</b> In jedem Kapitel ganz unten „Selbst einschätzen“. Die Kinder sehen, welche Station sie noch üben können, und formulieren ein Ziel. Abschluss im Kreis: „Was kann ich jetzt besser als vor drei Stunden?“</td></tr>
-  </table>
   <div class="spalten">
-    <div class="kasten gruen"><b>Nach der Stunde</b><ul><li>Zahnrad → <b>Klassenüberblick</b>: Welche Station fällt schwer? Wer hat den Hauptstollen noch nicht fertig?</li><li>Zahnrad → <b>Urkunden drucken</b>: eine pro Kind, mit „Ich kann …“-Tabelle zum Ankreuzen.</li></ul></div>
-    <div class="kasten"><b>Weiterarbeiten</b><ul><li>Die Selbsteinschätzung ist eine gute Grundlage für ein Lernentwicklungsgespräch.</li><li>Im Klassenrat Pro/Contra, Rollen und Satzanfänge weiter nutzen – die Streitfragen funktionieren auch ohne App.</li><li>Jede Station hat viele Aufgaben – ein zweiter Durchgang bringt neue Beispiele, gut zum Üben vor der Klassenarbeit.</li></ul></div>
+    <div>
+      <h2>So ist die App aufgebaut</h2>
+      <ul>
+        <li><b>Schmiede</b> (iPads, <span class="k">index.html</span>): Jedes Kind spielt mit seinem Zwerg. Pro Kapitel ein <b>Hauptstollen</b> mit drei Stationen – den schafft jedes Kind, nur er zählt für die Klasse.</li>
+        <li><b>Noch tiefer graben</b>: freiwillig für Schnelle, Tiefe 1–5, jede schwerer. Bringt Edelsteine für Schmuck, aber keinen Vorsprung.</li>
+        <li><b>Insel</b> (Board, <span class="k">insel.html</span>): Lieferungen eintippen, das Dorf wächst, Zwergenrat und Inselrätsel.</li>
+        <li><b>Zwergenrat</b>: Stämme zu 3–4 Kindern diskutieren eine Streitfrage mit verteilten Rollen (Pro/Contra), dann stimmt die Klasse ab.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Gut zu wissen</h2>
+      <ul>
+        <li>Keine Anmeldung, keine Namen, keine fremden Server. Der Spielstand steckt in einem Code auf der <b>Zwergenpass-Karte</b>.</li>
+        <li>Nichts wird auf den iPads installiert: Safari öffnen, am Ende Tab schließen.</li>
+        <li>Läuft nach dem ersten Öffnen auch ohne WLAN.</li>
+        <li>Vorbereitung: Karten drucken (<span class="k">karten.html</span>), Insel am Board öffnen, Klassengröße einstellen.</li>
+      </ul>
+      <h2>Die drei Stunden</h2>
+      <ul>
+        <li><b>1 · Gestrandet:</b> Begründen mit weil, da, denn.</li>
+        <li><b>2 · Das Dorf wächst:</b> Meinung – Begründung – Beispiel, Zuhören.</li>
+        <li><b>3 · Das Inselfest:</b> Anknüpfen, Einwände, Gegenargumente, Rückblick.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="kasten gold vorlesen">
+    <b>Zum Vorlesen in der ersten Stunde</b> <span class="hell">(etwa 1 Minute, dabei die Insel am Board zeigen)</span>
+    <p>„Stellt euch vor: Ein Sturm hat ein Schiff voller Zwerge an eine fremde Insel gespült. Das Schiff ist kaputt, die alten Häuser auf der Insel sind nur noch Ruinen. Seht ihr sie hier auf dem Board?</p>
+    <p>Die Zwerge wollen ihr Dorf wieder aufbauen – und dafür brauchen sie euch. Jede und jeder von euch bekommt gleich einen eigenen Zwerg. In der Schmiede arbeitet Meisterin Hammerlind. Sie zeigt euch, wie man <b>Argumente schmiedet</b>: Man sagt seine Meinung und erklärt, <b>warum</b>. Für jedes gute Argument gibt es Holz, Stein und Eisen. Am Ende der Stunde liefert ihr euer Material hier am Board ab – und das Dorf wächst.</p>
+    <p>Aber Zwerge bauen nichts, ohne vorher zu beraten. Deshalb trifft sich immer wieder der <b>Zwergenrat</b>. Dort diskutiert ihr in kleinen Stämmen über Fragen aus unserer Schule – zum Beispiel, ob Handys in der Pause erlaubt sein sollen. Was die Klasse entscheidet, bestimmt, welches Haus als Nächstes gebaut wird.</p>
+    <p>Das Wichtigste: Das Dorf wächst nur, wenn <b>alle</b> mitmachen. Es kommt nicht darauf an, wer am schnellsten ist, sondern dass jede und jeder seine Stationen schafft. Wer fertig ist, kann noch tiefer in den Stollen graben und Edelsteine finden.</p>
+    <p style="margin-bottom:0">Und denkt daran: Gute Argumente sind wie gutes Werkzeug. Sie funktionieren nicht nur auf der Insel, sondern überall – auch hier in unserer Klasse. Also: Ran an die Hämmer!“</p>
   </div>
 </section>
 
 <!-- ===================== SPICKZETTEL ===================== -->
 <section class="blatt" id="spick">
   <h1>Spickzettel fürs Lehrerpult</h1>
+  <p class="unter">Die ganze Einheit auf einer Seite – zum Hinlegen neben das Board.</p>
   <div class="spalten">
     <div>
       <h2>Die Codes</h2>
@@ -160,5 +158,60 @@
     </div>
   </div>
 </section>
+
+<!-- ===================== STUNDE 1 ===================== -->
+<section class="blatt" id="s1">
+  <h1>Stunde 1 · Gestrandet</h1>
+  <p class="unter">Schwerpunkt: Begründungen, die wirklich erklären – Verknüpfen mit weil, da und denn.</p>
+  <div class="kasten gold"><b>Vorbereiten:</b> Zwergenpass-Karten drucken (<span class="k">karten.html</span>) und verteilen. Insel am Board öffnen, unter Zahnrad die Klassengröße prüfen. Koffer-iPads mit der Schmiede (<span class="k">index.html</span>) bereitlegen – am besten die Seite schon vorher einmal auf jedem iPad öffnen, dann läuft sie auch bei schwachem WLAN.</div>
+  <table>
+    <tr><th>Zeit</th><th>Wer</th><th>Ablauf</th></tr>
+    <tr><td class="zeit">0–5</td><td class="wer">Plenum</td><td><b>Geschichte am Board:</b> Der Zwergenclan ist gestrandet. Die Ruinen zeigen, was wir aufbauen. „Mit jedem guten Argument bekommt das Dorf Baumaterial.“ Ziel klären: Wir lernen, unsere Meinung überzeugend zu begründen. <b>Brücke zum Unterricht:</b> „Gute Argumente sind wie gutes Werkzeug – sie funktionieren überall. Darum üben wir an Fragen aus eurer Schule.“ (So begrüßt auch Meisterin Hammerlind in der Schmiede.)</td></tr>
+    <tr><td class="zeit">5–8</td><td class="wer">iPads</td><td><b>Start:</b> „Neuer Zwerg“ → Zwerg wählen → Kartennummer antippen (steht oben auf der Karte). Name auf die Karte schreiben.</td></tr>
+    <tr><td class="zeit">8–25</td><td class="wer">iPads</td><td><b>Schmiede, Hauptstollen:</b> Stumpf oder scharf? · Erz oder Schlacke? · Weil-Denn-Amboss. Meisterin Hammerlind macht jede Station einmal vor. Danach erscheint „Stollen gemeistert!“. Wer mag: <b>„Noch tiefer graben“</b> (Tiefe 1–5, jede schwerer, freiwillig) und Funkenregen – das bringt Edelsteine für Schmuck, nicht für Gebäude.<br><i>Sie gehen herum, hören beim Meisterstück zu und helfen Kindern, die zweimal falsch lagen.</i></td></tr>
+    <tr><td class="zeit">25–29</td><td class="wer">Board</td><td><b>Lieferung:</b> „Lieferung“ antippen. Jedes Kind sagt seinen Lieferschein („Sieben: S V C U“), Sie tippen am Laptop mit. Danach schreiben die Kinder ihren Zwergenpass auf die Karte. Das Dorf wächst – und hält an: <b>Der Zwergenrat muss entscheiden.</b></td></tr>
+    <tr><td class="zeit">29–39</td><td class="wer">Stämme</td><td><b>Zwergenrat in den Stämmen:</b> Tafel → „Zwergenrat beginnen“. Sie wählen eine <b>Streitfrage</b> aus dem Schulalltag (z. B. Schule ab 9 Uhr, Hausaufgaben, Handys in der Pause) – noch ohne Gebäude. Das Board bildet Stämme zu 3–4 Zwergen, verteilt <b>Pro</b> (dafür) und <b>Contra</b> (dagegen) – 2 gegen 2 oder 2 gegen 1 – und die Rollen. Stammescode antippen, die Kinder geben ihn ein. Das iPad führt Schritt für Schritt: Frage → Seite („Du musst nicht persönlich dieser Meinung sein“) → Partner mit derselben Seite → Argumenttafel (mind. 3 Argumente) → Diskussion im Stamm → Stammesentscheidung → Bote. Redezeit am Board: 10 Minuten.</td></tr>
+    <tr><td class="zeit">39–45</td><td class="wer">Plenum</td><td><b>Klassenabstimmung:</b> „Zur Klassenabstimmung“. Die Boten melden nacheinander: „Die … stimmen für …, weil …“. Sie zählen mit +/− pro Seite, dann „Abstimmung abschließen“ – das Board fragt noch einmal nach und warnt, wenn Stimmen und Stämme nicht zusammenpassen. Gleichstand: Stichwahl per Handzeichen. Erst jetzt kommt die Spielwelt dazu: „Der Zwergenrat hat entschieden!“ – gewinnt Pro, entsteht das eine Gebäude, gewinnt Contra, das andere.</td></tr>
+  </table>
+  <div class="spalten">
+    <div class="kasten gruen"><b>Differenzierung</b><ul><li>Langsame: nur Hauptstollen, Laterne (Tipp), Hilfe nach 2 Fehlern.</li><li>Schnelle: „Noch tiefer graben“ (Tiefe 1–5, jede schwerer, Tiefe 5 zu zweit), Bonusinsel. Weitergraben ist freiwillig – nach jeder Tiefe darf man aufhören.</li><li>Das Dorf wächst nur durch den Hauptstollen – jedes Kind zählt gleich.</li></ul></div>
+    <div class="kasten"><b>Wenn die Zeit knapp wird</b><ul><li>Zweite Ratsfrage (Kapitel 1 hat zwei) zu Beginn von Stunde 2 – gleiche Stämme, neue Streitfrage.</li><li>Argumenttafel und Diskussion je 4 Minuten (die Wache achtet auf die Zeit).</li><li>Lieferung nie streichen – sonst fehlt das Material.</li></ul></div>
+  </div>
+</section>
+
+<!-- ===================== STUNDE 2 ===================== -->
+<section class="blatt" id="s2">
+  <h1>Stunde 2 · Das Dorf wächst</h1>
+  <p class="unter">Schwerpunkt: Meinung – Begründung – Beispiel, Gesprächsmotoren und gutes Zuhören.</p>
+  <table>
+    <tr><th>Zeit</th><th>Wer</th><th>Ablauf</th></tr>
+    <tr><td class="zeit">0–6</td><td class="wer">Plenum</td><td><b>Inselrätsel:</b> 5 Wiederholungsfragen, die Klasse zeigt A/B/C mit den Fingern. Für jede Runde, in der die Mehrheit richtig lag, bringt eine Möwe ein Geschenk.<br>Optional: <b>Auftrag des Tages</b> wählen (z. B. „Heute graben wir zusammen 11 Tiefen tiefer“).</td></tr>
+    <tr><td class="zeit">6–9</td><td class="wer">iPads</td><td><b>Anmelden:</b> „Ich habe einen Zwergenpass“ → Code von der Karte eintippen. Dann <b>Inselbotschaft</b> eintippen (steht in der Materialtafel, drei Silben – antippen = groß für alle). Damit öffnen sich Kapitel 2 und die Gebäude-Stollen.</td></tr>
+    <tr><td class="zeit">9–28</td><td class="wer">iPads</td><td><b>Schmiede, Kapitel 2:</b> Argument-Puzzle · Motor oder Bremse? · Hör-Stollen (zu zweit: der Partner liest vor). Wer fertig ist: Gebäude-Stollen aus Kapitel 1, „Noch tiefer graben“, Beispiel-Regen. Wer Kapitel 1 noch nicht fertig hat, macht das zuerst.</td></tr>
+    <tr><td class="zeit">28–32</td><td class="wer">Board</td><td><b>Lieferung</b> wie in Stunde 1. Pässe aufschreiben lassen.</td></tr>
+    <tr><td class="zeit">32–45</td><td class="wer">Stämme + Plenum</td><td><b>Zwergenrat:</b> neue Streitfrage, gleicher Ablauf wie in Stunde 1. Mit „Neu mischen“ bekommen alle neue Stämme, Seiten und Rollen (neuer Stammescode). Auf Anknüpfen achten: „Du sagst, dass … Ich denke dazu …“. Kapitel 2 hat zwei Ratsfragen: Nach dem Ergebnis führt „Nächste Streitfrage“ direkt weiter – oder die zweite Frage zu Beginn von Stunde 3.</td></tr>
+  </table>
+  <div class="kasten gold"><b>Kapitel 2 öffnet sich nicht?</b> Ein Kapitel ist geschafft, wenn das Material der ganzen Klasse reicht (3 pro Kind). Fehlen Kinder, unter Zahnrad die Klassengröße verkleinern oder dort „Kapitel 2“ von Hand wählen. Danach zeigt die Tafel die passende Inselbotschaft.</div>
+</section>
+
+<!-- ===================== STUNDE 3 ===================== -->
+<section class="blatt" id="s3">
+  <h1>Stunde 3 · Das Inselfest</h1>
+  <p class="unter">Schwerpunkt: auf andere eingehen, Einwände entkräften, Gegenargumente – und Rückblick.</p>
+  <table>
+    <tr><th>Zeit</th><th>Wer</th><th>Ablauf</th></tr>
+    <tr><td class="zeit">0–5</td><td class="wer">Plenum</td><td><b>Inselrätsel</b> (jetzt mit Fragen aus allen Kapiteln).</td></tr>
+    <tr><td class="zeit">5–8</td><td class="wer">iPads</td><td>Zwergenpass und neue <b>Inselbotschaft</b> eintippen.</td></tr>
+    <tr><td class="zeit">8–26</td><td class="wer">iPads</td><td><b>Schmiede, Kapitel 3:</b> Ja, und – ja, aber? · Wer hört zu? · Überzeug den Inselrat (Grimbart und Amara prüfen Inselvorhaben wie Hängebrücke, Strandfest oder Ziegen). Danach Gebäude-Stollen aus Kapitel 2 und „Noch tiefer graben“ (Tiefe 5: Streitgespräch zu zweit).</td></tr>
+    <tr><td class="zeit">26–30</td><td class="wer">Board</td><td><b>Lieferung.</b> Für die Urkunden möglichst den <b>langen Zwergenpass</b> eingeben lassen (Lieferungen → „Langen Zwergenpass-Code eintippen“): Dann kennt die Insel auch Kronen und Gebäude-Stollen.</td></tr>
+    <tr><td class="zeit">30–37</td><td class="wer">Plenum</td><td><b>Letzter Zwergenrat:</b> eine letzte Streitfrage – kurz in den Stämmen (Tafel und Diskussion je 3 Minuten), dann melden die Boten. Die Siegerseite entscheidet: Leuchtturm oder Festhalle. Danach entsteht das Schiff, das Fest beginnt, das Schiff segelt los.</td></tr>
+    <tr><td class="zeit">37–45</td><td class="wer">iPads</td><td><b>Rückblick:</b> In jedem Kapitel ganz unten „Selbst einschätzen“. Die Kinder sehen, welche Station sie noch üben können, und formulieren ein Ziel. Abschluss im Kreis: „Was kann ich jetzt besser als vor drei Stunden?“</td></tr>
+  </table>
+  <div class="spalten">
+    <div class="kasten gruen"><b>Nach der Stunde</b><ul><li>Zahnrad → <b>Klassenüberblick</b>: Welche Station fällt schwer? Wer hat den Hauptstollen noch nicht fertig?</li><li>Zahnrad → <b>Urkunden drucken</b>: eine pro Kind, mit „Ich kann …“-Tabelle zum Ankreuzen.</li></ul></div>
+    <div class="kasten"><b>Weiterarbeiten</b><ul><li>Die Selbsteinschätzung ist eine gute Grundlage für ein Lernentwicklungsgespräch.</li><li>Im Klassenrat Pro/Contra, Rollen und Satzanfänge weiter nutzen – die Streitfragen funktionieren auch ohne App.</li><li>Jede Station hat viele Aufgaben – ein zweiter Durchgang bringt neue Beispiele, gut zum Üben vor der Klassenarbeit.</li></ul></div>
+  </div>
+</section>
+
 </body>
 </html>
