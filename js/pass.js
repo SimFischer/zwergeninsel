@@ -35,6 +35,7 @@
     setzeKernBits(k, m) { for (let i = 0; i < 3; i++) if (m & (1 << i)) this.setzeKern(k, i); }
     coreCount(k) { return [0, 1, 2].filter((i) => this.hatKern(k, i)).length; }
     coreTotal() { return [0, 1, 2].reduce((a, k) => a + this.coreCount(k), 0); }
+    gemeinschaftOffen(k) { return [0, 1, 2].filter((i) => this.tiefe(k, i) >= 2).length >= 2; }
     hatGemeinschaft(k) { return this.tiefe(k, GEM) >= 1; }
     /* freiwillige Schritte eines Kapitels: jede Zusatztiefe + der Gemeinschaftsstollen (je 5 Edelsteine) */
     extra(k) { return [0, 1, 2].reduce((a, i) => a + Math.max(0, this.tiefe(k, i) - 1), 0) + this.tiefe(k, GEM); }

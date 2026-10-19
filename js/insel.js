@@ -4,7 +4,7 @@
   const { h, bild, icon, speicher } = ZI;
   const KEY = 'zi-insel';
 
-  const leer = () => ({ klassengroesse: 27, kapitel: 0, zwerge: {}, gebaut: [], schmuck: 0, rat: {}, gefeiert: [], geschenke: 0, auftrag: null, sonder: 0, nacht: false });
+  const leer = () => ({ klassengroesse: 27, kapitel: 0, zwerge: {}, gebaut: [], schmuck: 0, rat: {}, gefeiert: [], geschenke: 0, auftrag: null, sonder: 0 });
   function aufbereiten(roh) {
     const i = Object.assign(leer(), roh || {});
     if (typeof i.rat === 'string') i.rat = { 0: i.rat };          // ältere Speicherstände
@@ -127,7 +127,7 @@
   const zwergSchicht = h('div');
   const schmuckSchicht = h('div');
   const sonderSchicht = h('div');
-  /* Lebendige Insel: Wolken, Möwen und Nacht */
+  /* Lebendige Insel: Wolken und Möwen */
   const wolken = h('div', { class: 'wolken', 'aria-hidden': 'true' }, [1, 2, 3].map((n) => {
     const sp = h('span');
     const img = h('img', { src: ZI.BILD('wolke-' + n), alt: '' });
@@ -150,36 +150,7 @@
   ];
   const tiere = h('div', { class: 'tiere', 'aria-hidden': 'true' }, TIERE.map((t) =>
     h('div', { class: 'tier ' + t.klasse, style: { left: t.x + '%', top: t.y + '%', width: t.w + '%' } }, ZI.bildOder(t.datei, '', null))));
-  const nachtSchicht = h('div', { class: 'nacht-schicht', 'aria-hidden': 'true' });
-  // Lichter liegen ÜBER der Nachtabdunklung: nur wiederaufgebaute Orte leuchten nachts
-  const lichtSchicht = h('div', { class: 'licht-schicht', 'aria-hidden': 'true' });
-  buehne.append(schmuckSchicht, sonderSchicht, tiere, zwergSchicht, moewen, wolken, nachtSchicht, lichtSchicht);
-  const LICHT_ART = { lagerfeuer: 'feuer', werkstatt: 'glut', leuchtturm: 'leuchtfeuer', brunnen: 'laterne', steg: 'laterne', schiff: 'laterne' };
-  const LICHT_BILD = { feuer: 'nacht-lagerfeuer', glut: 'nacht-schmiedeglut', fensterlicht: 'nacht-fensterlicht' };
-  const FACKEL = ['steg', 'brunnen', 'ratsplatz', 'leuchtturm', 'bibliothek', 'festhalle'];
-  const FEUERSTELLE = ['huette1', 'huette2', 'huette3', 'muehle'];
-  function zeigeLichter() {
-    const hoehe = (w) => w * 16 / 9; // Bühne ist 16:9, Gebäudebilder quadratisch
-    const lichter = [];
-    const sprite = (datei, cls, x, y, w) => h('span', { class: 'licht-sprite ' + cls, style: { left: x + '%', top: y + '%', width: w + '%' } }, ZI.bildOder(datei, '', null));
-    ZI.GEBAEUDE.forEach((g) => {
-      if (!insel.gebaut.includes(g.id)) return; // Ruine: dunkel
-      const art = LICHT_ART[g.id] || 'fensterlicht';
-      const hh = hoehe(g.w);
-      const y = art === 'leuchtfeuer' ? g.y - hh * 0.86 : art === 'feuer' ? g.y - hh * 0.25 : g.y - hh * 0.42;
-      // weicher Lichtschein
-      lichter.push(h('span', { class: 'licht ' + art, style: { left: g.x + '%', top: y + '%', width: (art === 'fensterlicht' ? g.w * 0.9 : g.w * 1.1) + '%' } }));
-      // gemaltes Licht als Kern (unscharf), passend zur Lichtart
-      if (LICHT_BILD[art]) lichter.push(sprite(LICHT_BILD[art], 'kern ' + art, g.x, y, g.w * (art === 'fensterlicht' ? 0.32 : 0.45)));
-      // Leben vor den Häusern: Fackeln und kleine Feuerstellen
-      if (FACKEL.includes(g.id)) lichter.push(sprite('nacht-fackel', 'fackel', g.x - g.w * 0.38, g.y - hh * 0.06, g.w * 0.22));
-      if (FEUERSTELLE.includes(g.id)) lichter.push(sprite('nacht-feuerstelle-klein', 'feuerstelle', g.x + g.w * 0.42, g.y - hh * 0.02, g.w * 0.26));
-    });
-    schmuckSchicht.querySelectorAll('.schmuck.lampe').forEach((el) => {
-      lichter.push(h('span', { class: 'licht laterne', style: { left: el.style.left, top: 'calc(' + el.style.top + ' - ' + (parseFloat(el.style.width) * 1.2) + '%)', width: (parseFloat(el.style.width) * 2.2) + '%' } }));
-    });
-    ZI.setze(lichtSchicht, ...lichter);
-  }
+  buehne.append(schmuckSchicht, sonderSchicht, tiere, zwergSchicht, moewen, wolken);
   function moeweSvg(geschenk) {
     const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     s.setAttribute('viewBox', '0 0 60 40'); s.setAttribute('class', 'moewe-svg');
@@ -209,7 +180,6 @@
     const m = h('div', { class: 'moewe-flug', 'aria-hidden': 'true' }, moewe(true));
     ziel.appendChild(m);
     setTimeout(() => {
-      ZI.ton.plopp();
       const r = m.getBoundingClientRect(); const z = ziel.getBoundingClientRect();
       const g = h('div', { class: 'geschenk-fall', 'aria-hidden': 'true', style: { left: (r.left - z.left + r.width * 0.35) + 'px', top: (r.top - z.top + r.height * 0.6) + 'px', width: (r.width * 0.35) + 'px' } },
         ZI.bildOder('geschenk', '', null));
@@ -247,7 +217,6 @@
     h('button', { class: 'knopf holz', onclick: () => oeffneStammesraete() }, 'Zwergenrat'),
     h('button', { class: 'knopf holz', onclick: oeffneRaetsel }, 'Inselrätsel'),
     h('button', { class: 'knopf holz', onclick: oeffneAuftrag }, 'Auftrag'),
-    h('button', { class: 'rund', 'aria-label': 'Tag oder Nacht', onclick: () => { insel.nacht = !insel.nacht; sichern(); zeigeNacht(); } }, icon.mond()),
     vollbildKnopf,
     h('button', { class: 'rund', 'aria-label': 'Einstellungen', onclick: oeffneEinstellungen }, icon.zahnrad()));
   screen.append(buehne, titel, tafel, knoepfe);
@@ -264,14 +233,14 @@
       el.classList.toggle('gesperrt', g.kapitel > kap() + 1);
       el.classList.toggle('mit-rauch', ist);
     });
-    if (!animiert) { insel.gebaut = soll.slice(); sichern(); zeigeLichter(); return; }
+    if (!animiert) { insel.gebaut = soll.slice(); sichern(); return; }
     neu.forEach((id, i) => setTimeout(() => baue(id), 900 * i + 300));
     if (kapitelFertig() && !insel.gefeiert.includes(kap())) {
       insel.gefeiert.push(kap());
       setTimeout(feiern, 900 * neu.length + 2200);
     }
     insel.gebaut = Array.from(new Set([...insel.gebaut, ...soll]));
-    sichern(); zeigeLichter();
+    sichern();
   }
 
   function baue(id) {
@@ -285,26 +254,23 @@
       s.style.setProperty('--dx', Math.cos(w) * d + 'px'); s.style.setProperty('--dy', Math.sin(w) * d * 0.5 - 20 + 'px');
       buehne.appendChild(s); setTimeout(() => s.remove(), 1200);
     }
-    ZI.ton.amboss();
     setTimeout(() => {
       el.classList.add('gebaut');
       el.querySelector('.fertig').style.display = '';
       el.classList.remove('wird-gebaut'); void el.offsetWidth; el.classList.add('wird-gebaut');
       el.classList.add('mit-rauch');
-      ZI.ton.fanfare();
       const u = ZI.bauUebung(id);
       ZI.meldung(g.name + ' steht!' + (u ? ' Neue Übung in der Schmiede: „' + u.name + '“' : ''), u ? 5000 : 3200);
       zeigeTafel();
     }, 450);
-    setTimeout(zeigeLichter, 1200);
   }
 
   function zeigeSchmuck(animiert) {
     const anzahl = Math.min(ZI.SCHMUCK.length, Math.floor((edelsteine() + (insel.geschenke || 0) * 5) / ZI.SCHMUCK_PRO));
     ZI.setze(sonderSchicht, ...ZI.SONDERSCHMUCK.slice(0, insel.sonder || 0).map((s) =>
-      h('div', { class: 'schmuck sonder' + (/laterne/.test(s.id) ? ' lampe' : ''), style: { left: s.x + '%', top: s.y + '%', width: s.w + '%', animation: 'none' } }, ZI.bildOder([s.id, s.alt], s.name, null))));
+      h('div', { class: 'schmuck sonder', style: { left: s.x + '%', top: s.y + '%', width: s.w + '%', animation: 'none' } }, ZI.bildOder([s.id, s.alt], s.name, null))));
     ZI.setze(schmuckSchicht, ...ZI.SCHMUCK.slice(0, anzahl).map((s, i) => {
-      const el = h('div', { class: 'schmuck' + (/laterne/.test(s.id) ? ' lampe' : ''), style: { left: s.x + '%', top: s.y + '%', width: s.w + '%' } }, ZI.bildOder(s.id, s.name, null));
+      const el = h('div', { class: 'schmuck', style: { left: s.x + '%', top: s.y + '%', width: s.w + '%' } }, ZI.bildOder(s.id, s.name, null));
       if (!animiert || i < insel.schmuck) el.style.animation = 'none';
       return el;
     }));
@@ -399,7 +365,6 @@
   function kapitelWeiter() {
     if (!naechstesKapitelBereit()) return;
     insel.kapitel = kap() + 1; sichern();
-    ZI.ton.fanfare();
     ZI.meldung('Kapitel ' + ZI.KAPITEL[kap()].nr + ' beginnt: ' + ZI.KAPITEL[kap()].titel + '!', 3500);
     allesZeigen(false);
   }
@@ -410,9 +375,7 @@
     zeigeZwerge(neueIds);
     pruefeAuftrag(animiert);
     zeigeTafel();
-    zeigeNacht();
   }
-  function zeigeNacht() { screen.classList.toggle('nacht', !!insel.nacht); zeigeLichter(); }
 
   /* ---------- Auftrag des Tages ---------- */
   const heute = () => new Date().toISOString().slice(0, 10);
@@ -442,7 +405,7 @@
       sichern();
       zeigeSchmuck(false);
       if (animiert) setTimeout(() => {
-        ZI.feuerwerk(7000); ZI.ton.fanfare();
+        ZI.feuerwerk(7000);
         const sonder = ZI.SONDERSCHMUCK[insel.sonder - 1];
         ZI.meldung('Auftrag erfüllt! Als Belohnung steht jetzt ' + (sonder ? sonder.name : 'etwas Besonderes') + ' im Dorf.', 5000);
       }, 1500);
@@ -461,7 +424,7 @@
         const ziel = d.ziel(n);
         return h('button', { class: 'option', onclick: () => {
           insel.auftrag = { typ: d.id, ziel, tag: heute(), start: Date.now(), basis: d.wert ? d.wert(staende()) : 0, erledigt: false };
-          sichern(); f.schliessen(); ZI.ton.fanfare(); allesZeigen(false); ZI.meldung('Neuer Auftrag: ' + d.text(ziel), 4000);
+          sichern(); f.schliessen(); allesZeigen(false); ZI.meldung('Neuer Auftrag: ' + d.text(ziel), 4000);
         } }, d.text(ziel));
       })),
       h('button', { class: 'knopf holz', onclick: () => f.schliessen() }, 'Schließen'),
@@ -493,7 +456,6 @@
       const unten = h('div', { class: 'knopf-reihe' }, loesen);
       loesen.addEventListener('click', () => {
         f.optionen.forEach((o, i) => opts[i].classList.add(o.ok ? 'richtig' : 'weg'));
-        ZI.ton.richtig();
         ZI.setze(unten,
           h('div', { class: 'rueckmeldung tipp', style: { flexBasis: '100%' } }, f.info || ''),
           h('button', { class: 'knopf moos', onclick: () => { treffer++; insel.geschenke = (insel.geschenke || 0) + 1; sichern(); moewe(); weiter(); } }, 'Die meisten hatten recht'),
@@ -512,7 +474,7 @@
     function weiter() {
       nr++;
       if (nr < fragen.length) { setTimeout(frage, 300); return; }
-      ZI.ton.fanfare(); if (treffer >= 4) ZI.konfetti(120);
+      if (treffer >= 4) ZI.konfetti(120);
       ZI.setze(inhalt, h('div', { class: 'raetsel-karte pergament auf-pergament', style: { alignItems: 'center', textAlign: 'center' } },
         h('h2', { style: { fontSize: '44px' } }, treffer + ' von ' + fragen.length + ' richtig!'),
         h('p', { style: { margin: 0, fontSize: '24px' } }, treffer ? 'Die Möwen haben ' + treffer + ' Geschenk' + (treffer === 1 ? '' : 'e') + ' zur Insel gebracht. Jedes Geschenk hilft beim Schmücken des Dorfs.' : 'Nächstes Mal bringen die Möwen bestimmt Geschenke!'),
@@ -583,7 +545,7 @@
       c = String(c).toUpperCase();
       if (!ZEICHEN.includes(c)) { if (/^[01IO]$/.test(c)) ZI.meldung('Im Lieferschein gibt es keine 0, 1, I oder O.', 2000); return; }
       if (puffer.length >= 4) puffer = ''; // offene Rückfrage: neuer Code beginnt
-      puffer += c; zeigePuffer(); ZI.ton.klick && ZI.ton.klick();
+      puffer += c; zeigePuffer();
       if (puffer.length === 4) setTimeout(pruefe, 120);
     }
     function loesche() { puffer = puffer.slice(0, -1); zeigePuffer(); }
@@ -591,7 +553,6 @@
     function pruefe() {
       const info = ZI.Stand.ausLieferCode(puffer);
       if (!info) {
-        ZI.ton.falsch();
         anzeige.classList.remove('wackeln'); void anzeige.offsetWidth; anzeige.classList.add('wackeln');
         ZI.setze(rueck, h('div', { class: 'rueckmeldung schlecht' }, '„' + puffer + '“ ist kein gültiger Lieferschein. Bitte noch einmal vorlesen lassen.'));
         puffer = ''; setTimeout(zeigePuffer, 500);
@@ -603,7 +564,6 @@
     }
     function frageKonflikt(erg) {
       const alt = ZI.ZWERGE.find((d) => d.nr === erg.altZwerg); const neu = ZI.ZWERGE.find((d) => d.nr === erg.info.zwerg);
-      ZI.ton.falsch();
       ZI.setze(rueck, h('div', { class: 'rueckmeldung tipp' },
         h('div', null, h('b', null, 'Karte ' + erg.info.karte + ':'), ' Bisher war das ' + alt.name + ', jetzt kommt ' + neu.name + '. Hat das Kind den Zwerg gewechselt?'),
         h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-start', marginTop: '8px' } },
@@ -611,7 +571,6 @@
           h('button', { class: 'knopf holz klein', onclick: () => { puffer = ''; zeigePuffer(); ZI.setze(rueck, h('div', { class: 'klein' }, 'Abgebrochen. Bitte die Kartennummer prüfen.')); } }, 'Nein, abbrechen'))));
     }
     function gelungen(erg) {
-      ZI.ton.richtig();
       if (!neueIds.includes(erg.id)) neueIds.push(erg.id);
       letzte = erg;
       const z = ZI.ZWERGE.find((d) => d.nr === erg.stand.zwerg);
@@ -649,7 +608,7 @@
       const hin = h('div');
       const ok = () => {
         const erg = annehmenPass(eingabe.value);
-        if (!erg) { ZI.ton.falsch(); ZI.setze(hin, h('div', { class: 'rueckmeldung schlecht' }, 'Der Code stimmt nicht.')); return; }
+        if (!erg) { ZI.setze(hin, h('div', { class: 'rueckmeldung schlecht' }, 'Der Code stimmt nicht.')); return; }
         g.schliessen(); if (!erg.info) erg.info = { karte: erg.stand.karte || '–', kapitel: kap(), kern: erg.stand.kern[kap()], tief: Math.min(7, erg.stand.extra(kap())) };
         gelungen(erg);
       };
@@ -713,7 +672,7 @@
       knopf.textContent = 'Pause';
       timer = setInterval(() => { sek = Math.max(0, sek - 1); uhr.textContent = Math.floor(sek / 60) + ':' + String(sek % 60).padStart(2, '0');
         if (sek === 60) ZI.meldung('Noch eine Minute!', 3000);
-        if (!sek) { clearInterval(timer); timer = null; ZI.ton.fanfare(); knopf.textContent = 'Zeit ist um'; } }, 1000);
+        if (!sek) { clearInterval(timer); timer = null; knopf.textContent = 'Zeit ist um'; } }, 1000);
     });
     return { uhr, knopf, stopp: () => clearInterval(timer) };
   }
@@ -760,7 +719,7 @@
         h('button', { class: 'rund', 'aria-label': 'Zurück zur Insel', onclick: () => { zeit.stopp(); ui.remove(); } }, icon.zurueck()),
         h('div', { class: 'titel' }, 'Zwergenrat · Stämme'),
         h('div', { class: 'spacer' }),
-        h('button', { class: 'knopf holz klein', onclick: () => { st.seed = (st.seed + 1 + Math.floor(Math.random() * 6)) % 8; sichern(); ZI.ton.plopp(); zeichne(); } }, 'Neu mischen'),
+        h('button', { class: 'knopf holz klein', onclick: () => { st.seed = (st.seed + 1 + Math.floor(Math.random() * 6)) % 8; sichern(); zeichne(); } }, 'Neu mischen'),
         zeit.uhr, zeit.knopf),
       h('div', { class: 'stamm-inhalt' }, ZI.ratsReise(1), kopf, raster,
         h('div', { class: 'stamm-unten' },
@@ -787,7 +746,7 @@
         const c = liste[n] || 0;
         const b = h('button', { class: 'rede-zelle stufe-' + Math.min(c, 3) + (hervor === n ? ' hervor' : ''), 'aria-label': 'Karte ' + n + ', ' + c + ' Beiträge' },
           kartenKopf(n), h('span', { class: 'rede-striche' }, c ? '|'.repeat(Math.min(c, 6)) : ''));
-        b.addEventListener('click', () => { liste[n] = Math.max(0, c + (minus ? -1 : 1)); sichern(); ZI.ton.plopp(); zeichne(); });
+        b.addEventListener('click', () => { liste[n] = Math.max(0, c + (minus ? -1 : 1)); sichern(); zeichne(); });
         return b;
       }));
     }
@@ -800,7 +759,7 @@
         h('button', { class: 'knopf holz klein', onclick: () => {
           const leise = kartenNummern().filter((n) => !(liste[n] > 0));
           if (!leise.length) { ZI.meldung('Alle waren schon dran!'); return; }
-          const n = ZI.zufall(leise); zeichne(n); ZI.ton.plopp();
+          const n = ZI.zufall(leise); zeichne(n);
           ZI.meldung('Vielleicht möchte Karte ' + n + ' etwas sagen?', 3500);
         } }, 'Wer war noch nicht dran?'),
         minusKnopf,
@@ -820,7 +779,7 @@
     const zeit = redezeit(5);
     const seite = (x) => {
       const zahl = h('div', { class: 'abstimm-zahl' }, String(stimmen[x]));
-      const aendern = (d) => { stimmen[x] = Math.max(0, stimmen[x] + d); zahl.textContent = String(stimmen[x]); sichern(); ZI.ton.plopp(); };
+      const aendern = (d) => { stimmen[x] = Math.max(0, stimmen[x] + d); zahl.textContent = String(stimmen[x]); sichern(); };
       return h('div', { class: 'abstimm-seite pergament auf-pergament ' + (x === 'a' ? 'pro' : 'contra') },
         ZI.seitenMarke(x === 'a' ? 'pro' : 'contra'),
         h('h3', null, x === 'a' ? t.pro : t.contra),
@@ -851,7 +810,7 @@
     document.body.appendChild(rat);
 
     function abschliessen() {
-      if (!stimmen.a && !stimmen.b) { ZI.meldung('Tragt zuerst ein, wofür die Stämme gestimmt haben.'); ZI.ton.falsch(); return; }
+      if (!stimmen.a && !stimmen.b) { ZI.meldung('Tragt zuerst ein, wofür die Stämme gestimmt haben.'); return; }
       const anzahl = ZI.stammesEinteilung(kartenNummern().length, st.seed || 0).length;
       const summe = stimmen.a + stimmen.b;
       const gleich = stimmen.a === stimmen.b;
@@ -873,7 +832,7 @@
       if (RF) { insel.rat[RF.id] = geb.id; insel.ratStreit = Object.assign(insel.ratStreit || {}, { [RF.id]: st.thema }); }
       st.stimmen = { a: 0, b: 0 };
       sichern();
-      ZI.ton.fanfare(); ZI.konfetti && ZI.konfetti(140);
+      ZI.konfetti && ZI.konfetti(140);
       const naechste = offeneRatsfrage();
       const f = ZI.fenster([
         ZI.ratsReise(geb ? 11 : 10),
@@ -893,7 +852,6 @@
   /* ---------- Kapitel geschafft ---------- */
   function feiern() {
     const k = kap();
-    ZI.ton.fanfare();
     ZI.feuerwerk(8000);
     if (!ZI.KAPITEL[k + 1] && bauEls.schiff) { bauEls.schiff.classList.remove('segelt'); void bauEls.schiff.offsetWidth; bauEls.schiff.classList.add('segelt'); }
     const nk = ZI.KAPITEL[k + 1];

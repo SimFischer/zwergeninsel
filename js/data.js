@@ -34,11 +34,10 @@ ZI.ALLE_BILDER = [
   'icon-beispiel', 'icon-beispielregen', 'icon-erz-schlacke', 'icon-fehlerjagd', 'icon-funkenregen', 'icon-gegenargument', 'icon-hoeren', 'icon-inselrat', 'icon-ja-und', 'icon-kette', 'icon-kobold-kampf', 'icon-meisterstueck', 'icon-meisterstueck2', 'icon-motor-bremse', 'icon-puzzle', 'icon-situation', 'icon-sprecherwechsel', 'icon-streitgespraech', 'icon-stumpf-scharf', 'icon-weil-denn', 'icon-zuhoeren',
   'rolle-aelteste', 'rolle-gedaechtnis', 'rolle-wache', 'gemeinschaftsstollen-icon', 'schmiede-axt-werkstueck', 'zwerg-freigeschaltet-glanz',
   'transition-schmiede', 'transition-stollen', 'transition-gemeinschaftsstollen',
-  'nacht-fackel', 'nacht-fensterlicht', 'nacht-feuerstelle-klein', 'nacht-lagerfeuer', 'nacht-schmiedeglut',
   ...['01-brumm', '02-hilda', '03-tarek', '04-svea', '05-kira', '06-ole', '07-fenno', '08-smaragda', '09-bodo', '10-amara', '11-grimbart', '12-rubina'].map((z) => 'zwerg-' + z + '-jubel'),
 ];
 /* Nur das Board braucht diese; die iPads laden sie nicht */
-ZI.NUR_BOARD = (n) => /-ruine$|^(nacht-|insel-grund|fest-szene|schiff|fahne|laterne|kristall-laterne|blumenbeet|bank|faesser|statue|wegweiser|gemuesegarten|ziegen|moewe-|krabbe|delfin|huhn|hase|schildkroete|schmetterling|wolke-|sonder-)/.test(n);
+ZI.NUR_BOARD = (n) => /-ruine$|^(insel-grund|fest-szene|schiff|fahne|laterne|kristall-laterne|blumenbeet|bank|faesser|statue|wegweiser|gemuesegarten|ziegen|moewe-|krabbe|delfin|huhn|hase|schildkroete|schmetterling|wolke-|sonder-)/.test(n);
 
 /* ---------- Die 12 Zwerge ----------
    unlock(s): s ist der Spielstand (siehe pass.js), gibt true zurück, wenn freigeschaltet. */
