@@ -32,7 +32,7 @@ ZI.ALLE_BILDER = [
   'rang-1', 'rang-2', 'rang-3', 'rang-4', 'rang-5', 'rang-6', 'rang-7',
   ...['funke', 'k1', 'k2', 'k3', 'fehler', 'kobold', 'rede', 'ohr', 'rat', 'krone1', 'krone5', 'krone9', 'stern3', 'stern9', 'gems', 'buch', 'freunde', 'clan'].map((a) => 'abzeichen-' + a),
   'icon-beispiel', 'icon-beispielregen', 'icon-erz-schlacke', 'icon-fehlerjagd', 'icon-funkenregen', 'icon-gegenargument', 'icon-hoeren', 'icon-inselrat', 'icon-ja-und', 'icon-kette', 'icon-kobold-kampf', 'icon-meisterstueck', 'icon-meisterstueck2', 'icon-motor-bremse', 'icon-puzzle', 'icon-situation', 'icon-sprecherwechsel', 'icon-streitgespraech', 'icon-stumpf-scharf', 'icon-weil-denn', 'icon-zuhoeren',
-  'rolle-aelteste', 'rolle-gedaechtnis', 'rolle-wache', 'gemeinschaftsstollen-icon', 'schmiede-axt-werkstueck', 'zwerg-freigeschaltet-glanz',
+  'gemeinschaftsstollen-icon', 'schmiede-axt-werkstueck', 'zwerg-freigeschaltet-glanz',
   'transition-schmiede', 'transition-stollen', 'transition-gemeinschaftsstollen',
   ...['01-brumm', '02-hilda', '03-tarek', '04-svea', '05-kira', '06-ole', '07-fenno', '08-smaragda', '09-bodo', '10-amara', '11-grimbart', '12-rubina'].map((z) => 'zwerg-' + z + '-jubel'),
 ];

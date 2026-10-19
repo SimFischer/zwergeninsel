@@ -118,3 +118,24 @@ test('Antwortpositionen werden unabhängig vom Aufgaben-Vorrat gemischt', () => 
   }
   assert.ok(positions.every((n) => n > 850 && n < 1150), positions.join('/'));
 });
+
+test('Zwergenrat teilt ausschließlich Pro/Contra zu und hält Dreier-/Vierergruppen ausgeglichen', () => {
+  const z = bank();
+  for (let n = 3; n <= 40; n++) for (let seed = 0; seed < 8; seed++) {
+    const groups = z.stammesEinteilung(n, seed);
+    assert.equal(JSON.stringify(groups), JSON.stringify(z.stammesEinteilung(n, seed)));
+    const numbers = groups.flatMap((g) => g.mitglieder.map((m) => m.karte));
+    assert.equal(new Set(numbers).size, n);
+    for (const group of groups) {
+      const members = z.mitSeiten(group, seed);
+      for (const member of members) {
+        assert.equal(Object.keys(member).sort().join('/'), 'karte/seite');
+        assert.ok(['pro', 'contra'].includes(member.seite));
+      }
+      const pro = members.filter((m) => m.seite === 'pro').length;
+      if (members.length === 4) assert.equal(pro, 2);
+      if (members.length === 3) assert.ok(pro === 1 || pro === 2);
+    }
+  }
+  assert.equal(z.RATS_REISE[7], 'Ergebnis melden');
+});

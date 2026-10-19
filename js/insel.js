@@ -656,7 +656,7 @@
     return h('div', { class: 'karten-kopf' }, z ? bild(z.datei, z.name) : h('div', { class: 'karten-kopf-leer' }), h('b', null, String(n)));
   }
 
-  /* ---------- Zwergenrat, Teil 1: Stämme beraten eine Streitfrage (PRO/CONTRA + Rollen) ---------- */
+  /* ---------- Zwergenrat, Teil 1: Stämme beraten eine Streitfrage (PRO/CONTRA) ---------- */
   function themaFuerJetzt() {
     const rf = wartetAufRat() || (ZI.RATSFRAGEN[kap()] || []).find((f) => !insel.rat[f.id]);
     const i = rf ? ZI.RATSFRAGEN.flat().indexOf(rf) : -1;
@@ -706,12 +706,11 @@
         h('button', { class: 'stamm-code pergament', title: 'Groß zeigen', onclick: () => grossZeigen('Stammescode', silbig(code), 'Schmiede → „Stammesrat“ → Code eintippen') },
           h('div', { class: 'klein' }, 'Stammescode für die iPads · antippen = groß'),
           h('b', null, silbig(code)),
-          h('div', { class: 'klein' }, 'Dort stehen Frage, Seite und Rolle.')));
+          h('div', { class: 'klein' }, 'Dort stehen die Frage und eure Pro-/Contra-Position.')));
       ZI.setze(raster, ...ZI.stammesEinteilung(n, st.seed).map((g) => h('div', { class: 'stamm-karte pergament auf-pergament', style: { borderTopColor: g.farbe } },
         h('h3', { style: { color: g.farbe } }, g.name),
         h('div', { class: 'stamm-mitglieder' }, ZI.mitSeiten(g, st.seed).map((m) => h('div', { class: 'stamm-mitglied' },
-          kartenKopf(m.karte), ZI.seitenMarke(m.seite, 'klein'),
-          h('span', { class: 'stamm-rolle' }, m.rolle ? [ZI.rollenSymbol(m.rolle, 'klein'), ' ' + m.rolle.name] : '')))))));
+          h('b', { class: 'stamm-nummer' }, String(m.karte)), ZI.seitenMarke(m.seite, 'klein')))))));
     }
     const ui = h('div', { class: 'rat stammesrat' },
       ZI.hintergrund('zwergenrat-hintergrund', 'hg-ersatz-stollen', 'rgba(20,12,8,0.45)'),
@@ -723,7 +722,7 @@
         zeit.uhr, zeit.knopf),
       h('div', { class: 'stamm-inhalt' }, ZI.ratsReise(1), kopf, raster,
         h('div', { class: 'stamm-unten' },
-          h('div', null, 'Auf den iPads: Frage → Seite → Partner → Argumenttafel → Diskussion im Stamm → Stammesentscheidung. Danach melden die Boten.'),
+          h('div', null, 'Auf den iPads: Frage → Seite → Partner → Argumenttafel → Diskussion im Stamm → Stammesentscheidung. Danach bestimmt jeder Stamm eine Person, die das Ergebnis mitteilt.'),
           h('button', { class: 'knopf', onclick: () => { zeit.stopp(); ui.remove(); oeffneRat(); } }, 'Zur Klassenabstimmung'))));
     document.body.appendChild(ui);
     sichern(); zeichne();
@@ -804,7 +803,7 @@
         h('div', { class: 'abstimm-seiten' }, seite('a'), seite('b')),
         h('div', { class: 'knopf-reihe' }, h('button', { class: 'knopf gross', onclick: abschliessen }, 'Abstimmung abschließen')),
         h('div', { class: 'rat-regeln pergament auf-pergament' },
-          h('p', { style: { margin: '0 0 8px' } }, h('b', null, 'Die Boten melden nacheinander: '), '„Die … stimmen für …, weil …“ Tippt für jeden Stamm auf +.'),
+          h('p', { style: { margin: '0 0 8px' } }, h('b', null, 'Eine Person aus jedem Stamm meldet nacheinander: '), '„Die … stimmen für …, weil …“ Lehrkraft: Trage für jeden Stamm eine Stimme mit + ein.'),
           h('h3', null, 'So kannst du antworten'),
           h('ul', null, ZI.DISKUSSION_SAETZE.map((r) => h('li', null, r))))));
     document.body.appendChild(rat);

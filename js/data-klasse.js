@@ -33,10 +33,6 @@
     'Wenn ich dich richtig verstanden habe, …',
     'Ich kann dein Argument nachvollziehen. Aber …',
   ];
-  const rolle = (id) => ZI.STAMMES_ROLLEN.find((r) => r.id === id);
-  rolle('bote').saetze = ['Unser Stamm ist für …, weil …', 'Am wichtigsten finden wir, dass …', 'Wir waren uns nicht einig: Einerseits …, andererseits …'];
-  rolle('gedaechtnis').saetze = ['Du hast gesagt, dass …', 'Bis jetzt haben wir gesagt, dass …', 'Auf der einen Seite …, auf der anderen Seite …'];
-
   /* ---------- Begründet oder nicht? (Stunde 7: Sitzordnung) ---------- */
   ZI.BEGRUENDET_RUNDEN = [
     {"id": "BEGRUENDET_RUNDEN:pausenecke","kopf": "Thema: Pausen","jaText": "begründet","neinText": "nicht begründet","frage": "Wird eine Meinung mit einem Grund erklärt?","karten": [{"text": "Wir sollten eine ruhige Pausenecke einrichten.","ja": false,"info": "Das ist eine Meinung. Der Grund fehlt noch."},{"text": "Wir sollten eine ruhige Pausenecke einrichten, weil wir dort abschalten und neue Kraft sammeln.","ja": true,"info": "Hier wird die Meinung mit einem Grund erklärt."},{"text": "Die Pausenecke befindet sich auf einem Teil unseres Schulhofs.","ja": false,"info": "Das ist eine Feststellung, keine begründete Meinung."},{"text": "Mein Vorschlag: Wir regeln, welche ruhigen Spiele in der Ecke erlaubt sind.","ja": false,"info": "Hier wird etwas vorgeschlagen, ohne den Grund zu erklären."},{"text": "Wir sollten eine ruhige Pausenecke einrichten, weil wir dort Karten mit Freunden tauschen können.","ja": true,"info": "Auch ein anderer Vorteil ist ein Grund. Ob er stark ist, ist eine weitere Frage."},{"text": "Wir sollten eine ruhige Pausenecke einrichten. Dafür spricht: Wer sich ausruht, muss nicht die ganze Pause auf Lärm achten.","ja": true,"info": "Der zweite Satz nennt einen Grund für die Meinung."}]},
