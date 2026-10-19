@@ -17,7 +17,7 @@
       this.id = o.id ?? Math.floor(Math.random() * 32768);
       this.zwerg = o.zwerg ?? 1;            // 1–12
       this.kern = o.kern ?? [0, 0, 0];      // je Kapitel Bitmaske der 3 Stationen
-      this.tief = o.tief ?? [0, 0, 0];      // je Kapitel Bitmaske der 3 Tiefen Stollen
+      this.tief = o.tief ?? [0, 0, 0];      // je Kapitel erreichte Tiefe 0–5 („Noch tiefer graben“)
       this.bonus = o.bonus ?? [0, 0, 0];    // je Kapitel beste Sterne im Bonusspiel (0–3)
       this.offen = o.offen ?? 0;            // höchstes freigeschaltetes Kapitel (0 = Kapitel 1)
       this.kronen = o.kronen ?? [0, 0, 0];  // je Kapitel: Hauptstollen-Stationen fehlerfrei geschafft
@@ -25,18 +25,21 @@
     }
     static bits(m) { let n = 0; for (let i = 0; i < 3; i++) if (m & (1 << i)) n++; return n; }
     coreCount(k) { return Stand.bits(this.kern[k]); }
-    deepCount(k) { return Stand.bits(this.tief[k]); }
-    deepTotal() { return this.tief.reduce((a, m) => a + Stand.bits(m), 0); }
+    tiefe(k) { return Math.min(5, this.tief[k] || 0); }
+    deepCount(k) { return this.tiefe(k); }
+    deepTotal() { return [0, 1, 2].reduce((a, k) => a + this.tiefe(k), 0); }
     coreTotal() { return this.kern.reduce((a, m) => a + Stand.bits(m), 0); }
     kronenTotal() { return this.kronen.reduce((a, m) => a + Stand.bits(m), 0); }
     bonusMax() { return Math.max(...this.bonus); }
     bonusTotal() { return this.bonus.reduce((a, b) => a + b, 0); }
     gems() { return this.deepTotal() * (ZI.GEMS_PRO_STOLLEN || 5) + this.bonusTotal(); }
     hatKern(k, i) { return !!(this.kern[k] & (1 << i)); }
-    hatTief(k, i) { return !!(this.tief[k] & (1 << i)); }
+    // i = einer der bisherigen Tiefen Stollen; er ist geschafft, wenn seine Tiefe erreicht ist
+    hatTief(k, i) { return this.tiefe(k) >= ZI.tiefeVon(k, i); }
     hatKrone(k, i) { return !!(this.kronen[k] & (1 << i)); }
     setzeKern(k, i) { this.kern[k] |= (1 << i); }
-    setzeTief(k, i) { this.tief[k] |= (1 << i); }
+    setzeTief(k, i) { this.setzeTiefe(k, ZI.tiefeVon(k, i)); }
+    setzeTiefe(k, n) { this.tief[k] = Math.max(this.tiefe(k), Math.min(5, n)); }
     setzeKrone(k, i) { this.kronen[k] |= (1 << i); }
     hatBau(bit) { return !!(this.bau & (1 << bit)); }
     setzeBau(bit) { this.bau |= (1 << bit); }

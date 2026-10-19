@@ -86,7 +86,7 @@
   }
   function seitenKarte(w, frei) {
     if (!frei) {
-      const st = w.art === 'bau' ? ZI.bauUebung(w.bau) : INHALT[w.k] && INHALT[w.k][w.art][w.i];
+      const st = w.art === 'bau' ? ZI.bauUebung(w.bau) : INHALT[w.k] && INHALT[w.k][w.art][w.art === 'tief' ? ZI.tiefeVon(w.k, w.i) - 1 : w.i];
       return h('div', { class: 'seite gesperrt' },
         h('div', { class: 'seite-kopf' }, icon.schloss(), h('span', null, '???')),
         h('p', null, 'Schaffe „' + (st ? st.name : '…') + '“, dann erscheint hier ein Merksatz.'));
@@ -449,8 +449,10 @@
         { name: 'Erz oder Schlacke?', info: 'Sortiere: Welche Begründung passt zur Meinung?', icon: ['icon-erz-schlacke', 'eisen-roh'], spiel: () => spielErz(), vor: 'k1s2' },
         { name: 'Weil-Denn-Amboss', info: 'Bau Begründungssätze mit weil, da und denn.', icon: ['icon-weil-denn', 'runenplatte'], spiel: () => spielWeilDenn(), vor: 'k1s3' },
       ],
-      tief: [
-        { name: 'Fehlerjagd', info: 'Der Fehlerkobold hat Sätze verbogen. Finde den richtigen.', icon: ['icon-fehlerjagd', 'kobold-frech'], spiel: () => spielFehlerjagd() },
+      tief: [ // Tiefe 1–5: jede Stufe schwerer
+        { name: 'Passt es?', info: 'Nur eine Begründung passt wirklich zur Meinung. Finde sie.', icon: ['icon-erz-schlacke', 'eisen-roh'], spiel: () => spielPasst() },
+        { name: 'Welches ist stärker?', info: 'Beide Begründungen passen. Welche überzeugt mehr?', icon: ['icon-stumpf-scharf', 'axt-scharf'], spiel: () => spielStaerker() },
+        { name: 'Fehlerjagd', info: 'Mach schwache Begründungen besser und repariere verbogene Sätze.', icon: ['icon-fehlerjagd', 'kobold-frech'], spiel: () => spielFehlerjagd() },
         { name: 'Beispiel-Edelstein', info: 'Finde das Beispiel, das die Begründung stützt.', icon: ['icon-beispiel', 'edelstein'], spiel: () => spielBeispiele() },
         { name: 'Meisterstück', gemeinschaft: true, info: 'Jeder sagt 3 Argumente. Der andere prüft.', icon: ['icon-meisterstueck', 'meisterin-erklaert'], spiel: () => spielMeisterstueck(1) },
       ],
@@ -464,7 +466,9 @@
       ],
       tief: [
         { name: 'Kobold-Kampf', info: 'Der Fehlerkobold ist zurück! Besiege ihn mit allem, was du kannst.', icon: ['icon-kobold-kampf', 'kobold-chaos'], spiel: () => spielBoss() },
+        { name: 'Welches ist stärker?', info: 'Beide Begründungen passen. Welche überzeugt mehr?', icon: ['icon-stumpf-scharf', 'axt-scharf'], spiel: () => spielStaerker() },
         { name: 'Argument-Kette', info: 'Welche Stützen machen ein Argument stärker?', icon: ['icon-kette', 'eisen-gluehend'], spiel: () => spielKette() },
+        { name: 'Dafür oder dagegen?', info: 'Erkenne, welche Sätze gegen eine Meinung sprechen.', icon: ['icon-motor-bremse', 'schleifstein'], spiel: () => spielDafuerDagegen() },
         { name: 'Meisterstück II', gemeinschaft: true, info: 'Jeder sagt 3 Argumente mit Beispiel. Der andere prüft.', icon: ['icon-meisterstueck2', 'meisterin-jubelt'], spiel: () => spielMeisterstueck(2) },
       ],
       bonus: { name: 'Beispiel-Regen', info: 'Fang die Beispiele, die wirklich passen! Bis zu 3 Sterne.', icon: ['icon-beispielregen', 'edelstein'], spiel: () => spielFunkenregen(ZI.BEISPIELREGEN, 'Beispiel-Regen', 'Oben stehen eine Meinung und eine Begründung. Von oben regnen Beispiele. Tippe nur die Beispiele an, die zur Begründung passen! Unpassende kosten einen Punkt.') },
@@ -478,11 +482,27 @@
       tief: [
         { name: 'Gegenargument-Schmiede', info: 'Finde das Argument, das dagegen spricht.', icon: ['icon-gegenargument', 'axt-scharf'], spiel: () => spielGegenargument() },
         { name: 'Wer überzeugt wen?', info: 'Das beste Argument passt zur Person.', icon: ['icon-situation', 'zwerg-10-amara'], spiel: () => spielSituation() },
+        { name: 'Besser begründen', info: 'Mach schwache Begründungen stark.', icon: ['icon-stumpf-scharf', 'axt-scharf'], spiel: () => spielVerbessern() },
+        { name: 'Auf Einwände reagieren', info: 'Antworte auf Gegenargumente – höflich und mit Grund.', icon: ['icon-inselrat', 'zwerg-11-grimbart'], spiel: () => spielEinwaende() },
         { name: 'Streitgespräch', gemeinschaft: true, info: 'Meinung, Zuhören und Gegenargument – mit Rollenwechsel.', icon: ['icon-streitgespraech', 'meisterin-jubelt'], spiel: () => spielMeisterstueck(3) },
       ],
       bonus: { name: 'Sprecherwechsel', info: 'Steig im richtigen Moment ein – ohne zu unterbrechen. Bis zu 3 Sterne.', icon: ['icon-sprecherwechsel', 'stern'], spiel: () => spielSprecherwechsel() },
     },
   ];
+
+  function betreteStation(def, k, art, idx) {
+    K = k; letzterReiter = k; aktStation = { k, art, i: idx };
+    const los = () => { if (def.vor && ZI.VORMACHEN[def.vor]) zeigeVormachen(ZI.VORMACHEN[def.vor], def.spiel); else def.spiel(); };
+    // Ortswechsel: kurze Szene beim Betreten (Gemeinschaftsstollen: zwei Zwerge; tiefer graben: Abstieg)
+    if (def.gemeinschaft) uebergang('gemeinsam', 'Gemeinsam kommt ihr tiefer.', los);
+    else if (art === 'tief') uebergang('stollen', 'Tiefe ' + (idx + 1) + ' …', los);
+    else los();
+  }
+  // nächste Tiefe im Kapitel k (oder null, wenn ganz unten)
+  function naechsteTiefe(k, s) {
+    const n = (s || stand).tiefe(k);
+    return n < 5 && INHALT[k] ? n : null;
+  }
 
   function kapitelOffen(k) {
     if (k === 0) return true;
@@ -521,12 +541,7 @@
         gesperrt ? h('div', { class: 'schloss', style: { top: '8px', right: '8px', width: '28px', height: '28px' } }, icon.schloss()) : null);
       b.addEventListener('click', () => {
         if (gesperrt) { ZI.meldung(sperrText); ZI.ton.falsch(); return; }
-        K = k; letzterReiter = k; aktStation = { k, art, i: idx };
-        const los = () => { if (def.vor && ZI.VORMACHEN[def.vor]) zeigeVormachen(ZI.VORMACHEN[def.vor], def.spiel); else def.spiel(); };
-        // Ortswechsel: kurze Szene beim Betreten (Gemeinschaftsstollen: zwei Zwerge; Tiefe Stollen: Abstieg)
-        if (def.gemeinschaft) uebergang('gemeinsam', 'Gemeinsam kommt ihr tiefer.', los);
-        else if (art === 'tief') uebergang('stollen', 'Tiefer in den Stollen …', los);
-        else los();
+        betreteStation(def, k, art, idx);
       });
       return b;
     }
@@ -540,10 +555,13 @@
           h('h2', null, 'Hauptstollen'),
           h('p', { class: 'erklaer' }, 'Diese drei Stationen schafft jede und jeder. Jede bringt Baumaterial für unser Dorf.'),
           h('div', { class: 'stationen' }, inh.kern.map((d, i) => stationKarte(d, k, stand.hatKern(k, i), false, '', i, ROHSTOFF[i].name, 'kern', i)))),
-        h('section', { class: 'pergament stollen auf-pergament' },
-          h('h2', null, 'Tiefe Stollen'),
-          h('p', { class: 'erklaer' }, 'Für Meisterschmiede: Jeder Stollen bringt ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine. Daraus wird Schmuck für unser Dorf.'),
-          h('div', { class: 'stationen' }, inh.tief.map((d, i) => stationKarte(d, k, stand.hatTief(k, i), !tiefOffen, 'Schaffe zuerst den Hauptstollen.', undefined, null, 'tief', i)))),
+        h('section', { class: 'pergament stollen auf-pergament tiefer-graben' },
+          h('h2', { class: 'titel-mit-bild' }, ZI.bildOder('stollen-tiefer', '', null, 'titel-bild'), 'Noch tiefer graben'),
+          h('p', { class: 'erklaer' }, 'Freiwillig für Mutige: Jede Tiefe ist schwerer als die davor und bringt ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine. Für die Klasse zählt nur der Hauptstollen.'),
+          h('div', { class: 'stationen tiefen' }, inh.tief.map((d, i) => {
+            const zu = !tiefOffen ? 'Schaffe zuerst den Hauptstollen.' : (!testmodus && i > stand.tiefe(k)) ? 'Grab zuerst bis Tiefe ' + i + '.' : '';
+            return stationKarte(Object.assign({}, d, { name: 'Tiefe ' + (i + 1) + ': ' + d.name }), k, stand.tiefe(k) > i, !!zu, zu, undefined, null, 'tief', i);
+          }))),
         gebaeudeStollen(k),
         h('section', { class: 'pergament stollen auf-pergament' },
           h('h2', null, 'Bonusinsel'),
@@ -721,6 +739,15 @@
     const krone = st && st.art === 'kern' && fehlerZaehler === 0;
     const schonKrone = krone && stand.hatKrone(st.k, st.i);
     const z = aktuellerZwerg();
+    // Wie sieht der Stand danach aus? (Kopie, damit nichts doppelt eingetragen wird)
+    const nach = new ZI.Stand(JSON.parse(JSON.stringify(stand))); eintragen(nach);
+    const k = st ? st.k : K;
+    const gemeistert = st && st.art === 'kern' && stand.coreCount(k) < 3 && nach.coreCount(k) === 3;
+    const tiefeNeu = st && st.art === 'tief' && nach.tiefe(k) > stand.tiefe(k) ? nach.tiefe(k) : 0;
+    if (gemeistert) { titel = 'Stollen gemeistert!'; text = text + ' Damit hast du den Hauptstollen geschafft – das zählt für die Klasse. Wer mag, kann jetzt noch tiefer graben.'; }
+    if (tiefeNeu) titel = 'Du hast Tiefe ' + tiefeNeu + ' erreicht.';
+    const tiefer = (gemeistert || tiefeNeu) && naechsteTiefe(k, nach) !== null ? naechsteTiefe(k, nach) : null;
+    const weiter = (danach) => { f.schliessen(); fortschritt((s) => { eintragen(s); if (krone) s.setzeKrone(st.k, st.i); }, danach); };
     const f = ZI.fenster([
       h('div', { class: 'geschafft-reihe' },
         h('div', { class: 'gross-bild strahlen' }, bild(datei, alt)),
@@ -728,7 +755,10 @@
       h('h2', null, titel),
       h('p', { style: { margin: 0, fontSize: '21px' } }, text),
       krone ? h('div', { class: 'krone-info' }, ZI.bildOder('krone', 'Krone', icon.krone()), h('span', null, schonKrone ? 'Wieder fehlerfrei – deine goldene Krone glänzt!' : 'Ganz ohne Fehler! Dafür bekommst du eine goldene Krone.')) : null,
-      h('button', { class: 'knopf', onclick: () => { f.schliessen(); fortschritt((s) => { eintragen(s); if (krone) s.setzeKrone(st.k, st.i); }, () => zeigeHalle()); } }, 'Zurück zur Halle'),
+      tiefeNeu === 5 ? h('p', { style: { margin: 0, fontSize: '19px' } }, 'Tiefer geht es in diesem Kapitel nicht. Du bist ganz unten angekommen!') : null,
+      h('div', { class: 'fenster-fuss' },
+        h('button', { class: 'knopf' + (tiefer !== null ? ' holz' : ''), onclick: () => weiter(() => zeigeHalle()) }, 'Zurück zur Halle'),
+        tiefer !== null ? h('button', { class: 'knopf', onclick: () => weiter(() => betreteStation(INHALT[k].tief[tiefer], k, 'tief', tiefer)) }, 'Noch tiefer graben') : null),
     ]);
     f.el.classList.add('geschafft-fenster');
   }
@@ -781,7 +811,7 @@
         h('div', { class: 'halle-inhalt' },
           h('section', { class: 'pergament auf-pergament stollen' },
             h('div', { class: 'rang-kopf' }, ZI.bildOder('rang-' + (rang.nr + 1), rang.name, null, 'rang-emblem'), h('h2', null, 'Dein Rang: ' + rang.name)),
-            h('p', { class: 'erklaer' }, rang.naechsterName ? 'Noch ' + (rang.naechsterAb - rang.punkte) + ' Punkte bis „' + rang.naechsterName + '“. Punkte gibt es für jede Station, jeden Tiefen Stollen, jeden Bonusstern und jede goldene Krone.' : 'Du hast den höchsten Rang erreicht!'),
+            h('p', { class: 'erklaer' }, rang.naechsterName ? 'Noch ' + (rang.naechsterAb - rang.punkte) + ' Punkte bis „' + rang.naechsterName + '“. Punkte gibt es für jede Station, jede erreichte Tiefe, jeden Bonusstern und jede goldene Krone.' : 'Du hast den höchsten Rang erreicht!'),
             h('div', { class: 'rang-leiter' }, ZI.RAENGE.map((r, i) => h('div', { class: 'stufe' + (i <= rang.nr ? ' erreicht' : '') + (i === rang.nr ? ' jetzt' : '') },
               h('span', { class: 'stufe-punkte' }, String(r.ab)), h('span', null, aktuellerZwerg().w ? r.w : r.m))))),
           h('section', { class: 'pergament auf-pergament stollen' },
@@ -892,19 +922,95 @@
   const aufgabeSituation = (it) => ({ frage: 'Welches Argument überzeugt diese Person am besten?', kopf: it.situation, optionen: it.optionen });
   const aufgabeEinwand = (fall, e) => ({ frage: e.wer + ' hat einen Einwand. Was antwortest du?', vorher: fall.meinung, kopf: e.wer + ': ' + e.einwand, ws: e.datei, optionen: e.optionen });
 
-  /* Tiefer Stollen 1 */
+  const aufgabeVerbessern = (it) => ({ frage: 'Diese Begründung ist schwach. Womit wird sie stärker?', vorher: it.schwach, optionen: it.optionen });
+
+  /* ---------- Noch tiefer graben: Tiefe 1–5 je Kapitel ---------- */
+  const tiefeJetzt = () => (aktStation && aktStation.art === 'tief' ? aktStation.i + 1 : 1);
+  // nur der nächste Schritt zählt; wer aus dem Rückblick tiefer übt, überspringt keine Stufe
+  const tiefEintrag = (s) => { const n = tiefeJetzt(); if (n <= s.tiefe(K) + 1) s.setzeTiefe(K, n); };
+  const tiefGeschafft = (titel, text, datei) => geschafft({ titel, text: text + ' Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.', datei: datei || 'edelstein', alt: 'Edelstein', eintragen: tiefEintrag });
+
+  function spielPasst() {
+    auswahlSpiel({
+      titel: 'Passt es?',
+      frageText: 'Welche Begründung passt wirklich zur Meinung?',
+      items: mischen(ZI.ERZ_SCHLACKE.filter((rd) => rd.gruende.filter((g) => !g.erz).length >= 2)).slice(0, 6).map((rd) => {
+        const erz = mischen(rd.gruende.filter((g) => g.erz))[0];
+        const schlacke = mischen(rd.gruende.filter((g) => !g.erz)).slice(0, 2);
+        return { kopf: rd.meinung, optionen: [erz, ...schlacke].map((g) => ({ text: g.text, ok: g.erz, info: g.info })) };
+      }),
+      tipp: ZI.TIPPS.erz,
+      wsVorher: 'eisen-roh', wsNachher: 'eisen-gluehend',
+      start: 'Jetzt geht es tiefer: Zwei Begründungen klingen gut, passen aber nicht. Nur eine erklärt die Meinung wirklich.',
+      ende: () => tiefGeschafft('Gut sortiert!', 'Du erkennst, welche Begründung wirklich passt.'),
+    });
+  }
+  function spielStaerker() {
+    auswahlSpiel({
+      titel: 'Welches ist stärker?',
+      frageText: 'Beide Begründungen passen. Welche ist stärker?',
+      items: mischen(ZI.STAERKER).slice(0, 7).map((it) => ({ kopf: it.meinung, optionen: it.optionen })),
+      tipp: 'Ein starkes Argument erklärt genau, WAS besser wird – und gilt nicht nur für dich, sondern für viele.',
+      wsVorher: 'schmiede-axt-werkstueck', wsNachher: 'axt-scharf',
+      start: 'Diesmal passen beide Begründungen. Aber eine überzeugt viel mehr. Frag dich: Welche erklärt genauer, was besser wird?',
+      ende: () => tiefGeschafft('Scharfer Blick!', 'Du erkennst starke Argumente.'),
+    });
+  }
+  function spielVerbessern() {
+    auswahlSpiel({
+      titel: 'Besser begründen',
+      frageText: 'Diese Begründung ist schwach. Womit wird sie stärker?',
+      items: mischen(ZI.VERBESSERN).slice(0, 6).map(aufgabeVerbessern).concat(mischen(ZI.STAERKER).slice(0, 2).map((it) => ({ frage: 'Welche Begründung ist stärker?', kopf: it.meinung, optionen: it.optionen }))),
+      tipp: 'Lauter ist nicht besser. Eine starke Begründung erklärt, WARUM – und gilt nicht nur für dich.',
+      wsVorher: 'schmiede-axt-werkstueck', wsNachher: 'axt-scharf',
+      start: 'Im Rat hört man oft schwache Begründungen. Du machst sie stark!',
+      ende: () => tiefGeschafft('Stark begründet!', 'Du machst aus schwachen Begründungen starke.'),
+    });
+  }
+  function spielDafuerDagegen() {
+    sortierSpiel({
+      titel: 'Dafür oder dagegen?',
+      runden: mischen(ZI.DAFUER_DAGEGEN).slice(0, 2),
+      jaText: 'Dafür', neinText: 'Dagegen', jaUnter: 'stützt die Meinung', neinUnter: 'Gegenargument',
+      frageText: 'Spricht der Satz für die Meinung oder dagegen?',
+      tipp: 'Frag dich: Würde jemand diesen Satz sagen, der die Meinung gut findet? Dann ist er dafür.',
+      start: 'Wer gut diskutiert, kennt auch die Argumente der anderen Seite. Sortiere: dafür oder dagegen?',
+      wsVorher: 'eisen-roh', wsNachher: 'eisen-gluehend',
+      rundeFertig: 'Jetzt kennst du beide Seiten!',
+      falschJa: 'Hm, würde das jemand sagen, der dafür ist?',
+      falschNein: 'Schau noch einmal: Stützt der Satz nicht doch die Meinung?',
+      ende: () => tiefGeschafft('Beide Seiten erkannt!', 'Du erkennst Gegenargumente.'),
+    });
+  }
+  function spielEinwaende() {
+    const items = [];
+    mischen(ZI.INSELRAT).slice(0, 3).forEach((fall) => mischen(fall.einwaende).slice(0, 3).forEach((e) => items.push(aufgabeEinwand(fall, e))));
+    auswahlSpiel({
+      titel: 'Auf Einwände reagieren',
+      frageText: 'Was antwortest du?',
+      items: items.slice(0, 8),
+      tipp: ZI.TIPPS.inselrat,
+      wsVorher: 'eisen-roh', wsNachher: 'eisen-gluehend',
+      leiste: { text: 'Überzeugung', wachsen: true },
+      start: 'Jetzt wird es schwer: Viele Einwände hintereinander. Nimm jeden ernst und antworte mit einem Grund.',
+      ende: () => tiefGeschafft('Alle Einwände gemeistert!', 'Du reagierst stark auf Gegenargumente.'),
+    });
+  }
+
+  /* Tiefe 3 in Kapitel 1 */
   function spielFehlerjagd() {
     auswahlSpiel({
       titel: 'Fehlerjagd',
       frageText: 'Der Fehlerkobold hat zwei Sätze verbogen. Welcher Satz ist richtig?',
       // erst Lückenwörter (leichter), dann ganze Sätze prüfen
-      items: [...mischen(ZI.bauUebung('huette2').items).slice(0, 3).map(aufgabeLuecke),
-        ...mischen(ZI.FEHLERJAGD).slice(0, 7).map((it) => Object.assign(aufgabeFehler(it), { frage: 'Der Fehlerkobold hat zwei Sätze verbogen. Welcher Satz ist richtig?' }))],
+      // erst schwache Begründungen verbessern, dann verbogene Sätze reparieren
+      items: [...mischen(ZI.VERBESSERN).slice(0, 4).map(aufgabeVerbessern),
+        ...mischen(ZI.FEHLERJAGD).slice(0, 5).map((it) => Object.assign(aufgabeFehler(it), { frage: 'Der Fehlerkobold hat zwei Sätze verbogen. Welcher Satz ist richtig?' }))],
       tipp: ZI.TIPPS.fehler,
       wsVorher: 'kobold-chaos', wsNachher: 'kobold-besiegt',
-      start: 'Achtung, der Fehlerkobold war hier! Prüfe Komma und Verb.',
+      start: 'Achtung, der Fehlerkobold war hier! Er hat Begründungen stumpf gemacht und Sätze verbogen. Repariere alles.',
       ende: () => geschafft({ titel: 'Kobold besiegt!', text: 'Du hast alle Fehler gefunden. Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.', datei: 'edelstein', alt: 'Edelstein',
-        eintragen: (s) => s.setzeTief(K, 0) }),
+        eintragen: tiefEintrag }),
     });
   }
 
@@ -920,7 +1026,7 @@
       wsVorher: 'eisen-roh', wsNachher: 'edelstein',
       start: 'Ein gutes Beispiel zeigt, dass deine Begründung stimmt – wie ein Edelstein im Griff deiner Axt.',
       ende: () => geschafft({ titel: 'Stollen geschafft!', text: 'Du kennst dich mit Beispielen aus. Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.', datei: 'edelstein', alt: 'Edelstein',
-        eintragen: (s) => s.setzeTief(K, 1) }),
+        eintragen: tiefEintrag }),
     });
   }
 
@@ -1332,7 +1438,7 @@
       setTimeout(() => geschafft({
         titel: streit ? 'Starkes Streitgespräch!' : 'Meisterstück!',
         text: (streit ? 'Ihr habt zugehört, angeknüpft und widersprochen – wie echte Ratsmitglieder.' : 'Ihr habt beide ' + PRO + ' Argumente gesagt und geprüft.') + ' Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.',
-        datei: 'edelstein', alt: 'Edelstein', eintragen: (s) => s.setzeTief(K, 2) }), 700);
+        datei: 'edelstein', alt: 'Edelstein', eintragen: tiefEintrag }), 700);
     }
 
     vorbereiten();
@@ -1486,7 +1592,7 @@
       start: 'Da ist er wieder, der Fehlerkobold! Jede richtige Antwort ist ein Hammerschlag. Nach zehn Treffern gibt er auf.',
       boss: true,
       ende: () => geschafft({ titel: 'Kobold besiegt!', text: 'Der Fehlerkobold gibt auf und verspricht, nie wieder Argumente durcheinanderzubringen. Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.', datei: 'kobold-besiegt', alt: 'Besiegter Kobold',
-        eintragen: (s) => s.setzeTief(K, 0) }),
+        eintragen: tiefEintrag }),
     });
   }
 
@@ -1552,7 +1658,7 @@
       zeichne();
     }
     function ende() {
-      geschafft({ titel: 'Stollen geschafft!', text: 'Deine Argument-Ketten halten. Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.', datei: 'edelstein', alt: 'Edelstein', eintragen: (s) => s.setzeTief(K, 1) });
+      geschafft({ titel: 'Stollen geschafft!', text: 'Deine Argument-Ketten halten. Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.', datei: 'edelstein', alt: 'Edelstein', eintragen: tiefEintrag });
     }
     item();
   }
@@ -1616,7 +1722,7 @@
       tipp: ZI.TIPPS.gegen,
       wsVorher: 'schmiede-axt-werkstueck', wsNachher: 'axt-scharf',
       start: 'Ein Gegenargument spricht gegen eine Meinung. Wer Gegenargumente kennt, kann besser mitdiskutieren – und seine eigene Meinung prüfen.',
-      ende: () => geschafft({ titel: 'Stollen geschafft!', text: 'Du schmiedest starke Gegenargumente. Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.', datei: 'edelstein', alt: 'Edelstein', eintragen: (s) => s.setzeTief(K, 0) }),
+      ende: () => geschafft({ titel: 'Stollen geschafft!', text: 'Du schmiedest starke Gegenargumente. Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.', datei: 'edelstein', alt: 'Edelstein', eintragen: tiefEintrag }),
     });
   }
 
@@ -1631,7 +1737,7 @@
       tipp: ZI.TIPPS.situation,
       wsVorher: 'truhe-zu', wsNachher: 'truhe-offen',
       start: 'Nicht jedes Argument überzeugt jeden. Überleg, was der Person wichtig ist.',
-      ende: () => geschafft({ titel: 'Stollen geschafft!', text: 'Du weißt, wie man verschiedene Menschen überzeugt. Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.', datei: 'edelstein', alt: 'Edelstein', eintragen: (s) => s.setzeTief(K, 1) }),
+      ende: () => geschafft({ titel: 'Stollen geschafft!', text: 'Du weißt, wie man verschiedene Menschen überzeugt. Dafür bekommst du ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine.', datei: 'edelstein', alt: 'Edelstein', eintragen: tiefEintrag }),
     });
   }
 
@@ -1900,9 +2006,9 @@
     const k = Math.min(stand.offen, ZI.KAPITEL.length - 1);
     const kern = INHALT[k] ? INHALT[k].kern : [];
     const offen = kern.findIndex((d, i) => !stand.hatKern(k, i));
-    const tief = INHALT[k] ? INHALT[k].tief.findIndex((d, i) => !stand.hatTief(k, i)) : -1;
+    const tief = naechsteTiefe(k) ?? -1;
     const satz = offen >= 0 ? 'Als Nächstes: „' + kern[offen].name + '“. Ich komme mit!'
-      : tief >= 0 ? 'Der Hauptstollen ist geschafft! Wollen wir tiefer? „' + INHALT[k].tief[tief].name + '“ wartet.'
+      : tief >= 0 ? 'Der Hauptstollen ist geschafft! Wollen wir noch tiefer graben? Tiefe ' + (tief + 1) + ' wartet.'
         : 'Wir haben in diesem Kapitel alles geschafft. Stark!';
     return h('div', { class: 'begleiter' },
       h('div', { class: 'begleiter-bild' }, bild([z.datei + '-jubel', z.datei], z.name)),
@@ -1977,7 +2083,7 @@
     eingabe.addEventListener('keydown', (e) => { if (e.key === 'Enter') pruefen(); });
     const f = ZI.fenster([
       h('h2', null, 'Stammesrat'),
-      h('p', { style: { margin: 0 } }, 'Am Board steht der Stammescode aus drei Silben. Damit erfährst du, in welchem Stamm du bist und welche Rolle du hast.'),
+      h('p', { style: { margin: 0 } }, 'Am Board steht der Stammescode aus drei Silben. Damit erfährst du die Streitfrage, deine Seite, deinen Stamm und deine Rolle.'),
       eingabe, hinweis,
       h('div', { class: 'knopf-reihe' },
         h('button', { class: 'knopf holz', onclick: () => f.schliessen() }, 'Abbrechen'),
@@ -1985,54 +2091,125 @@
     ]);
     setTimeout(() => eingabe.focus(), 150);
   }
-  function zeigeStammesrat(c) {
+  /* Zwergenrat auf dem iPad: geführter Weg 1–8 (Frage, Seite, Partner, Tafel, Stamm, Diskussion, Abstimmen, Bote) */
+  function zeigeStammesrat(c, schritt) {
     const staemme = ZI.stammesEinteilung(c.n, c.seed);
     const g = staemme.find((x) => x.mitglieder.some((m) => m.karte === stand.karte));
     if (!g) { sitzung.loeschen('zi-stamm'); stammesratEingeben(); return; }
-    const ich = g.mitglieder.find((m) => m.karte === stand.karte);
+    const mit = ZI.mitSeiten(g, c.seed);
+    const ich = mit.find((m) => m.karte === stand.karte);
     const rolle = ich.rolle;
-    const t = ZI.STAMMES_THEMEN[c.thema];
-    const rf = t.frage ? ZI.ratsfrageNach(t.frage) : null;
-    const dreier = g.mitglieder.length < 4;
+    const t = ZI.STREITFRAGEN[c.thema] || ZI.STREITFRAGEN[0];
+    const meineSeite = ich.seite === 'pro' ? t.pro : t.contra;
+    const partner = mit.filter((m) => m.seite === ich.seite && m.karte !== stand.karte);
+    const tafelKey = 'zi-argumente-' + c.wort;
+    const tafel = sitzung.lesen(tafelKey, ['', '', '']);
+    schritt = schritt || c.schritt || 1;
+    c.schritt = schritt; sitzung.schreiben('zi-stamm', c);
+    const geh = (n) => { ZI.ton.plopp(); zeigeStammesrat(c, n); };
+    const weiterKnopf = (text, n, extra) => h('button', Object.assign({ class: 'knopf', onclick: () => geh(n) }, extra || {}), text);
+    const zurueck = schritt > 1 ? h('button', { class: 'knopf holz', onclick: () => geh(schritt - 1) }, 'Zurück') : null;
+    const rollenKarte = () => h('div', { class: 'rollenkarte pergament auf-pergament', style: { borderColor: g.farbe } },
+      h('div', { class: 'rollenkarte-zeichen' }, ZI.rollenSymbol(rolle)),
+      h('div', null,
+        h('div', { class: 'klein' }, 'Deine Aufgabe im Stamm'),
+        h('h2', { style: { margin: 0, color: g.farbe } }, rolle.name),
+        h('dl', { class: 'rollen-erklaerung' },
+          h('dt', null, 'Meine Aufgabe:'), h('dd', null, rolle.einfach.aufgabe),
+          h('dt', null, 'Das mache ich:'), h('dd', null, rolle.einfach.tun))));
+    const seitenKarte = () => h('div', { class: 'seitenkarte pergament auf-pergament ' + ich.seite },
+      ZI.seitenMarke(ich.seite, 'gross'),
+      h('div', null, h('div', { class: 'klein' }, 'Deine Seite'), h('div', { class: 'seiten-titel' }, meineSeite)));
+    const tafelAnsicht = () => h('div', { class: 'pergament auf-pergament stamm-box argumenttafel' },
+      h('h3', { class: 'titel-mit-bild' }, ZI.bildOder('argumenttafel', '', null, 'titel-bild'), 'Eure Argumenttafel · ', meineSeite),
+      h('ol', { class: 'saetze' }, tafel.filter((x) => x.trim()).map((x) => h('li', null, x))));
+    let inhalt; let fuss;
+    if (schritt === 1) {
+      inhalt = [h('div', { class: 'pergament auf-pergament stamm-box rat-gross' },
+        h('p', { class: 'klein', style: { margin: 0 } }, 'Ihr diskutiert jetzt diese Frage in eurem Zwergenstamm.'),
+        h('div', { class: 'streitfrage' }, t.frage),
+        h('div', { class: 'seiten-zeile' }, h('span', null, ZI.seitenMarke('pro', 'klein'), ' ', t.pro), h('span', null, ZI.seitenMarke('contra', 'klein'), ' ', t.contra)))];
+      fuss = weiterKnopf('Welche Seite habe ich?', 2);
+    } else if (schritt === 2) {
+      inhalt = [seitenKarte(),
+        h('p', { class: 'rat-hinweis pergament auf-pergament' }, 'Das ist deine Rolle für die Diskussion. Du musst nicht persönlich dieser Meinung sein.'),
+        rollenKarte()];
+      fuss = weiterKnopf('Weiter', 3);
+    } else if (schritt === 3) {
+      inhalt = [seitenKarte(), h('div', { class: 'pergament auf-pergament stamm-box rat-gross' },
+        partner.length ? [h('p', { style: { margin: 0, fontSize: '22px' } }, 'Trefft euch jetzt mit dem Zwerg aus eurem Stamm, der dieselbe Position hat.'),
+          h('div', { class: 'stamm-liste' }, partner.map((m) => h('div', { class: 'stamm-person' }, h('b', null, 'Karte ' + m.karte), ZI.seitenMarke(m.seite, 'klein'))))]
+          : h('p', { style: { margin: 0, fontSize: '22px' } }, 'Auf deiner Seite bist du allein. Sammle deine Argumente selbst. Dafür darfst du in der Diskussion als Erste oder Erster sprechen.'))];
+      fuss = weiterKnopf(partner.length ? 'Wir haben uns gefunden' : 'Weiter', 4);
+    } else if (schritt === 4) {
+      const felder = h('div', { class: 'tafel-felder' });
+      const los = weiterKnopf('Fertig gesammelt', 5);
+      const pruefe = () => { const n = tafel.filter((x) => x.trim().length >= 3).length; los.disabled = n < 3; los.textContent = n < 3 ? 'Noch ' + (3 - n) + ' Argument' + (3 - n === 1 ? '' : 'e') : 'Fertig gesammelt'; };
+      const zeichneFelder = () => ZI.setze(felder, ...tafel.map((v, i) => {
+        const feld = h('textarea', { class: 'tafel-feld', rows: '2', maxlength: '160', 'aria-label': 'Argument ' + (i + 1), placeholder: i === 0 ? 'z. B. … weil …' : 'Argument ' + (i + 1) });
+        feld.value = v;
+        feld.addEventListener('input', () => { tafel[i] = feld.value; sitzung.schreiben(tafelKey, tafel); pruefe(); });
+        return h('label', { class: 'tafel-zeile' }, h('span', { class: 'tafel-nr' }, String(i + 1)), feld);
+      }));
+      zeichneFelder();
+      inhalt = [h('div', { class: 'pergament auf-pergament stamm-box argumenttafel' },
+        h('h3', { class: 'titel-mit-bild' }, ZI.bildOder('argumenttafel', '', null, 'titel-bild'), 'Argumenttafel · ', meineSeite),
+        h('p', { style: { margin: '0 0 8px' } }, h('b', null, partner.length ? 'Sammelt gemeinsam mindestens 3 Argumente.' : 'Sammle mindestens 3 Argumente.'), ' Stichwörter reichen. Die Tafel bleibt nur auf diesem iPad.'),
+        felder,
+        tafel.length < 5 ? h('button', { class: 'knopf holz klein', onclick: () => { tafel.push(''); sitzung.schreiben(tafelKey, tafel); zeigeStammesrat(c, 4); } }, '+ noch ein Argument') : null)];
+      fuss = los; pruefe();
+    } else if (schritt === 5) {
+      inhalt = [h('div', { class: 'pergament auf-pergament stamm-box' },
+        h('h3', null, 'Euer Stamm: die ' + g.name),
+        h('p', { style: { margin: '0 0 8px' } }, 'Setzt euch jetzt als ganzer Stamm zusammen.'),
+        h('div', { class: 'stamm-liste' }, mit.map((m) => h('div', { class: 'stamm-person' + (m.karte === stand.karte ? ' ich' : '') },
+          h('b', null, 'Karte ' + m.karte + (m.karte === stand.karte ? ' (du)' : '')), ZI.seitenMarke(m.seite, 'klein'),
+          h('span', { class: 'stamm-rolle' }, ZI.rollenSymbol(m.rolle, 'klein'), ' ' + m.rolle.name))))), rollenKarte()];
+      fuss = weiterKnopf('Wir sitzen zusammen', 6);
+    } else if (schritt === 6) {
+      inhalt = [h('div', { class: 'pergament auf-pergament stamm-box rat-gross' }, h('div', { class: 'streitfrage klein-frage' }, t.frage),
+        h('p', { style: { margin: 0, fontSize: '22px' } }, h('b', null, 'Jetzt diskutiert ihr als Stamm.'), ' Erst sagt PRO ein Argument, dann CONTRA. Danach antwortet ihr aufeinander.')),
+        h('div', { class: 'stamm-spalten' },
+          tafelAnsicht(),
+          h('div', { class: 'pergament auf-pergament stamm-box' },
+            h('h3', null, 'So kannst du anfangen'),
+            h('ul', { class: 'saetze' }, ZI.DISKUSSION_SAETZE.map((x) => h('li', null, x))))),
+        h('div', { class: 'pergament auf-pergament stamm-box' },
+          h('h3', { class: 'titel-mit-bild' }, ZI.rollenSymbol(rolle, 'klein'), ' Deine Aufgabe als ' + rolle.name),
+          h('p', { style: { margin: '0 0 6px' } }, rolle.einfach.tun + (g.mitglieder.length < 4 && rolle.id === 'aelteste' ? ' Ihr seid nur drei: Achte auch auf die Zeit.' : '')),
+          h('ul', { class: 'saetze' }, rolle.saetze.map((x) => h('li', null, x))))];
+      fuss = weiterKnopf('Wir sind fertig – abstimmen', 7);
+    } else if (schritt === 7) {
+      const wahl = (x) => h('button', { class: 'knopf abstimm-knopf ' + (x === 'a' ? 'pro' : 'contra') + (c.wahl === x ? ' gewaehlt' : ''), 'aria-pressed': String(c.wahl === x),
+        onclick: () => { c.wahl = x; sitzung.schreiben('zi-stamm', c); ZI.ton.plopp(); zeigeStammesrat(c, 7); } },
+        ZI.seitenMarke(x === 'a' ? 'pro' : 'contra', 'klein'), h('span', null, x === 'a' ? t.pro : t.contra));
+      inhalt = [h('div', { class: 'pergament auf-pergament stamm-box rat-gross' },
+        h('div', { class: 'streitfrage klein-frage' }, t.frage),
+        h('p', { style: { margin: '0 0 10px' } }, 'Jetzt zählt nicht mehr deine Rolle. Wofür ist euer Stamm nach der Diskussion? Einigt euch und tippt auf eurem iPad dasselbe.'),
+        h('div', { class: 'abstimm-wahl' }, wahl('a'), wahl('b')),
+        c.wahl ? h('div', { class: 'rueckmeldung gut', style: { fontSize: '22px' } }, 'Die ' + g.name + ' stimmen für: ', h('b', null, c.wahl === 'a' ? t.pro : t.contra)) : null)];
+      fuss = weiterKnopf('Abstimmung bestätigen', 8, { disabled: c.wahl ? null : true });
+    } else {
+      const ergebnis = c.wahl === 'a' ? t.pro : t.contra;
+      inhalt = [h('div', { class: 'pergament auf-pergament stamm-box rat-gross' + (rolle.id === 'bote' ? ' bote-ich' : '') },
+        h('div', { class: 'titel-mit-bild' }, ZI.rollenSymbol(ZI.STAMMES_ROLLEN.find((r) => r.id === 'bote'), 'klein'), h('h3', { style: { margin: 0 } }, rolle.id === 'bote' ? 'Du bist der Bote!' : 'Euer Bote meldet')),
+        h('p', { style: { margin: '6px 0', fontSize: '22px' } }, rolle.id === 'bote' ? 'Sag gleich im Zwergenrat laut:' : 'Euer Bote sagt gleich im Zwergenrat:'),
+        h('div', { class: 'meinung' }, '„Die ' + g.name + ' stimmen für: ' + ergebnis + ', weil …“'),
+        h('p', { style: { margin: '8px 0 0' } }, 'Schaut jetzt zum Board. Dort zählt die Klasse alle Stämme. Die Siegerseite entscheidet, welches Gebäude die Zwerge bauen.')),
+        tafelAnsicht()];
+      fuss = h('button', { class: 'knopf holz', onclick: () => zeigeHalle() }, 'Zurück zur Halle');
+    }
     zeige(h('div', { class: 'screen' },
       ZI.hintergrund('zwergenrat-hintergrund', 'hg-ersatz-stollen', 'rgba(20,12,8,0.45)'),
       h('div', { class: 'leiste' },
         h('button', { class: 'rund', 'aria-label': 'Zurück zur Halle', onclick: () => zeigeHalle() }, icon.zurueck()),
-        h('div', null, h('div', { class: 'titel' }, 'Stammesrat der ' + g.name), h('div', { class: 'untertitel' }, 'Stammescode ' + c.wort.match(/../g).join(' '))),
+        h('div', null, h('div', { class: 'titel' }, 'Zwergenrat · ' + g.name), h('div', { class: 'untertitel' }, 'Stammescode ' + c.wort.match(/../g).join(' '))),
         h('div', { class: 'spacer' }),
+        schritt >= 6 && schritt < 8 ? h('button', { class: 'knopf holz klein', onclick: () => { const f = ZI.fenster([tafelAnsicht(), h('div', { class: 'knopf-reihe' }, h('button', { class: 'knopf', onclick: () => f.schliessen() }, 'Schließen'))]); } }, 'Meine Tafel') : null,
         h('button', { class: 'knopf holz klein', onclick: () => { sitzung.loeschen('zi-stamm'); stammesratEingeben(); } }, 'Neuer Code')),
       h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2 } },
-        h('div', { class: 'stammesrat-ipad' },
-          h('div', { class: 'rollenkarte pergament auf-pergament', style: { borderColor: g.farbe } },
-            h('div', { class: 'rollenkarte-zeichen' }, ZI.rollenSymbol(rolle)),
-            h('div', null,
-              h('div', { class: 'klein' }, 'Deine Rolle'),
-              h('h2', { style: { margin: 0, color: g.farbe } }, rolle.name),
-              // drei kurze Fragen – leicht verständlich, auch für Kinder mit Deutsch als Zweitsprache
-              h('dl', { class: 'rollen-erklaerung' },
-                h('dt', null, 'Meine Aufgabe:'), h('dd', null, rolle.einfach.aufgabe),
-                h('dt', null, 'Ich achte darauf:'), h('dd', null, rolle.einfach.achten + (dreier && rolle.id === 'aelteste' ? ' Ihr seid nur drei: Achte auch auf die Zeit.' : '')),
-                h('dt', null, 'Das mache ich:'), h('dd', null, rolle.einfach.tun)))),
-          h('div', { class: 'pergament auf-pergament stamm-box' },
-            h('h3', null, 'Euer Thema ', h('span', { class: 'herkunft' + (t.frage ? ' insel' : '') }, ZI.themaHerkunft(t))),
-            h('div', { class: 'meinung' }, ZI.themaText(t)),
-            rf ? h('div', { class: 'stamm-optionen' }, rf.optionen.map((id) => {
-              const geb = ZI.GEBAEUDE.find((x) => x.id === id); const u = ZI.bauUebung(id);
-              return h('div', { class: 'stamm-option' }, h('div', { class: 'stamm-option-bild' }, bild(id, geb.name)),
-                h('div', null, h('b', null, geb.name), u ? h('div', { class: 'klein' }, 'schaltet frei: „' + u.name + '“') : null));
-            })) : null),
-          h('div', { class: 'stamm-spalten' },
-            h('div', { class: 'pergament auf-pergament stamm-box' },
-              h('h3', null, 'Deine Sätze als ' + rolle.name),
-              h('ul', { class: 'saetze' }, rolle.saetze.map((x) => h('li', null, x)))),
-            h('div', { class: 'pergament auf-pergament stamm-box' },
-              h('h3', null, 'Für alle im Stamm'),
-              h('ul', { class: 'saetze' }, ZI.ALLE_SAETZE.map((x) => h('li', null, x))))),
-          h('div', { class: 'pergament auf-pergament stamm-box' },
-            h('h3', null, 'Dein Stamm'),
-            h('div', { class: 'stamm-liste' }, g.mitglieder.map((m) => h('div', { class: 'stamm-person' + (m.karte === stand.karte ? ' ich' : '') },
-              h('b', null, 'Karte ' + m.karte), h('span', { class: 'stamm-rolle' }, ZI.rollenSymbol(m.rolle, 'klein'), ' ' + m.rolle.name + (m.karte === stand.karte ? ' (du)' : ''))))),
-            h('p', { class: 'klein', style: { margin: '8px 0 0' } }, 'Setzt euch zusammen. Jeder sagt mindestens einmal seine Meinung mit Begründung.'))))));
+        h('div', { class: 'stammesrat-ipad' }, ZI.ratsReise(schritt), ...inhalt,
+          h('div', { class: 'knopf-reihe rat-fuss' }, zurueck, fuss)))));
   }
 
   /* ---------- Begründungshand: die zwei stärksten von fünf Begründungen wählen ---------- */
@@ -2173,7 +2350,7 @@
               h('div', { class: 'lieferschein-bild' }, bild(z.datei, z.name)),
               h('div', null,
                 h('h2', { style: { fontSize: '30px', margin: 0 } }, 'Lieferschein'),
-                h('div', { class: 'klein' }, 'Kapitel ' + (stand.offen + 1) + ' · ' + material + ' Material' + (stand.deepCount(stand.offen) ? ' · ' + stand.deepCount(stand.offen) + ' Tiefe Stollen' : '')))),
+                h('div', { class: 'klein' }, 'Kapitel ' + (stand.offen + 1) + ' · ' + material + ' Material' + (stand.deepCount(stand.offen) ? ' · ' + stand.deepCount(stand.offen) + ' Tiefen' : '')))),
             h('div', { class: 'schein-zeile' },
               h('div', { class: 'schein-karte' }, h('span', null, 'Karte'), h('b', null, String(stand.karte))),
               h('div', { class: 'schein-code', 'aria-label': 'Lieferschein: ' + schein.split('').join(' ') },

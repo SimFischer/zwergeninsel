@@ -19,6 +19,14 @@
     'Ich kann dein Argument nachvollziehen. Aber …',
     'Am wichtigsten finde ich, dass …',
   ];
+  /* Satzanfänge für die Diskussion im Stamm und im Rat */
+  ZI.DISKUSSION_SAETZE = [
+    '„Ich finde …, weil …“',
+    '„Ein Argument dafür ist …“',
+    '„Dagegen spricht …“',
+    '„Du sagst, dass … Ich denke dazu …“',
+    '„Ich verstehe dein Argument, aber …“',
+  ];
   ZI.ALLE_SAETZE = [
     'Ich finde, dass …, weil …',
     'Du sagst, dass … Dazu denke ich, dass …',
@@ -137,9 +145,6 @@
   if (seite) Object.assign(seite, muehle.wissen);
 
   /* ---------- Themen der 5a (Stunde 1, 4, 7 und Themenwahl aus Stunde 12) ---------- */
-  ZI.STAMMES_THEMEN[5] = { text: 'Sollte unsere Klasse einen Ausflug in den Kletterpark machen?' };
-  ZI.STAMMES_THEMEN[6] = { text: 'Sollte es längere Pausen geben, dafür aber später Schulschluss?' };
-  ZI.STAMMES_THEMEN[7] = { text: 'Wie sollten wir unsere Sitzordnung festlegen?' };
   const neueThemen = [
     ['Sollte unsere Klasse einen Ausflug in den Kletterpark machen?', 'unsere Klasse einen Ausflug in den Kletterpark machen sollte', 'unsere Klasse keinen Ausflug in den Kletterpark machen sollte'],
     ['Sollte es längere Pausen geben, dafür aber später Schulschluss?', 'es längere Pausen und dafür später Schulschluss geben sollte', 'es keine längeren Pausen mit späterem Schulschluss geben sollte'],

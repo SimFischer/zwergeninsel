@@ -587,4 +587,102 @@
         { text: 'Ich will auf jeden Fall Tafeldienst.', ja: false, info: 'Nicht begründet: Nur ein Wunsch, kein Grund.' }]),
     );
   }
+
+  /* =========================================================
+     NOCH TIEFER GRABEN – neue Stufen (schwerer statt mehr)
+     ========================================================= */
+  const o = (text, ok, info) => ({ text, ok, info });
+  /* Tiefe 2: Beide Begründungen passen – welche ist stärker? */
+  ZI.STAERKER = [
+    { meinung: 'Wir sollten in der Pause draußen spielen dürfen, …', optionen: [
+      o('… weil man sich draußen bewegt und danach im Unterricht besser aufpassen kann.', true, 'Stärker: Es erklärt, was die Bewegung bringt – für alle und für das Lernen.'),
+      o('… weil es draußen schöner ist.', false, 'Passt, bleibt aber ungenau. Warum ist es schöner, und was bringt das?')] },
+    { meinung: 'Unsere Klasse sollte eine Leseecke bekommen, …', optionen: [
+      o('… weil ich gern auf Kissen sitze.', false, 'Passt, aber es geht nur um dich. Ein starkes Argument gilt für viele.'),
+      o('… weil man dort in Ruhe lesen kann, wenn es im Raum laut ist.', true, 'Stärker: Es nennt einen echten Nutzen für die ganze Klasse.')] },
+    { meinung: 'Es sollte Wasserspender in der Schule geben, …', optionen: [
+      o('… weil Wasser gesund ist.', false, 'Stimmt, ist aber sehr allgemein. Was genau bringt der Wasserspender?'),
+      o('… weil viele Kinder sonst zu wenig trinken und dann Kopfschmerzen bekommen.', true, 'Stärker: Es zeigt ein echtes Problem und eine Folge.')] },
+    { meinung: 'Wir sollten Klassendienste einführen, …', optionen: [
+      o('… weil dann jeder mal Verantwortung übernimmt und nicht immer dieselben aufräumen.', true, 'Stärker: Es erklärt, was gerechter wird.'),
+      o('… weil Dienste wichtig sind.', false, 'Das sagt nur „wichtig“. Warum sind sie wichtig?')] },
+    { meinung: 'Man sollte mit dem Fahrrad zur Schule fahren, …', optionen: [
+      o('… weil Fahrräder Spaß machen.', false, 'Passt, ist aber nur ein Gefühl. Was bringt es wirklich?'),
+      o('… weil man sich bewegt und die Luft vor der Schule sauberer bleibt.', true, 'Stärker: Zwei echte Vorteile, die man prüfen kann.')] },
+    { meinung: 'Wir sollten einen Klassenrat einführen, …', optionen: [
+      o('… weil wir dort Streit in Ruhe klären können und alle zu Wort kommen.', true, 'Stärker: Es erklärt genau, wobei der Klassenrat hilft.'),
+      o('… weil andere Klassen auch einen haben.', false, 'Schwach: Dass andere es machen, ist noch kein Grund.')] },
+    { meinung: 'Kinder sollten genug schlafen, …', optionen: [
+      o('… weil man ausgeschlafen besser lernen und sich mehr merken kann.', true, 'Stärker: Es nennt eine klare Folge.'),
+      o('… weil Mama das sagt.', false, 'Schwach: Wer etwas sagt, ist noch keine Begründung.')] },
+    { meinung: 'Wir sollten einmal im Monat draußen Unterricht machen, …', optionen: [
+      o('… weil drinnen langweilig ist.', false, 'Ungenau: Was genau wird draußen besser?'),
+      o('… weil wir draußen Pflanzen und Tiere direkt beobachten können.', true, 'Stärker: Es zeigt, was man draußen lernen kann.')] },
+    { meinung: 'Man sollte andere ausreden lassen, …', optionen: [
+      o('… weil man sonst nicht erfährt, was der andere eigentlich meint.', true, 'Stärker: Es erklärt, was sonst verloren geht.'),
+      o('… weil das höflich ist.', false, 'Passt, aber warum ist es wichtig, höflich zu sein? Das bleibt offen.')] },
+    { meinung: 'Wir sollten weniger Plastik benutzen, …', optionen: [
+      o('… weil Plastik nicht schön aussieht.', false, 'Schwach: Aussehen ist nicht das Problem.'),
+      o('… weil Plastikmüll oft im Meer landet und Tiere ihn fressen.', true, 'Stärker: Es zeigt eine echte, schlimme Folge.')] },
+  ];
+  /* Tiefe 3: Eine schwache Begründung besser machen */
+  ZI.VERBESSERN = [
+    { schwach: 'Ich finde, dass wir eine Klassenfahrt machen sollten, weil Klassenfahrten toll sind.', optionen: [
+      o('… weil wir uns als neue Klasse dabei besser kennenlernen.', true, 'Jetzt erklärt die Begründung, WAS die Fahrt bringt.'),
+      o('… weil Klassenfahrten wirklich sehr, sehr toll sind.', false, 'Nur lauter, nicht besser: Es fehlt immer noch das Warum.'),
+      o('… weil der Bus groß ist.', false, 'Das passt nicht zur Meinung.')] },
+    { schwach: 'Ich finde, dass man Müll trennen sollte, weil man das so macht.', optionen: [
+      o('… weil das alle machen.', false, 'Dass alle es machen, ist kein Grund.'),
+      o('… weil man aus getrenntem Müll neue Dinge herstellen kann.', true, 'Jetzt steht da ein echter Grund.'),
+      o('… weil die Tonnen bunt sind.', false, 'Das passt nicht zur Meinung.')] },
+    { schwach: 'Ich finde, dass wir mehr Sport machen sollten, weil Sport gut ist.', optionen: [
+      o('… weil Bewegung uns fit macht und wir danach ruhiger lernen.', true, 'Jetzt erklärt die Begründung, warum Sport gut ist.'),
+      o('… weil Sport echt gut ist.', false, 'Nur lauter, nicht besser.'),
+      o('… weil die Turnhalle neu ist.', false, 'Das ist kein Grund für mehr Sport.')] },
+    { schwach: 'Ich finde, dass man Tiere gut behandeln sollte, weil ich Tiere mag.', optionen: [
+      o('… weil Tiere süß sind.', false, 'Immer noch nur ein Gefühl.'),
+      o('… weil Tiere genau wie wir Schmerzen und Angst spüren.', true, 'Jetzt gilt der Grund für alle, nicht nur für dich.'),
+      o('… weil ich einen Hund habe.', false, 'Das erzählt von dir, begründet aber nichts.')] },
+    { schwach: 'Ich finde, dass wir leise arbeiten sollten, weil es so ist.', optionen: [
+      o('… weil Leise-Sein eine Regel ist.', false, 'Eine Regel nennen ist noch kein Grund.'),
+      o('… weil Lärm stört.', false, 'Schon besser, aber noch ungenau: Wobei stört er?'),
+      o('… weil sich dann alle besser konzentrieren können.', true, 'Jetzt ist klar, was das Leise-Sein bringt.')] },
+    { schwach: 'Ich finde, dass wir Obst essen sollten, weil Obst gut ist.', optionen: [
+      o('… weil Obst Vitamine hat, die uns vor Erkältungen schützen.', true, 'Jetzt erklärt die Begründung, warum Obst gut ist.'),
+      o('… weil Obst sehr gut ist.', false, 'Nur lauter, nicht besser.'),
+      o('… weil Äpfel rot sind.', false, 'Das passt nicht zur Meinung.')] },
+    { schwach: 'Ich finde, dass wir Pausenspiele abwechseln sollten, weil ich keinen Fußball mag.', optionen: [
+      o('… weil ich lieber Fangen spiele.', false, 'Wieder nur dein Wunsch.'),
+      o('… weil dann auch Kinder mitspielen können, die Fußball nicht mögen.', true, 'Jetzt denkt die Begründung an alle.'),
+      o('… weil Fußball doof ist.', false, 'Das ist eine Meinung, kein Grund.')] },
+    { schwach: 'Ich finde, dass man einen Helm tragen sollte, weil Helme wichtig sind.', optionen: [
+      o('… weil Helme wirklich wichtig sind.', false, 'Nur lauter, nicht besser.'),
+      o('… weil Helme teuer sind.', false, 'Das passt nicht zur Meinung.'),
+      o('… weil ein Helm bei einem Sturz den Kopf schützt.', true, 'Jetzt steht da, WOFÜR der Helm wichtig ist.')] },
+  ];
+  /* Tiefe 4 (Kapitel 2): Spricht der Satz dafür oder dagegen? */
+  const dd = (meinung, ...karten) => ({ kopf: meinung, karten: karten.map(([text, ja, info]) => ({ text, ja, info })) });
+  ZI.DAFUER_DAGEGEN = [
+    dd('Die Schule sollte erst um 9 Uhr beginnen.',
+      ['Viele Kinder wären ausgeschlafener.', true, 'Dafür: ein Vorteil des späten Beginns.'],
+      ['Dann ist die Schule erst später aus.', false, 'Dagegen: ein Nachteil, den man bedenken muss.'],
+      ['Man könnte in Ruhe frühstücken.', true, 'Dafür: noch ein Vorteil.'],
+      ['Eltern müssen oft früh zur Arbeit.', false, 'Dagegen: Wer bringt die Kinder dann?'],
+      ['Morgens ist der Kopf oft noch müde.', true, 'Dafür: Es stützt den späteren Beginn.'],
+      ['Nachmittags bleibt weniger Zeit für Hobbys.', false, 'Dagegen: Die Freizeit wird kürzer.']),
+    dd('Handys sollten in der Pause erlaubt sein.',
+      ['Man kann kurz die Eltern erreichen.', true, 'Dafür: ein Vorteil.'],
+      ['Dann spielen weniger Kinder zusammen.', false, 'Dagegen: Die Pause wird ruhiger, aber einsamer.'],
+      ['Fotos können ohne Erlaubnis gemacht werden.', false, 'Dagegen: eine echte Gefahr.'],
+      ['Man kann zusammen Musik hören.', true, 'Dafür: ein Vorteil für die Pause.'],
+      ['Die Augen brauchen in der Pause auch eine Pause.', false, 'Dagegen: Erholung fehlt.'],
+      ['Man lernt, selbst vernünftig mit dem Handy umzugehen.', true, 'Dafür: ein Grund, es zu erlauben.']),
+    dd('Es sollte keine Hausaufgaben geben.',
+      ['Man hat mehr Zeit für Familie und Freunde.', true, 'Dafür: ein Vorteil ohne Hausaufgaben.'],
+      ['Durch Üben merkt man sich Dinge besser.', false, 'Dagegen: Hausaufgaben helfen beim Lernen.'],
+      ['Manche Kinder haben zu Hause keine Hilfe.', true, 'Dafür: Hausaufgaben sind nicht für alle gerecht.'],
+      ['Die Lehrkraft sieht, was noch nicht klappt.', false, 'Dagegen: Hausaufgaben zeigen, wo man Hilfe braucht.'],
+      ['Nach der Schule ist man oft müde.', true, 'Dafür: Es stützt die Meinung.'],
+      ['Man lernt, sich die Zeit selbst einzuteilen.', false, 'Dagegen: ein Vorteil von Hausaufgaben.']),
+  ];
 })();

@@ -620,17 +620,13 @@ img.truhe-klein, .platzhalter.truhe-klein { width: 110px; height: auto; max-heig
 .rollenkarte h2 { font-size: 40px; }
 .stamm-box { padding: 14px 18px; }
 .stamm-box h3 { margin: 0 0 6px; font-size: 22px; }
-.stamm-optionen { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-.stamm-option { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 12px; background: #fffaf0; border: 2px solid #b08a5a; }
-.stamm-option-bild { width: 70px; flex: none; }
-.stamm-option-bild img { width: 100%; display: block; }
 .stamm-spalten { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .saetze { margin: 0; padding-left: 22px; font-size: 19px; }
 .saetze li { margin-bottom: 4px; }
 .stamm-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
 .stamm-person { display: flex; flex-direction: column; padding: 8px 12px; border-radius: 10px; background: #fffaf0; border: 2px solid rgba(58, 38, 23, 0.2); font-size: 17px; }
 .stamm-person.ich { border-color: var(--gold); background: #fff1cf; }
-@media (max-width: 760px) { .stamm-spalten, .stamm-optionen { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .stamm-spalten { grid-template-columns: 1fr; } }
 
 /* ---------- Begründungshand ---------- */
 .hand-kopf { display: flex; align-items: center; gap: 12px; }
@@ -640,9 +636,6 @@ img.truhe-klein, .platzhalter.truhe-klein { width: 110px; height: auto; max-heig
 .abschied { max-width: 560px; padding: 26px 30px; display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; font-size: 20px; }
 .abschied p { margin: 0; }
 
-/* Themen-Herkunft: Klasse oder Insel */
-.herkunft { display: inline-block; vertical-align: middle; margin-left: 6px; padding: 2px 10px; border-radius: 999px; font-family: var(--text, inherit); font-size: 15px; font-weight: 700; letter-spacing: .02em; background: #2f6f8f; color: #fff; }
-.herkunft.insel { background: #6b4a1e; }
 
 /* iPad-Bildschirmtastatur: Fenster rutschen über die Tastatur, statt von ihr verdeckt zu werden */
 .schleier { padding-bottom: calc(20px + var(--tastatur, 0px)); transition: padding-bottom 0.2s; }
@@ -811,3 +804,42 @@ a.lk-kachel:active { transform: translateY(2px); }
 .sterne-bild .stern.an { filter: none; opacity: 1; }
 .sterne-bild .stern img { width: 100%; height: 100%; object-fit: contain; }
 .sterne-bild.klein .stern { width: 26px; height: 26px; }
+
+/* ---------- Zwergenrat: Weg 1–11, PRO/CONTRA, Argumenttafel ---------- */
+.rats-reise { list-style: none; margin: 0; padding: 6px; display: flex; gap: 4px; flex-wrap: wrap; border-radius: 14px; background: rgba(255, 250, 240, 0.92); }
+.rats-reise li { flex: 1 1 0; min-width: 62px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 2px; border-radius: 10px; border: 2px solid rgba(58, 38, 23, 0.18); color: var(--tinte-hell); font-size: 12px; line-height: 1.1; text-align: center; hyphens: manual; }
+.rats-reise .rr-nr { font-family: var(--titel); font-size: 18px; }
+.rats-reise li.fertig { background: #e3efd3; border-color: #7fb24a; color: var(--tinte); }
+.rats-reise li.jetzt { background: #fff1cf; border-color: var(--gold, #e8b23a); color: var(--tinte); font-weight: 700; box-shadow: 0 0 0 3px rgba(232, 178, 58, 0.45); }
+.seiten-marke { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; color: #fff; background: #4f8a2a; font-size: 15px; vertical-align: middle; white-space: nowrap; }
+.seiten-marke.contra { background: #b4532a; }
+.seiten-marke .seiten-bild { width: 22px; height: 22px; object-fit: contain; }
+.seiten-marke.gross { padding: 8px 18px; font-size: 30px; }
+.seiten-marke.gross .seiten-bild { width: 64px; height: 64px; }
+.seiten-zeile { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 8px; font-size: 19px; font-weight: 700; }
+.seitenkarte { display: flex; align-items: center; gap: 18px; padding: 16px 22px; border: 4px solid #4f8a2a; }
+.seitenkarte.contra { border-color: #b4532a; }
+.seiten-titel { font-family: var(--titel); font-size: 34px; line-height: 1.1; }
+.rat-hinweis { margin: 0; padding: 12px 18px; font-size: 21px; font-weight: 700; }
+.rat-gross { font-size: 20px; }
+.streitfrage { font-family: var(--titel); font-size: 36px; line-height: 1.15; margin: 6px 0; }
+.streitfrage.klein-frage { font-size: 26px; }
+.argumenttafel .titel-bild { width: 40px; height: 40px; }
+.titel-mit-bild { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tafel-felder { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.tafel-zeile { display: flex; gap: 10px; align-items: flex-start; }
+.tafel-nr { flex: none; width: 34px; height: 34px; border-radius: 50%; background: #3a2617; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--titel); font-size: 20px; margin-top: 6px; }
+.tafel-feld { flex: 1; min-width: 0; font: inherit; font-size: 19px; padding: 8px 12px; border-radius: 10px; border: 2px solid #b08a5a; background: #fffdf6; resize: vertical; }
+.abstimm-wahl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+.abstimm-knopf { display: flex; flex-direction: column; gap: 6px; white-space: normal; min-height: 96px; font-size: 22px; }
+.abstimm-knopf.gewaehlt { outline: 5px solid var(--gold, #e8b23a); outline-offset: 2px; }
+.bote-ich { border: 4px solid var(--gold, #e8b23a); }
+.rat-fuss { justify-content: flex-end; }
+.tiefer-graben .titel-bild { width: 44px; height: 44px; }
+@media (max-width: 760px) { .abstimm-wahl { grid-template-columns: 1fr; } .rats-reise .rr-name { display: none; } }
+/* Tiefen als Schacht: jede Stufe ein Stück tiefer */
+.stationen.tiefen { grid-template-columns: 1fr; gap: 10px; }
+.stationen.tiefen > .station:nth-child(2) { margin-left: 4%; }
+.stationen.tiefen > .station:nth-child(3) { margin-left: 8%; }
+.stationen.tiefen > .station:nth-child(4) { margin-left: 12%; }
+.stationen.tiefen > .station:nth-child(5) { margin-left: 16%; }

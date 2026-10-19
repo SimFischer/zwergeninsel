@@ -113,6 +113,14 @@
   };
   ZI.zufall = (arr) => arr[Math.floor(Math.random() * arr.length)];
   /* Rollen-Symbol: Bild aus bilder/rolle-….png, solange es fehlt ein Ausweich-Zeichen */
+  /* Weg durch den Zwergenrat: 1–8 im Stamm (iPad), 9–11 am Board */
+  ZI.RATS_REISE = ['Streitfrage', 'Seite', 'Partner', 'Tafel', 'Stamm trifft sich', 'Diskussion', 'Abstimmen', 'Bote', 'Klassen\u00ADabstimmung', 'Siegerseite', 'Gebäude'];
+  ZI.ratsReise = (aktiv) => h('ol', { class: 'rats-reise', 'aria-label': 'Ablauf des Zwergenrats' },
+    ZI.RATS_REISE.map((name, i) => h('li', { class: (i + 1 < aktiv ? 'fertig' : i + 1 === aktiv ? 'jetzt' : '') + (i >= 8 ? ' board' : ''), 'aria-current': i + 1 === aktiv ? 'step' : null },
+      h('span', { class: 'rr-nr' }, String(i + 1)), h('span', { class: 'rr-name' }, name))));
+  /* PRO/CONTRA-Marke mit Bild-Slot (rolle-pro.png / rolle-contra.png), sonst Schriftzug */
+  ZI.seitenMarke = (seite, cls) => h('span', { class: 'seiten-marke ' + seite + ' ' + (cls || '') },
+    ZI.bildOder('rolle-' + seite, '', null, 'seiten-bild'), h('b', null, seite === 'pro' ? 'PRO' : 'CONTRA'));
   ZI.rollenSymbol = (rolle, cls) => h('span', { class: 'rollen-symbol ' + (cls || ''), 'aria-hidden': 'true' },
     ZI.bildOder(rolle.bild, rolle.name, h('span', { class: 'rollen-zeichen' }, rolle.zeichen)));
   /* Bausteine mischen, sodass der Satz NIE schon fertig oder fast fertig dasteht.

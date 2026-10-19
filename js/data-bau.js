@@ -392,16 +392,31 @@
       saetze: ['Wir haben noch … Minuten.', 'Lass sie bitte ausreden.', 'Kannst du das noch begründen?'] },
   ];
   ZI.ALLE_SAETZE = ['Ich finde, dass …, weil …', 'Ich stimme dir zu, denn …', 'Du sagst, dass … Aber …', 'Ja, und außerdem …'];
-  /* Themen: die Ratsfragen (mit Gebäuden) und freie Streitfragen zum Üben */
-  ZI.STAMMES_THEMEN = [
-    { frage: 'k1a' }, { frage: 'k1b' }, { frage: 'k2a' }, { frage: 'k2b' }, { frage: 'k3a' },
-    { text: 'Sollte es an unserer Schule einen Kuscheltiertag geben?' },
-    { text: 'Sollten Handys in der Pause erlaubt sein?' },
-    { text: 'Sollten wir einen Klassenausflug in den Wald oder in den Zoo machen?' },
+  /* Streitfragen für den Zwergenrat: aus dem Schulalltag, ohne Fachwissen beide Seiten vertretbar.
+     pro = Seite A (gewinnt sie, entsteht das erste Gebäude der Ratsfrage), contra = Seite B (das zweite). Höchstens 8 (Stammescode). */
+  ZI.STREITFRAGEN = [
+    { frage: 'Soll die Schule erst um 9 Uhr beginnen?', pro: 'Schule ab 9 Uhr', contra: 'Schule ab 8 Uhr' },
+    { frage: 'Soll es längere Pausen geben – auch wenn die Schule dann später endet?', pro: 'Längere Pausen', contra: 'Pausen bleiben so' },
+    { frage: 'Soll es Hausaufgaben geben?', pro: 'Ja, Hausaufgaben', contra: 'Keine Hausaufgaben' },
+    { frage: 'Sollen Handys in der Pause erlaubt sein?', pro: 'Handys erlaubt', contra: 'Handys verboten' },
+    { frage: 'Soll es in der Klasse einen festen Sitzplan geben?', pro: 'Fester Sitzplan', contra: 'Freie Platzwahl' },
+    { frage: 'Soll die Klassenfahrt ohne Smartphones stattfinden?', pro: 'Fahrt ohne Handy', contra: 'Handy darf mit' },
+    { frage: 'Soll unsere Klasse ein Tier bekommen, um das wir uns kümmern?', pro: 'Ja, ein Klassentier', contra: 'Kein Klassentier' },
+    { frage: 'Soll es an unserer Schule eine Schuluniform geben?', pro: 'Schuluniform', contra: 'Eigene Kleidung' },
   ];
+  ZI.STAMMES_THEMEN = ZI.STREITFRAGEN; // ein Pool für Stammesrat und großen Rat
+  /* Pro/Contra im Stamm: bei 4 Zwergen 2 gegen 2, bei 3 Zwergen 2 gegen 1. Gleiche Eingabe → gleiche Seite auf Board und iPad. */
+  ZI.seiteImStamm = (stamm, i, seed) => ((i + stamm.nr + (seed || 0)) % 2 === 0 ? 'pro' : 'contra');
+  ZI.mitSeiten = (stamm, seed) => {
+    const m = stamm.mitglieder.map((x, i) => Object.assign({}, x, { seite: ZI.seiteImStamm(stamm, i, seed) }));
+    // nie alle auf einer Seite
+    if (m.length > 1 && m.every((x) => x.seite === m[0].seite)) m[m.length - 1].seite = m[0].seite === 'pro' ? 'contra' : 'pro';
+    return m;
+  };
+  /* Die bisherigen Tiefen Stollen sind jetzt Stufen der Tiefen-Leiter: Kapitel k, Stollen i → Tiefe */
+  ZI.TIEFE_VON = [[3, 4, 5], [1, 3, 5], [1, 2, 5]];
+  ZI.tiefeVon = (k, i) => (ZI.TIEFE_VON[k] || [1, 2, 3])[i] || 5;
   ZI.ratsfrageNach = (id) => { for (const l of ZI.RATSFRAGEN) for (const f of l) if (f.id === id) return f; return null; };
-  ZI.themaHerkunft = (t) => (t.frage ? 'Für die Insel' : 'Aus eurer Klasse');
-  ZI.themaText = (t) => (t.frage ? ZI.ratsfrageNach(t.frage).frage : t.text);
   /* Stämme bilden: gleiche Eingabe → gleiche Einteilung, auf dem Board und auf jedem iPad */
   ZI.stammesEinteilung = function (n, seed) {
     let x = (seed * 2654435761 + n * 97 + 12345) >>> 0;
@@ -426,14 +441,14 @@
       { text: 'Ich erkenne, ob eine Begründung wirklich erklärt, WARUM.', uebung: { art: 'kern', i: 0 } },
       { text: 'Ich finde Begründungen, die zur Meinung passen.', uebung: { art: 'kern', i: 1 } },
       { text: 'Ich baue Sätze mit weil, da und denn richtig.', uebung: { art: 'kern', i: 2 } },
-      { text: 'Ich kann eine Begründung mit einem Beispiel stützen.', uebung: { art: 'tief', i: 1 } },
-      { text: 'Ich kann meine Meinung laut und begründet sagen.', uebung: { art: 'tief', i: 2 } },
+      { text: 'Ich kann eine Begründung mit einem Beispiel stützen.', uebung: { art: 'tief', i: 3 } },
+      { text: 'Ich kann meine Meinung laut und begründet sagen.', uebung: { art: 'tief', i: 4 } },
     ],
     [
       { text: 'Ich kenne die drei Teile eines Arguments: Meinung, Begründung und Beispiel.', uebung: { art: 'kern', i: 0 } },
       { text: 'Ich erkenne Gesprächsmotoren und Gesprächsbremsen.', uebung: { art: 'kern', i: 1 } },
       { text: 'Ich höre genau zu und erkenne Meinung, Begründung und Beispiel.', uebung: { art: 'kern', i: 2 } },
-      { text: 'Ich unterscheide Stützen von neuen Argumenten.', uebung: { art: 'tief', i: 1 } },
+      { text: 'Ich unterscheide Stützen von neuen Argumenten.', uebung: { art: 'tief', i: 2 } },
     ],
     [
       { text: 'Ich erkenne, ob jemand zustimmt, widerspricht oder das Thema wechselt.', uebung: { art: 'kern', i: 0 } },

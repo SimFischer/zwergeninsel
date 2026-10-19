@@ -239,8 +239,7 @@
   });
   const knoepfe = h('div', { class: 'insel-knoepfe' },
     h('button', { class: 'knopf', onclick: oeffneLieferungen }, icon.tastatur(), 'Lieferungen'),
-    h('button', { class: 'knopf holz', onclick: oeffneStammesraete }, 'Stammesräte'),
-    h('button', { class: 'knopf holz', onclick: () => oeffneRat() }, 'Zwergenrat'),
+    h('button', { class: 'knopf holz', onclick: () => oeffneStammesraete() }, 'Zwergenrat'),
     h('button', { class: 'knopf holz', onclick: oeffneRaetsel }, 'Inselrätsel'),
     h('button', { class: 'knopf holz', onclick: oeffneAuftrag }, 'Auftrag'),
     h('button', { class: 'rund', 'aria-label': 'Tag oder Nacht', onclick: () => { insel.nacht = !insel.nacht; sichern(); zeigeNacht(); } }, icon.mond()),
@@ -353,12 +352,12 @@
     const rfFaellig = rf && bauplan().some((x) => x.frage === rf.id && m / zl >= x.anteil - 1e-9);
     if (rfFaellig) status = h('div', { class: 'rat-wartet' },
       h('b', null, 'Der Zwergenrat muss entscheiden!'),
-      h('div', null, rf.frage),
+      h('div', null, 'Die Klasse stimmt über eine Streitfrage ab. Davon hängt ab, was gebaut wird: ' + rf.optionen.map((id) => ZI.GEBAEUDE.find((g) => g.id === id).name).join(' oder ') + '.'),
       h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-start', gap: '6px' } },
-        h('button', { class: 'knopf klein', onclick: () => { insel.stamm = Object.assign(insel.stamm || {}, { thema: ZI.STAMMES_THEMEN.findIndex((t) => t.frage === rf.id), stimmen: {} }); oeffneStammesraete(); } }, 'Stammesräte'),
-        h('button', { class: 'knopf holz klein', onclick: () => oeffneRat(rf.id) }, 'Großer Rat')));
+        h('button', { class: 'knopf klein', onclick: () => oeffneStammesraete() }, 'Zwergenrat beginnen'),
+        h('button', { class: 'knopf holz klein', onclick: () => oeffneRat() }, 'Klassenabstimmung')));
     else if (n) status = h('div', { class: 'klein' }, 'Als Nächstes: ', h('b', null, n.gebaeude.name), ' – noch ' + n.bedarf + ' Lieferung' + (n.bedarf === 1 ? '' : 'en') + '.',
-      rf ? h('div', { style: { marginTop: '4px' } }, 'Bald fragt der Zwergenrat: ' + rf.frage) : null);
+      rf ? h('div', { style: { marginTop: '4px' } }, 'Bald tagt der Zwergenrat. Danach entsteht: ' + rf.optionen.map((id) => ZI.GEBAEUDE.find((g) => g.id === id).name).join(' oder ')) : null);
     else if (nk) status = h('div', { class: 'klein' }, h('b', null, 'Kapitel ' + ZI.KAPITEL[k].nr + ' geschafft! '), 'Mit der Inselbotschaft öffnet sich in der Schmiede Kapitel ' + nk.nr + '.',
       naechstesKapitelBereit() ? h('div', { style: { marginTop: '8px' } }, h('button', { class: 'knopf klein', onclick: kapitelWeiter }, 'Kapitel ' + nk.nr + ' beginnen')) : null);
     else status = h('div', { class: 'klein' }, h('b', null, 'Das ganze Dorf steht!'));
@@ -527,7 +526,7 @@
     const s = altStand || new ZI.Stand({ id: info.karte });
     s.id = info.karte; s.zwerg = info.zwerg;
     const k = info.kapitel;
-    s.kern[k] |= info.kern; s.tief[k] |= info.tief; s.bonus[k] = Math.max(s.bonus[k], info.bonus);
+    s.kern[k] |= info.kern; s.tief[k] = Math.max(s.tief[k], info.tief); s.bonus[k] = Math.max(s.bonus[k], info.bonus);
     s.offen = Math.max(s.offen, k);
     insel.zwerge[key] = { code: s.code(), erst: alt ? alt.erst : Date.now(), zeit: Date.now(), tag: heute(), karte: info.karte, lang: !!(alt && alt.lang) };
     sichern();
@@ -612,7 +611,7 @@
       letzte = erg;
       const z = ZI.ZWERGE.find((d) => d.nr === erg.stand.zwerg);
       const i = erg.info;
-      const teile = [i.kapitel !== kap() ? 'Kapitel ' + (i.kapitel + 1) : null, ZI.Stand.bits(i.kern) + ' Material', i.tief ? ZI.Stand.bits(i.tief) + ' Tiefe Stollen' : null].filter(Boolean);
+      const teile = [i.kapitel !== kap() ? 'Kapitel ' + (i.kapitel + 1) : null, ZI.Stand.bits(i.kern) + ' Material', i.tief ? 'Tiefe ' + Math.min(5, i.tief) : null].filter(Boolean);
       ZI.setze(rueck, h('div', { class: 'liefer-ok' },
         h('div', { class: 'liefer-ok-bild' }, bild(z.datei, z.name)),
         h('div', null, h('div', { class: 'liefer-ok-titel' }, 'Karte ' + i.karte + ' · ' + z.name), h('div', null, teile.join(' · '))),
@@ -693,73 +692,75 @@
     return h('div', { class: 'karten-kopf' }, z ? bild(z.datei, z.name) : h('div', { class: 'karten-kopf-leer' }), h('b', null, String(n)));
   }
 
-  /* ---------- Stammesräte: kleine Gruppen mit Rollen ---------- */
+  /* ---------- Zwergenrat, Teil 1: Stämme beraten eine Streitfrage (PRO/CONTRA + Rollen) ---------- */
   function themaFuerJetzt() {
     const rf = wartetAufRat() || (ZI.RATSFRAGEN[kap()] || []).find((f) => !insel.rat[f.id]);
-    const i = rf ? ZI.STAMMES_THEMEN.findIndex((t) => t.frage === rf.id) : -1;
-    return i >= 0 ? i : 5;
+    const i = rf ? ZI.RATSFRAGEN.flat().indexOf(rf) : -1;
+    return (i >= 0 ? i : 0) % ZI.STREITFRAGEN.length;
+  }
+  function offeneRatsfrage() { return wartetAufRat() || (ZI.RATSFRAGEN[kap()] || []).find((f) => !insel.rat[f.id] && !f.optionen.some((id) => insel.gebaut.includes(id))) || null; }
+  function redezeit(min) {
+    let sek = min * 60; let timer = null;
+    const uhr = h('div', { class: 'uhr' }, min + ':00');
+    const knopf = h('button', { class: 'knopf holz klein' }, 'Redezeit starten');
+    knopf.addEventListener('click', () => {
+      if (timer) { clearInterval(timer); timer = null; knopf.textContent = 'Weiter'; return; }
+      knopf.textContent = 'Pause';
+      timer = setInterval(() => { sek = Math.max(0, sek - 1); uhr.textContent = Math.floor(sek / 60) + ':' + String(sek % 60).padStart(2, '0');
+        if (sek === 60) ZI.meldung('Noch eine Minute!', 3000);
+        if (!sek) { clearInterval(timer); timer = null; ZI.ton.fanfare(); knopf.textContent = 'Zeit ist um'; } }, 1000);
+    });
+    return { uhr, knopf, stopp: () => clearInterval(timer) };
+  }
+  function waehleStreitfrage(danach) {
+    const f = ZI.fenster([
+      h('h2', null, 'Streitfrage wählen'),
+      h('div', { class: 'streitfragen-liste' }, ZI.STREITFRAGEN.map((t, i) => h('button', { class: 'knopf' + (insel.stamm.thema === i ? '' : ' holz'),
+        onclick: () => { insel.stamm.thema = i; insel.stamm.stimmen = { a: 0, b: 0 }; sichern(); f.schliessen(); danach(); } }, t.frage))),
+      h('div', { class: 'knopf-reihe' }, h('button', { class: 'knopf holz', onclick: () => f.schliessen() }, 'Abbrechen')),
+    ]);
+    f.el.classList.add('breit');
   }
   function oeffneStammesraete() {
     const st = insel.stamm = insel.stamm || {};
     if (st.seed === undefined) st.seed = Math.floor(Math.random() * 8);
-    if (st.thema === undefined || !ZI.STAMMES_THEMEN[st.thema]) st.thema = themaFuerJetzt();
-    st.stimmen = st.stimmen || {};
-    let sek = 6 * 60; let uhrTimer = null;
-    const uhr = h('div', { class: 'uhr' }, '6:00');
-    const uhrKnopf = h('button', { class: 'knopf holz klein' }, 'Redezeit starten');
-    const formatiere = () => { uhr.textContent = Math.floor(sek / 60) + ':' + String(sek % 60).padStart(2, '0'); };
-    uhrKnopf.addEventListener('click', () => {
-      if (uhrTimer) { clearInterval(uhrTimer); uhrTimer = null; uhrKnopf.textContent = 'Weiter'; return; }
-      uhrKnopf.textContent = 'Pause';
-      uhrTimer = setInterval(() => { sek = Math.max(0, sek - 1); formatiere(); if (sek === 60) ZI.meldung('Noch eine Minute – jetzt entscheiden!', 3000); if (!sek) { clearInterval(uhrTimer); uhrTimer = null; ZI.ton.fanfare(); uhrKnopf.textContent = 'Zeit ist um'; } }, 1000);
-    });
+    if (st.thema === undefined || !ZI.STREITFRAGEN[st.thema]) st.thema = themaFuerJetzt();
+    const zeit = redezeit(10);
     const kopf = h('div', { class: 'stamm-kopf' });
     const raster = h('div', { class: 'stamm-raster' });
-    const unten = h('div', { class: 'stamm-unten' });
     function zeichne() {
       const n = kartenNummern().length;
-      const t = ZI.STAMMES_THEMEN[st.thema];
-      const rf = t.frage ? ZI.ratsfrageNach(t.frage) : null;
+      const t = ZI.STREITFRAGEN[st.thema];
       const code = ZI.stammescode.kodiere(n, st.seed, st.thema);
-      const staemme = ZI.stammesEinteilung(n, st.seed);
       ZI.setze(kopf,
         h('div', { class: 'stamm-thema pergament' },
-          h('div', { class: 'klein' }, 'Darüber beratet ihr in eurem Stamm: ', h('span', { class: 'herkunft' + (t.frage ? ' insel' : '') }, ZI.themaHerkunft(t))),
-          h('div', { class: 'stamm-frage' }, ZI.themaText(t)),
+          h('div', { class: 'klein' }, 'Streitfrage für alle Stämme'),
+          h('div', { class: 'stamm-frage' }, t.frage),
+          h('div', { class: 'seiten-zeile' }, h('span', null, ZI.seitenMarke('pro', 'klein'), ' ', t.pro), h('span', null, ZI.seitenMarke('contra', 'klein'), ' ', t.contra)),
           h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-start', marginTop: '6px' } },
-            h('button', { class: 'knopf holz klein', onclick: () => { st.thema = (st.thema + 1) % ZI.STAMMES_THEMEN.length; st.stimmen = {}; sichern(); zeichne(); } }, 'Anderes Thema'))),
+            h('button', { class: 'knopf holz klein', onclick: () => waehleStreitfrage(zeichne) }, 'Andere Streitfrage'))),
         h('button', { class: 'stamm-code pergament', title: 'Groß zeigen', onclick: () => grossZeigen('Stammescode', silbig(code), 'Schmiede → „Stammesrat“ → Code eintippen') },
           h('div', { class: 'klein' }, 'Stammescode für die iPads · antippen = groß'),
           h('b', null, silbig(code)),
-          h('div', { class: 'klein' }, 'Schmiede → „Stammesrat“ → Code eintippen. Dort steht deine Rolle.')));
-      ZI.setze(raster, ...staemme.map((g) => h('div', { class: 'stamm-karte pergament auf-pergament', style: { borderTopColor: g.farbe } },
+          h('div', { class: 'klein' }, 'Dort stehen Frage, Seite und Rolle.')));
+      ZI.setze(raster, ...ZI.stammesEinteilung(n, st.seed).map((g) => h('div', { class: 'stamm-karte pergament auf-pergament', style: { borderTopColor: g.farbe } },
         h('h3', { style: { color: g.farbe } }, g.name),
-        h('div', { class: 'stamm-mitglieder' }, g.mitglieder.map((m) => h('div', { class: 'stamm-mitglied' },
-          kartenKopf(m.karte), h('span', { class: 'stamm-rolle' }, m.rolle ? [ZI.rollenSymbol(m.rolle, 'klein'), ' ' + m.rolle.name] : '')))),
-        rf ? h('div', { class: 'stamm-wahl' }, rf.optionen.map((id) => {
-          const geb = ZI.GEBAEUDE.find((x) => x.id === id);
-          return h('button', { class: 'knopf klein' + (st.stimmen[g.nr] === id ? '' : ' holz'), 'aria-pressed': String(st.stimmen[g.nr] === id),
-            onclick: () => { st.stimmen[g.nr] = st.stimmen[g.nr] === id ? undefined : id; sichern(); ZI.ton.plopp(); zeichne(); } }, geb.name);
-        })) : null)));
-      if (rf) {
-        const zaehl = {}; rf.optionen.forEach((id) => { zaehl[id] = Object.values(st.stimmen).filter((v) => v === id).length; });
-        ZI.setze(unten,
-          h('div', null, 'Stämme: ', ...rf.optionen.map((id, i) => h('span', null, i ? ' · ' : '', h('b', null, ZI.GEBAEUDE.find((x) => x.id === id).name + ' ' + zaehl[id])))),
-          h('button', { class: 'knopf', onclick: () => { clearInterval(uhrTimer); ui.remove(); oeffneRat(rf.id, zaehl); } }, 'Zum großen Rat – die Boten berichten'));
-      } else {
-        ZI.setze(unten, h('div', null, 'Freies Thema: Die Boten berichten danach kurz, wofür sich ihr Stamm entschieden hat – und warum.'),
-          h('button', { class: 'knopf', onclick: () => { clearInterval(uhrTimer); ui.remove(); oeffneRedeliste('stamm-' + st.thema); } }, 'Boten berichten'));
-      }
+        h('div', { class: 'stamm-mitglieder' }, ZI.mitSeiten(g, st.seed).map((m) => h('div', { class: 'stamm-mitglied' },
+          kartenKopf(m.karte), ZI.seitenMarke(m.seite, 'klein'),
+          h('span', { class: 'stamm-rolle' }, m.rolle ? [ZI.rollenSymbol(m.rolle, 'klein'), ' ' + m.rolle.name] : '')))))));
     }
     const ui = h('div', { class: 'rat stammesrat' },
       ZI.hintergrund('zwergenrat-hintergrund', 'hg-ersatz-stollen', 'rgba(20,12,8,0.45)'),
       h('div', { class: 'leiste' },
-        h('button', { class: 'rund', 'aria-label': 'Zurück zur Insel', onclick: () => { clearInterval(uhrTimer); ui.remove(); } }, icon.zurueck()),
-        h('div', { class: 'titel' }, 'Stammesräte'),
+        h('button', { class: 'rund', 'aria-label': 'Zurück zur Insel', onclick: () => { zeit.stopp(); ui.remove(); } }, icon.zurueck()),
+        h('div', { class: 'titel' }, 'Zwergenrat · Stämme'),
         h('div', { class: 'spacer' }),
-        h('button', { class: 'knopf holz klein', onclick: () => { st.seed = (st.seed + 1 + Math.floor(Math.random() * 6)) % 8; st.stimmen = {}; sichern(); ZI.ton.plopp(); zeichne(); } }, 'Neu mischen'),
-        uhr, uhrKnopf),
-      h('div', { class: 'stamm-inhalt' }, kopf, raster, unten));
+        h('button', { class: 'knopf holz klein', onclick: () => { st.seed = (st.seed + 1 + Math.floor(Math.random() * 6)) % 8; sichern(); ZI.ton.plopp(); zeichne(); } }, 'Neu mischen'),
+        zeit.uhr, zeit.knopf),
+      h('div', { class: 'stamm-inhalt' }, ZI.ratsReise(1), kopf, raster,
+        h('div', { class: 'stamm-unten' },
+          h('div', null, 'Auf den iPads: Frage → Seite → Partner → Argumenttafel → Diskussion im Stamm → Stammes-Abstimmung. Danach melden die Boten.'),
+          h('button', { class: 'knopf', onclick: () => { zeit.stopp(); ui.remove(); oeffneRat(); } }, 'Zur Klassenabstimmung'))));
     document.body.appendChild(ui);
     sichern(); zeichne();
   }
@@ -804,83 +805,77 @@
     f.el.classList.add('breit', 'rede-dialog');
   }
 
-  function oeffneRat(frageId, vorStimmen) {
-    const fragen = ZI.RATSFRAGEN[kap()] || [];
-    if (!fragen.length) { ZI.meldung('In diesem Kapitel gibt es keine Ratsfrage mehr.'); return; }
-    const offen = fragen.filter((f) => !insel.rat[f.id]);
-    const RF = fragen.find((f) => f.id === frageId) || offen[0] || fragen[fragen.length - 1];
-    const nr = fragen.indexOf(RF);
-    const [a, b] = RF.optionen.map((id) => ZI.GEBAEUDE.find((g) => g.id === id));
-    const stimmen = { [a.id]: (vorStimmen && vorStimmen[a.id]) || 0, [b.id]: (vorStimmen && vorStimmen[b.id]) || 0 };
-    let sek = 5 * 60; let uhrTimer = null;
-    const uhr = h('div', { class: 'uhr' }, '5:00');
-    const uhrKnopf = h('button', { class: 'knopf holz klein' }, 'Redezeit starten');
-    const formatiere = () => { uhr.textContent = Math.floor(sek / 60) + ':' + String(sek % 60).padStart(2, '0'); };
-    uhrKnopf.addEventListener('click', () => {
-      if (uhrTimer) { clearInterval(uhrTimer); uhrTimer = null; uhrKnopf.textContent = 'Weiter'; return; }
-      uhrKnopf.textContent = 'Pause';
-      uhrTimer = setInterval(() => { sek = Math.max(0, sek - 1); formatiere(); if (!sek) { clearInterval(uhrTimer); uhrTimer = null; ZI.ton.fanfare(); uhrKnopf.textContent = 'Zeit ist um'; } }, 1000);
-    });
-    const schonGebaut = RF.optionen.some((id) => insel.gebaut.includes(id));
-
-    function optionKarte(g) {
-      const zahl = h('span', null, String(stimmen[g.id]));
-      const u = ZI.bauUebung(g.id);
-      const aendern = (d) => { stimmen[g.id] = Math.max(0, stimmen[g.id] + d); zahl.textContent = String(stimmen[g.id]); ZI.ton.plopp(); };
-      const gewaehlt = insel.rat[RF.id] === g.id;
-      return h('div', { class: 'rat-option pergament auf-pergament' + (gewaehlt ? ' gewaehlt' : '') },
-        // Ruine heute → so sieht es nach dem Wiederaufbau aus (Schiff: das Wrack ist im Inselbild)
-        h('div', { class: 'bild rat-vorher-nachher' + (gewaehlt ? ' gebaut' : '') },
-          g.id === 'schiff' ? null : h('figure', { class: 'rat-ruine' }, bild([g.id + '-ruine', g.id], g.name + ' als Ruine'), h('figcaption', null, 'Jetzt: Ruine')),
-          g.id === 'schiff' ? null : h('span', { class: 'rat-pfeil', 'aria-hidden': 'true' }, '➜'),
-          h('figure', { class: 'rat-neu' }, bild(g.id, g.name), h('figcaption', null, g.id === 'schiff' ? 'Wird repariert' : 'Wird wieder aufgebaut'))),
-        h('h3', null, g.name),
-        u ? h('div', { class: 'rat-freischalt' },
-          h('div', { class: 'rat-freischalt-kopf' }, 'Schaltet in der Schmiede frei:'),
-          h('div', { class: 'rat-freischalt-name' }, '„' + u.name + '“'),
-          h('div', { class: 'rat-freischalt-text' }, u.schwerpunkt)) : null,
+  /* ---------- Zwergenrat, Teil 2: Klassenabstimmung → Siegerseite → Gebäude ---------- */
+  function oeffneRat() {
+    const st = insel.stamm = insel.stamm || {};
+    if (st.thema === undefined || !ZI.STREITFRAGEN[st.thema]) st.thema = themaFuerJetzt();
+    const t = ZI.STREITFRAGEN[st.thema];
+    const RF = offeneRatsfrage();
+    const stimmen = st.stimmen = Object.assign({ a: 0, b: 0 }, st.stimmen);
+    const zeit = redezeit(5);
+    const seite = (x) => {
+      const zahl = h('div', { class: 'abstimm-zahl' }, String(stimmen[x]));
+      const aendern = (d) => { stimmen[x] = Math.max(0, stimmen[x] + d); zahl.textContent = String(stimmen[x]); sichern(); ZI.ton.plopp(); };
+      return h('div', { class: 'abstimm-seite pergament auf-pergament ' + (x === 'a' ? 'pro' : 'contra') },
+        ZI.seitenMarke(x === 'a' ? 'pro' : 'contra'),
+        h('h3', null, x === 'a' ? t.pro : t.contra),
+        zahl, h('div', { class: 'klein' }, 'Stämme'),
         h('div', { class: 'stimmen' },
-          h('button', { class: 'rund', 'aria-label': 'Stimme weniger für ' + g.name, onclick: () => aendern(-1) }, '−'),
-          zahl,
-          h('button', { class: 'rund gold', 'aria-label': 'Stimme mehr für ' + g.name, onclick: () => aendern(1) }, '+')),
-        schonGebaut ? h('div', { class: 'klein' }, insel.gebaut.includes(g.id) ? 'Steht schon.' : 'Wird später gebaut.')
-          : h('button', { class: 'knopf', onclick: () => entscheiden(g) }, 'Der Rat wählt: ' + g.name));
-    }
-
+          h('button', { class: 'rund', 'aria-label': 'Eine Stimme weniger', onclick: () => aendern(-1) }, '−'),
+          h('button', { class: 'rund gold', 'aria-label': 'Eine Stimme mehr', onclick: () => aendern(1) }, '+')));
+    };
+    const zu = () => { zeit.stopp(); rat.remove(); };
     const rat = h('div', { class: 'rat' },
       ZI.hintergrund('zwergenrat-hintergrund', 'hg-ersatz-stollen', 'rgba(20,12,8,0.35)'),
       h('div', { class: 'leiste' },
-        h('button', { class: 'rund', 'aria-label': 'Zurück zur Insel', onclick: () => { clearInterval(uhrTimer); rat.remove(); } }, icon.zurueck()),
-        h('div', { class: 'titel' }, 'Der Zwergenrat tagt'),
-        fragen.length > 1 ? h('div', { class: 'rat-reiter' }, fragen.map((f, i) => h('button', {
-          class: 'knopf klein' + (f === RF ? '' : ' holz'), 'aria-pressed': String(f === RF),
-          onclick: () => { if (f === RF) return; clearInterval(uhrTimer); rat.remove(); oeffneRat(f.id); } }, 'Frage ' + (i + 1) + (insel.rat[f.id] ? ' ✓' : '')))) : null,
+        h('button', { class: 'rund', 'aria-label': 'Zurück zur Insel', onclick: zu }, icon.zurueck()),
+        h('div', { class: 'titel' }, 'Der Zwergenrat stimmt ab'),
         h('div', { class: 'spacer' }),
-        h('button', { class: 'knopf holz klein', onclick: () => { clearInterval(uhrTimer); rat.remove(); insel.stamm = Object.assign(insel.stamm || {}, { thema: ZI.STAMMES_THEMEN.findIndex((t) => t.frage === RF.id), stimmen: {} }); oeffneStammesraete(); } }, 'Erst in Stämmen beraten'),
-        h('button', { class: 'knopf holz klein', onclick: () => oeffneRedeliste(RF.id) }, 'Redeliste'),
-        uhr, uhrKnopf),
-      h('div', { class: 'rat-inhalt' },
-        h('div', { class: 'rat-frage pergament' }, (fragen.length > 1 ? 'Frage ' + (nr + 1) + ' von ' + fragen.length + ': ' : '') + RF.frage),
-        optionKarte(a), optionKarte(b),
+        h('button', { class: 'knopf holz klein', onclick: () => { zu(); oeffneStammesraete(); } }, 'Zurück zu den Stämmen'),
+        h('button', { class: 'knopf holz klein', onclick: () => oeffneRedeliste('streit-' + st.thema) }, 'Redeliste'),
+        zeit.uhr, zeit.knopf),
+      h('div', { class: 'rat-inhalt abstimmung' },
+        ZI.ratsReise(9),
+        h('div', { class: 'rat-frage pergament' }, t.frage),
+        h('div', { class: 'abstimm-seiten' }, seite('a'), seite('b')),
+        h('div', { class: 'knopf-reihe' }, h('button', { class: 'knopf gross', onclick: abschliessen }, 'Abstimmung abschließen')),
         h('div', { class: 'rat-regeln pergament auf-pergament' },
-          h('h3', null, 'Worüber wir abwägen'),
-          h('p', { style: { margin: '0 0 10px' } }, 'Beide Gebäude werden gebaut – aber was zuerst steht, bringt seine Übung zuerst. Welche Übung braucht unsere Klasse jetzt mehr? Begründet!'),
-          h('h3', null, 'Ratsregeln'),
-          h('ul', null, ZI.RATSREGELN.map((r) => h('li', null, r))),
-          h('h3', null, 'So kannst du anfangen'),
-          h('ul', null, ZI.SATZANFAENGE.map((r) => h('li', null, r))),
-          insel.rat[RF.id] ? h('p', { style: { margin: 0 } }, h('b', null, 'Bisherige Entscheidung: '), ZI.GEBAEUDE.find((g) => g.id === insel.rat[RF.id]).name) : null)));
+          h('p', { style: { margin: '0 0 8px' } }, h('b', null, 'Die Boten melden nacheinander: '), '„Die … stimmen für …, weil …“ Tippt für jeden Stamm auf +.'),
+          h('h3', null, 'So kannst du antworten'),
+          h('ul', null, ZI.DISKUSSION_SAETZE.map((r) => h('li', null, r))))));
     document.body.appendChild(rat);
 
-    function entscheiden(g) {
-      insel.rat[RF.id] = g.id; sichern();
-      clearInterval(uhrTimer);
-      rat.remove();
-      ZI.ton.fanfare();
-      ZI.meldung('Der Zwergenrat hat entschieden: Zuerst wird ' + g.name + ' gebaut.', 4000);
-      allesZeigen(true);
-      const naechste = fragen.find((f) => !insel.rat[f.id] && !f.optionen.some((id) => insel.gebaut.includes(id)));
-      if (naechste) setTimeout(() => oeffneRat(naechste.id), 3500);
+    function abschliessen() {
+      if (!stimmen.a && !stimmen.b) { ZI.meldung('Tragt zuerst ein, wofür die Stämme gestimmt haben.'); ZI.ton.falsch(); return; }
+      if (stimmen.a === stimmen.b) {
+        const f = ZI.fenster([
+          h('h2', null, 'Gleichstand!'),
+          h('p', { style: { margin: 0, fontSize: '21px' } }, 'Stichwahl im Plenum: Jede und jeder zeigt per Handzeichen. Welche Seite hat die Mehrheit?'),
+          h('div', { class: 'knopf-reihe' },
+            h('button', { class: 'knopf', onclick: () => { f.schliessen(); entscheiden('a'); } }, t.pro),
+            h('button', { class: 'knopf', onclick: () => { f.schliessen(); entscheiden('b'); } }, t.contra))]);
+        return;
+      }
+      entscheiden(stimmen.a > stimmen.b ? 'a' : 'b');
+    }
+    function entscheiden(x) {
+      zu();
+      const geb = RF ? ZI.GEBAEUDE.find((g) => g.id === RF.optionen[x === 'a' ? 0 : 1]) : null;
+      if (RF) { insel.rat[RF.id] = geb.id; insel.ratStreit = Object.assign(insel.ratStreit || {}, { [RF.id]: st.thema }); }
+      st.stimmen = { a: 0, b: 0 };
+      sichern();
+      ZI.ton.fanfare(); ZI.konfetti && ZI.konfetti(140);
+      const naechste = offeneRatsfrage();
+      const f = ZI.fenster([
+        ZI.ratsReise(geb ? 11 : 10),
+        h('h2', null, 'Der Zwergenrat hat entschieden!'),
+        h('p', { style: { margin: 0, fontSize: '22px' } }, 'Die Klasse ist für: ', h('b', null, x === 'a' ? t.pro : t.contra)),
+        geb ? h('div', { class: 'rat-ergebnis' }, h('div', { class: 'rat-ergebnis-bild' }, bild(geb.id, geb.name)),
+          h('p', { style: { margin: 0, fontSize: '22px' } }, 'Darum bauen die Zwerge jetzt: ', h('b', null, geb.name))) : null,
+        h('div', { class: 'knopf-reihe' },
+          naechste ? h('button', { class: 'knopf holz', onclick: () => { f.schliessen(); st.thema = (st.thema + 1) % ZI.STREITFRAGEN.length; sichern(); oeffneStammesraete(); } }, 'Nächste Streitfrage') : null,
+          h('button', { class: 'knopf', onclick: () => { f.schliessen(); allesZeigen(true); } }, geb ? 'Bauen!' : 'Zur Insel'))]);
+      f.el.classList.add('rat-entschieden');
     }
   }
 
@@ -927,7 +922,7 @@
         return h('div', null, balken(name, geschafft, nummern.length, geschafft < nummern.length * 0.6),
           gl ? h('div', { class: 'ue-krone' }, 'fehlerfrei: ' + krone + ' von ' + gl + ' (' + Math.round((krone / gl) * 100) + ' %)') : null);
       });
-      const tiefZeilen = N.tief.map((name, i) => balken(name, da.filter((x) => x.s.hatTief(k, i)).length, nummern.length, false));
+      const tiefZeilen = [1, 2, 3, 4, 5].map((n) => balken('Tiefe ' + n, da.filter((x) => x.s.tiefe(k) >= n).length, nummern.length, false));
       const bauZeilen = lang.length ? ZI.BAU_UEBUNGEN.filter((u) => u.kapitel === k).map((u) => balken(u.name, lang.filter((x) => x.s.hatBau(u.bit)).length, lang.length, false)) : [];
       // Kronen-Quote als Hinweis auf schwierige Stationen
       const quote = N.kern.map((name, i) => { const g = lang.filter((x) => x.s.hatKern(k, i)).length; const kr = lang.filter((x) => x.s.hatKrone(k, i)).length; return { name, q: g ? kr / g : 1, g }; }).filter((x) => x.g >= 3).sort((a, b) => a.q - b.q);
@@ -936,7 +931,7 @@
         h('div', { class: 'ue-spalten' },
           h('div', null,
             h('h3', null, 'Hauptstollen'), ...kernZeilen,
-            h('h3', null, 'Tiefe Stollen'), ...tiefZeilen,
+            h('h3', null, 'Noch tiefer graben (freiwillig)'), ...tiefZeilen,
             bauZeilen.length ? h('h3', null, 'Gebäude-Stollen (aus ' + lang.length + ' langen Codes)') : null, ...bauZeilen),
           h('div', null,
             h('h3', null, 'Hauptstollen noch nicht fertig (' + offen.length + ')'),
@@ -974,7 +969,7 @@
         <p>hat als <b>${esc(z.name)}</b> den Rang <b>${esc(rang.name)}</b> erreicht.</p>
         <ul class="werte">
           <li>${zahl(s.coreTotal(), 'Station', 'Stationen')} im Hauptstollen</li>
-          <li>${zahl(s.deepTotal(), 'Tiefer Stollen', 'Tiefe Stollen')}</li>
+          <li>${zahl(s.deepTotal(), 'Tiefe', 'Tiefen')} tiefer gegraben</li>
           ${lang ? `<li>${zahl(s.bauTotal(), 'Gebäude-Stollen', 'Gebäude-Stollen')}</li><li>${zahl(s.kronenTotal(), 'goldene Krone', 'goldene Kronen')}</li>` : ''}
           <li>${zahl(s.gems(), 'Edelstein', 'Edelsteine')}</li>
         </ul>

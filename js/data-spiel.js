@@ -8,7 +8,7 @@
 
   /* =========================================================
      RÄNGE
-     Punkte: jede geschaffte Station, jeder Tiefe Stollen, jeder Bonusstern
+     Punkte: jede geschaffte Station, jede erreichte Tiefe, jeder Bonusstern
      jede goldene Krone und jeder Gebäude-Stollen zählt 1 Punkt (höchstens 46).
      ========================================================= */
   ZI.RAENGE = [
@@ -120,8 +120,8 @@
   ZI.AUFTRAEGE = [
     { id: 'liefern', text: (z) => 'Heute liefern mindestens ' + z + ' Zwerge ihr Material ab.', ziel: (n) => Math.max(5, Math.round(n * 0.75)),
       einheit: 'Lieferungen', liefernZaehlen: true },
-    { id: 'tief', text: (z) => 'Heute schaffen wir zusammen ' + z + ' Tiefe Stollen.', ziel: (n) => Math.max(4, Math.round(n * 0.4)),
-      einheit: 'Tiefe Stollen', wert: (st) => st.reduce((a, s) => a + s.deepTotal(), 0) },
+    { id: 'tief', text: (z) => 'Heute graben wir zusammen ' + z + ' Tiefen tiefer.', ziel: (n) => Math.max(4, Math.round(n * 0.4)),
+      einheit: 'Tiefen', wert: (st) => st.reduce((a, s) => a + s.deepTotal(), 0) },
     { id: 'meister', text: (z) => 'Heute zeigen wir ' + z + ' Meisterstücke.', ziel: (n) => Math.max(3, Math.round(n * 0.25)),
       einheit: 'Meisterstücke', wert: (st) => st.reduce((a, s) => a + [0, 1, 2].filter((k) => s.hatTief(k, 2)).length, 0) },
     { id: 'kronen', text: (z) => 'Heute schmieden wir ' + z + ' goldene Kronen.', ziel: (n) => Math.max(4, Math.round(n * 0.35)),
