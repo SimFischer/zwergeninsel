@@ -438,23 +438,6 @@
     { name: 'Erzklopfer', farbe: '#2c8f8a' }, { name: 'Glutherzen', farbe: '#b03a3a' },
     { name: 'Sternenschmiede', farbe: '#6a4fa0' },
   ];
-  /* Reihenfolge = Vergabe im Stamm. Bei drei Zwergen fällt die Wache weg (die Älteste übernimmt sie). */
-  /* Rollen im Stammesrat. bild: erwartete Bilddatei in bilder/ (Ausweich-Zeichen, solange sie fehlt).
-     einfach: drei kurze Sätze für die Kinder – Aufgabe, worauf achten, was tun. */
-  ZI.STAMMES_ROLLEN = [
-    { id: 'aelteste', name: 'Älteste', bild: 'rolle-aelteste', zeichen: '🔔', aufgabe: 'Du leitest das Gespräch. Achte darauf, dass jeder einmal spricht – auch die Leisen.',
-      einfach: { aufgabe: 'Du leitest das Gespräch.', achten: 'Jeder sagt etwas. Auch die Leisen.', tun: 'Frag: „Wer möchte anfangen?“ Am Ende sagst du: „Lasst uns entscheiden.“' },
-      saetze: ['Wer möchte anfangen?', 'Was meinst du dazu, …?', 'Hat jeder schon etwas gesagt?', 'Lasst uns jetzt entscheiden.'] },
-    { id: 'bote', name: 'Bote', bild: 'auftrag-rolle', zeichen: '📜', aufgabe: 'Du merkst dir das Ergebnis. Im großen Rat sagst du es in einem Satz für deinen Stamm.',
-      einfach: { aufgabe: 'Du sprichst für deinen Stamm.', achten: 'Was hat dein Stamm entschieden? Und warum?', tun: 'Im großen Rat sagst du einen Satz: „Unser Stamm ist für …, weil …“' },
-      saetze: ['Unser Stamm ist für …, weil …', 'Unser stärkster Grund ist …', 'Wir waren uns nicht einig, aber die meisten finden …'] },
-    { id: 'gedaechtnis', name: 'Gedächtnis', bild: 'rolle-gedaechtnis', zeichen: '🧠', aufgabe: 'Du hörst genau zu und fasst zwischendurch zusammen, was gesagt wurde.',
-      einfach: { aufgabe: 'Du merkst dir, was gesagt wird.', achten: 'Welche Gründe gibt es dafür? Welche dagegen?', tun: 'Sag zwischendurch: „Bis jetzt haben wir gesagt, dass …“' },
-      saetze: ['Bis jetzt haben wir gesagt, dass …', 'Dafür spricht …, dagegen spricht …', 'Habe ich das richtig verstanden?'] },
-    { id: 'wache', name: 'Wache', bild: 'rolle-wache', zeichen: '⏳', aufgabe: 'Du achtest auf die Zeit und auf die Ratsregeln. Erinnere freundlich daran.',
-      einfach: { aufgabe: 'Du passt auf die Zeit und die Regeln auf.', achten: 'Reden alle freundlich? Lassen alle ausreden?', tun: 'Sag freundlich: „Wir haben noch 2 Minuten.“ oder „Lass sie bitte ausreden.“' },
-      saetze: ['Wir haben noch … Minuten.', 'Lass sie bitte ausreden.', 'Kannst du das noch begründen?'] },
-  ];
   ZI.ALLE_SAETZE = ['Ich finde, dass …, weil …', 'Ich stimme dir zu, denn …', 'Du sagst, dass … Aber …', 'Ja, und außerdem …'];
   /* Streitfragen für den Zwergenrat: aus dem Schulalltag, ohne Fachwissen beide Seiten vertretbar.
      pro = Seite A (gewinnt sie, entsteht das erste Gebäude der Ratsfrage), contra = Seite B (das zweite). Höchstens 8 (Stammescode). */
@@ -491,7 +474,7 @@
       const groesse = Math.floor(n / anzahl) + (g < n % anzahl ? 1 : 0);
       const mitglieder = karten.slice(pos, pos + groesse); pos += groesse;
       staemme.push({ nr: g, ...ZI.STAEMME[g % ZI.STAEMME.length],
-        mitglieder: mitglieder.map((karte, i) => ({ karte, rolle: ZI.STAMMES_ROLLEN[i] || null })) });
+        mitglieder: mitglieder.map((karte) => ({ karte })) });
     }
     return staemme;
   };

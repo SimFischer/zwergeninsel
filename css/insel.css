@@ -253,14 +253,6 @@ body.insel-seite .meldungen { top: calc(3vh * var(--ui, 1)); bottom: auto; flex-
 .tafel.zu .tafel-botschaft b { font-size: clamp(20px, 1.6vw, 28px); }
 
 /* ---------- Rollen und Redeliste ---------- */
-.rollen-leiste { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: -0.8vw; }
-.rolle-chip { display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; background: rgba(255, 250, 240, 0.92); border: 2px solid #b08a5a; font-size: clamp(15px, 1.1vw, 24px); }
-.rolle-zeichen { font-size: 1.2em; }
-.rollen-karten { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; align-self: stretch; }
-.rollen-karte { padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
-.rollen-karte h3 { margin: 0; font-size: 22px; }
-.rollen-karte p { margin: 0; font-size: 15px; color: var(--tinte-hell); flex: 1; }
-.rollen-zeichen { font-size: 40px; line-height: 1; }
 .karten-kopf { display: flex; align-items: center; gap: 6px; }
 .karten-kopf img, .karten-kopf .platzhalter, .karten-kopf-leer { width: 42px; height: 42px; object-fit: contain; font-size: 0; padding: 0; border-radius: 8px; }
 .karten-kopf-leer { background: rgba(58, 38, 23, 0.08); }
@@ -274,9 +266,7 @@ body.insel-seite .meldungen { top: calc(3vh * var(--ui, 1)); bottom: auto; flex-
 .rede-zelle.hervor { box-shadow: 0 0 0 4px var(--gold, #e8b23a); animation: aufploppen 0.5s; }
 .rede-striche { font-family: var(--titel); letter-spacing: 2px; color: #3f6a1c; min-height: 18px; font-size: 22px; }
 .knopf.aktiv { outline: 3px solid var(--gold, #e8b23a); }
-@media (max-width: 900px) { .rollen-karten { grid-template-columns: 1fr 1fr; } .rede-raster { grid-template-columns: repeat(6, 1fr); } }
-.rollen-leiste.leer { display: none; }
-.rolle-chip { color: var(--tinte, #3a2617); background: #fffaf0; box-shadow: 0 3px 0 rgba(0,0,0,0.25); }
+@media (max-width: 900px) { .rede-raster { grid-template-columns: repeat(6, 1fr); } }
 
 /* ---------- Klassenüberblick ---------- */
 .fenster.ueberblick-dialog { max-width: min(1180px, 96vw); width: 96vw; text-align: left; align-items: stretch; }
@@ -306,10 +296,7 @@ body.insel-seite .meldungen { top: calc(3vh * var(--ui, 1)); bottom: auto; flex-
 .stamm-karte { padding: 10px 14px 12px; border-top: 8px solid; display: flex; flex-direction: column; gap: 6px; }
 .stamm-karte h3 { margin: 0; font-size: clamp(20px, 1.5vw, 30px); }
 .stamm-mitglieder { display: flex; flex-direction: column; gap: 4px; }
-.stamm-mitglied { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: clamp(15px, 1vw, 21px); }
-.stamm-mitglied .karten-kopf img, .stamm-mitglied .karten-kopf-leer { width: 34px; height: 34px; }
-.stamm-mitglied .karten-kopf b { font-size: clamp(20px, 1.4vw, 28px); }
-.stamm-rolle { color: var(--tinte-hell); white-space: normal; overflow-wrap: anywhere; text-align: right; }
+.stamm-mitglied { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; font-size: clamp(15px, 1vw, 21px); }
 .stamm-unten { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 10px 16px; border-radius: 14px; background: rgba(255, 250, 240, 0.94); color: var(--tinte); font-size: clamp(17px, 1.3vw, 26px); }
 @media (max-width: 900px) { .stamm-kopf { grid-template-columns: 1fr; } }
 .stamm-kopf { align-items: start; }
@@ -358,11 +345,6 @@ button.stamm-code { text-align: center; }
 .geschenk-fall img { width: 100%; display: block; }
 @keyframes geschenk-fall { from { transform: translateY(0) rotate(0); opacity: 1; } 80% { opacity: 1; } to { transform: translateY(22vh) rotate(18deg); opacity: 0; } }
 
-/* Rollen-Symbole (Bild mit Ausweich-Zeichen) */
-.rollen-symbol { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; width: 1.4em; height: 1.4em; }
-.rollen-symbol img { width: 100%; height: 100%; object-fit: contain; }
-.rollen-symbol.klein { width: 1.2em; height: 1.2em; }
-.rollen-zeichen { font-size: 0.9em; line-height: 1; }
 /* Kopf der Tafel: Titel darf schrumpfen, Knöpfe bleiben immer innerhalb */
 .tafel-kopf { min-width: 0; }
 .tafel-kopf h2 { min-width: 0; flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -396,13 +378,11 @@ button.stamm-code { text-align: center; }
 
 /* Boardtexte dürfen in ihren Karten umbrechen. */
 .rat-inhalt > *, .stamm-inhalt > *, .stamm-karte, .stamm-mitglied > *,
-.abstimm-seite, .rolle-chip, .rollen-karte { min-width: 0; }
-.rat-frage, .stamm-frage, .stamm-karte h3, .abstimm-seite h3,
-.rollen-karte h3, .rolle-chip { overflow-wrap: anywhere; hyphens: auto; }
+.abstimm-seite { min-width: 0; }
+.rat-frage, .stamm-frage, .stamm-karte h3, .abstimm-seite h3 { overflow-wrap: anywhere; hyphens: auto; }
 .rat-frage { flex-shrink: 0; line-height: 1.2; }
 .rat .leiste { flex-wrap: wrap; }
 .rat .leiste .titel { min-width: 0; overflow-wrap: anywhere; }
-.rolle-chip { white-space: normal; }
-.rollen-symbol { flex-shrink: 0; }
-.stamm-mitglied { flex-wrap: wrap; }
 .stamm-mitglied .seiten-marke { flex-shrink: 0; }
+
+.stamm-nummer { font-family: var(--titel); font-size: clamp(22px, 1.5vw, 30px); }

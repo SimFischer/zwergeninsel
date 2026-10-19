@@ -2233,7 +2233,7 @@
     eingabe.addEventListener('keydown', (e) => { if (e.key === 'Enter') pruefen(); });
     const f = ZI.fenster([
       h('h2', null, 'Stammesrat'),
-      h('p', { style: { margin: 0 } }, 'Am Board steht der Stammescode aus drei Silben. Damit erfährst du die Streitfrage, deine Seite, deinen Stamm und deine Rolle.'),
+      h('p', { style: { margin: 0 } }, 'Am Board steht der Stammescode aus drei Silben. Damit erfährst du die Streitfrage, deinen Stamm und deine Pro-/Contra-Position.'),
       eingabe, hinweis,
       h('div', { class: 'knopf-reihe' },
         h('button', { class: 'knopf holz', onclick: () => f.schliessen() }, 'Abbrechen'),
@@ -2241,14 +2241,13 @@
     ]);
     setTimeout(() => eingabe.focus(), 150);
   }
-  /* Zwergenrat auf dem iPad: geführter Weg 1–8 (Frage, Seite, Partner, Tafel, Stamm, Diskussion, Abstimmen, Bote) */
+  /* Zwergenrat auf dem iPad: geführter Weg 1–8 (Frage, Seite, Partner, Tafel, Stamm, Diskussion, Abstimmen, Ergebnis melden) */
   function zeigeStammesrat(c, schritt) {
     const staemme = ZI.stammesEinteilung(c.n, c.seed);
     const g = staemme.find((x) => x.mitglieder.some((m) => m.karte === stand.karte));
     if (!g) { sitzung.loeschen('zi-stamm'); stammesratEingeben(); return; }
     const mit = ZI.mitSeiten(g, c.seed);
     const ich = mit.find((m) => m.karte === stand.karte);
-    const rolle = ich.rolle;
     const t = ZI.STREITFRAGEN[c.thema] || ZI.STREITFRAGEN[0];
     const meineSeite = ich.seite === 'pro' ? t.pro : t.contra;
     const partner = mit.filter((m) => m.seite === ich.seite && m.karte !== stand.karte);
@@ -2259,17 +2258,9 @@
     const geh = (n) => { zeigeStammesrat(c, n); };
     const weiterKnopf = (text, n, extra) => h('button', Object.assign({ class: 'knopf', onclick: () => geh(n) }, extra || {}), text);
     const zurueck = schritt > 1 ? h('button', { class: 'knopf holz', onclick: () => geh(schritt - 1) }, 'Zurück') : null;
-    const rollenKarte = () => h('div', { class: 'rollenkarte pergament auf-pergament', style: { borderColor: g.farbe } },
-      h('div', { class: 'rollenkarte-zeichen' }, ZI.rollenSymbol(rolle)),
-      h('div', null,
-        h('div', { class: 'klein' }, 'Deine Aufgabe im Stamm'),
-        h('h2', { style: { margin: 0, color: g.farbe } }, rolle.name),
-        h('dl', { class: 'rollen-erklaerung' },
-          h('dt', null, 'Meine Aufgabe:'), h('dd', null, rolle.einfach.aufgabe),
-          h('dt', null, 'Das mache ich:'), h('dd', null, rolle.einfach.tun))));
     const seitenKarte = () => h('div', { class: 'seitenkarte pergament auf-pergament ' + ich.seite },
       ZI.seitenMarke(ich.seite, 'gross'),
-      h('div', null, h('div', { class: 'klein' }, 'Deine Seite'), h('div', { class: 'seiten-titel' }, meineSeite)));
+      h('div', null, h('div', { class: 'klein' }, 'Deine Rolle: Pro oder Contra'), h('div', { class: 'seiten-titel' }, meineSeite)));
     const tafelAnsicht = () => h('div', { class: 'stamm-box argumenttafel' },
       h('h3', null, 'Eure Argumenttafel · ', meineSeite),
       h('ol', { class: 'saetze' }, tafel.filter((x) => x.trim()).map((x) => h('li', null, x))));
@@ -2285,8 +2276,7 @@
     } else if (schritt === 2) {
       inhalt = [seitenKarte(),
         h('p', { class: 'rat-hinweis pergament auf-pergament' }, 'Das ist deine Rolle für die Diskussion. Du musst nicht persönlich dieser Meinung sein.',
-          h('span', { class: 'rat-hinweis-klein' }, ich.seite === 'pro' ? 'Du sammelst Argumente dafür.' : 'Du sammelst Argumente dagegen.', ' Deine eigene Meinung zählt erst bei der Stammesentscheidung.')),
-        rollenKarte()];
+          h('span', { class: 'rat-hinweis-klein' }, ich.seite === 'pro' ? 'Du sammelst Argumente dafür.' : 'Du sammelst Argumente dagegen.', ' Deine eigene Meinung zählt erst bei der Stammesentscheidung.'))];
       fuss = weiterKnopf('Weiter', 3);
     } else if (schritt === 3) {
       inhalt = [seitenKarte(), h('div', { class: 'pergament auf-pergament stamm-box rat-gross' },
@@ -2319,21 +2309,16 @@
         h('h3', null, 'Euer Stamm: die ' + g.name),
         h('p', { style: { margin: '0 0 8px', fontSize: '20px' } }, h('b', null, 'Die Partnerarbeit ist vorbei.'), ' Setzt euch jetzt alle ' + mit.length + ' als ganzer Stamm zusammen – Pro und Contra an einen Tisch. Nehmt eure iPads mit.'),
         h('div', { class: 'stamm-liste' }, mit.map((m) => h('div', { class: 'stamm-person' + (m.karte === stand.karte ? ' ich' : '') },
-          h('b', null, 'Karte ' + m.karte + (m.karte === stand.karte ? ' (du)' : '')), ZI.seitenMarke(m.seite, 'klein'),
-          h('span', { class: 'stamm-rolle' }, ZI.rollenSymbol(m.rolle, 'klein'), ' ' + m.rolle.name))))), rollenKarte()];
+          h('b', null, 'Karte ' + m.karte + (m.karte === stand.karte ? ' (du)' : '')), ZI.seitenMarke(m.seite, 'klein')))))];
       fuss = weiterKnopf('Wir sitzen zusammen', 6);
     } else if (schritt === 6) {
       inhalt = [h('div', { class: 'pergament auf-pergament stamm-box rat-gross' }, h('div', { class: 'streitfrage klein-frage' }, t.frage),
-        h('p', { style: { margin: 0, fontSize: '22px' } }, h('b', null, 'Jetzt diskutiert ihr als Stamm.'), ' Erst sagt Pro ein Argument, dann Contra. Danach antwortet ihr aufeinander. Eure Argumente stehen links.')),
+        h('p', { style: { margin: 0, fontSize: '22px' } }, h('b', null, 'Jetzt diskutiert ihr als Stamm.'), ' Erst sagt Pro ein Argument, dann Contra. Danach antwortet ihr aufeinander. Eure Argumente stehen links. Achtet gemeinsam darauf, dass alle zu Wort kommen.')),
         h('div', { class: 'stamm-spalten' },
           tafelAnsicht(),
           h('div', { class: 'pergament auf-pergament stamm-box' },
             h('h3', null, 'So kannst du anfangen'),
-            h('ul', { class: 'saetze' }, ZI.DISKUSSION_SAETZE.map((x) => h('li', null, x))))),
-        h('div', { class: 'pergament auf-pergament stamm-box' },
-          h('h3', { class: 'titel-mit-bild' }, ZI.rollenSymbol(rolle, 'klein'), ' Deine Aufgabe als ' + rolle.name),
-          h('p', { style: { margin: '0 0 6px' } }, rolle.einfach.tun + (g.mitglieder.length < 4 && rolle.id === 'aelteste' ? ' Ihr seid nur drei: Achte auch auf die Zeit.' : '')),
-          h('ul', { class: 'saetze' }, rolle.saetze.map((x) => h('li', null, x))))];
+            h('ul', { class: 'saetze' }, ZI.DISKUSSION_SAETZE.map((x) => h('li', null, x)))))];
       fuss = weiterKnopf('Wir sind fertig – abstimmen', 7);
     } else if (schritt === 7) {
       const wahl = (x) => h('button', { class: 'knopf abstimm-knopf ' + (x === 'a' ? 'pro' : 'contra') + (c.wahl === x ? ' gewaehlt' : c.wahl ? ' holz' : ''), 'aria-pressed': String(c.wahl === x),
@@ -2342,17 +2327,18 @@
       inhalt = [h('div', { class: 'pergament auf-pergament stamm-box rat-gross' },
         h('div', { class: 'streitfrage klein-frage' }, t.frage),
         h('h3', null, 'Stammesentscheidung'),
-        h('p', { style: { margin: '0 0 10px' } }, 'Jetzt ist eure Rolle vorbei. Welche Seite hat euch nach der Diskussion mehr überzeugt? Das darf auch die andere Seite sein. Einigt euch und tippt alle dasselbe.'),
+        h('p', { style: { margin: '0 0 10px' } }, 'Jetzt zählt eure persönliche Meinung. Welche Seite hat euch nach der Diskussion mehr überzeugt? Stimmt im Stamm ab. Die Mehrheit entscheidet. Bei Gleichstand besprecht eure stärksten Gründe und einigt euch. Tippt danach alle dasselbe Ergebnis.'),
         h('div', { class: 'abstimm-wahl' }, wahl('a'), wahl('b')),
         c.wahl ? h('div', { class: 'rueckmeldung gut', style: { fontSize: '22px' } }, 'Die ' + g.name + ' stimmen für: ', h('b', null, c.wahl === 'a' ? t.pro : t.contra)) : null)];
       fuss = weiterKnopf(c.wahl ? 'Stammesentscheidung bestätigen' : 'Erst eine Seite wählen', 8, { disabled: c.wahl ? null : true });
     } else {
       const ergebnis = c.wahl === 'a' ? t.pro : t.contra;
-      inhalt = [h('div', { class: 'pergament auf-pergament stamm-box rat-gross' + (rolle.id === 'bote' ? ' bote-ich' : '') },
-        h('div', { class: 'titel-mit-bild' }, ZI.rollenSymbol(ZI.STAMMES_ROLLEN.find((r) => r.id === 'bote'), 'klein'), h('h3', { style: { margin: 0 } }, rolle.id === 'bote' ? 'Du bist der Bote!' : 'Euer Bote meldet')),
-        h('p', { style: { margin: '6px 0', fontSize: '22px' } }, rolle.id === 'bote' ? 'Sag gleich im Zwergenrat laut:' : 'Euer Bote sagt gleich im Zwergenrat:'),
+      inhalt = [h('div', { class: 'pergament auf-pergament stamm-box rat-gross' },
+        h('h3', { style: { margin: 0 } }, 'Entscheidung mitteilen'),
+        h('p', { style: { margin: '6px 0', fontSize: '22px' } }, 'Bestimmt jetzt eine Person, die eure Entscheidung dem Zwergenrat mitteilt.'),
+        h('p', { style: { margin: '6px 0' } }, 'Diese Person sagt im Zwergenrat:'),
         h('div', { class: 'meinung' }, '„Die ' + g.name + ' stimmen für: ' + ergebnis + ', weil …“'),
-        h('p', { style: { margin: '8px 0 0' } }, 'Schaut jetzt zum Board. Dort zählt die Klasse alle Stämme. Die Siegerseite entscheidet, welches Gebäude die Zwerge bauen.')),
+        h('p', { style: { margin: '8px 0 0' } }, 'Schaut jetzt zum Board. Die Lehrkraft trägt für euren Stamm eine Stimme ein. Die Siegerseite entscheidet, welches Gebäude die Zwerge bauen.')),
         tafelAnsicht()];
       fuss = h('button', { class: 'knopf holz', onclick: () => zeigeHalle() }, 'Zurück zur Halle');
     }
