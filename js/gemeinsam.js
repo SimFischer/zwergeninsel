@@ -152,6 +152,37 @@
     loeschen(k) { try { sessionStorage.removeItem(k); } catch (e) { /* egal */ } },
   };
 
+  /* Aufgaben als gemischten Vorrat ziehen; der Verlauf bleibt nur in diesem Tab. */
+  ZI.ziehen = function (pool, anzahl, name) {
+    if (!pool.length || anzahl <= 0) return [];
+    const id = (x) => x.id || JSON.stringify(x);
+    const eindeutig = new Map(pool.map((x) => [id(x), x]));
+    const ids = [...eindeutig.keys()];
+    const gruppe = name || (pool[0].id ? pool[0].id.split(':')[0] : ids.slice().sort().join('|'));
+    const verlauf = ZI.sitzung.lesen('zi-aufgaben', {});
+    const alt = verlauf[gruppe] || {};
+    let rest = [...new Set(alt.rest || [])].filter((x) => eindeutig.has(x));
+    const zuletzt = new Set(alt.zuletzt || []);
+    const letzteFaelle = new Set(verlauf.faelle || []);
+    const fall = (x) => (eindeutig.get(x).id || '').split(':')[1] || x;
+    const gezogen = [];
+    while (gezogen.length < Math.min(anzahl, ids.length)) {
+      if (!rest.length) rest = ZI.mischen(ids.filter((x) => !gezogen.includes(x)));
+      const neu = rest.filter((x) => !gezogen.includes(x));
+      if (!neu.length) { rest = []; continue; }
+      const dieseFaelle = new Set(gezogen.map(fall));
+      const kandidat = neu.find((x) => !zuletzt.has(x) && !letzteFaelle.has(fall(x)) && !dieseFaelle.has(fall(x)))
+        || neu.find((x) => !zuletzt.has(x) && !dieseFaelle.has(fall(x)))
+        || neu.find((x) => !zuletzt.has(x)) || neu[0];
+      gezogen.push(kandidat);
+      rest = rest.filter((x) => x !== kandidat);
+    }
+    verlauf[gruppe] = { rest, zuletzt: gezogen };
+    verlauf.faelle = [...(verlauf.faelle || []), ...gezogen.map(fall)].slice(-12);
+    ZI.sitzung.schreiben('zi-aufgaben', verlauf);
+    return gezogen.map((x) => eindeutig.get(x));
+  };
+
   /* ---------- iPad-Bildschirmtastatur: freie Höhe merken ---------- */
   if (window.visualViewport) {
     const tastatur = () => {
