@@ -427,3 +427,6 @@ button.stamm-code { text-align: center; }
 @media (max-height: 820px) { .abstimm-zahl { font-size: clamp(64px, 12vh, 120px); } .abstimm-seite { padding: 10px; } }
 .abschluss-stand { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin: 0; font-size: 24px; }
 .abschluss-stand > span > b { font-family: var(--titel); font-size: 34px; }
+
+.abstimm-seite .seiten-marke .seiten-bild { width: clamp(40px, 3.6vw, 72px); height: clamp(40px, 3.6vw, 72px); }
+.abstimm-seite .seiten-marke { font-size: clamp(16px, 1.3vw, 26px); }

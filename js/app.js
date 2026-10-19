@@ -561,11 +561,15 @@
     return n >= 1 && n < ZI.Stand.maxTiefe(i) ? n + 1 : null;
   }
   /* Tiefenabzeichen: Plätze für tiefe-1.png … tiefe-5.png und tiefe-krone.png (bis dahin Zahl bzw. Krone) */
+  /* Tiefenabzeichen: Steinmedaille (tiefe-1 … tiefe-5) mit der Zahl darauf; nicht erreichte sind blass */
+  function tiefeMedaille(i, an, cls) {
+    return h('span', { class: 'tiefen-abzeichen' + (an ? ' an' : '') + (cls ? ' ' + cls : ''), 'aria-label': 'Tiefe ' + i + (an ? ' erreicht' : '') },
+      ZI.bildOder('tiefe-' + i, '', null, 'medaille-bild'), h('b', null, String(i)));
+  }
   function tiefenLeiste(n, max, klein) {
     max = max || 5;
     return h('div', { class: 'tiefen-leiste' + (klein ? ' klein' : ''), 'aria-label': 'Tiefste Stufe: ' + n + ' von ' + max },
-      Array.from({ length: max }, (_, j) => j + 1).map((i) => h('span', { class: 'tiefen-abzeichen' + (i <= n ? ' an' : '') },
-        ZI.bildOder('tiefe-' + i, 'Tiefe ' + i, h('b', null, String(i))))),
+      Array.from({ length: max }, (_, j) => j + 1).map((i) => tiefeMedaille(i, i <= n)),
       h('span', { class: 'tiefen-abzeichen krone' + (n >= max ? ' an' : ''), title: 'Tiefen-Krone' },
         ZI.bildOder(['tiefe-krone', 'krone'], 'Tiefen-Krone', icon.krone())));
   }
@@ -624,8 +628,8 @@
         h('p', { style: { margin: 0, fontSize: '20px' } }, n ? 'Hier bist du bis Tiefe ' + stand.tiefe(k, idx) + ' gekommen. Was möchtest du?' : 'Du bist hier ganz unten angekommen. Stark!'),
         h('div', { class: 'stufen-wahl' },
           h('button', { class: 'knopf holz', onclick: () => { f.schliessen(); betreteStation(def, k, 'stollen', idx, 1); } }, 'Grundstufe üben'),
-          n ? h('button', { class: 'knopf', onclick: () => { f.schliessen(); betreteStation(def, k, 'stollen', idx, n); } },
-            'Noch tiefer graben', h('small', { class: 'knopf-unter' }, 'Tiefe ' + n + ': ' + def.tiefen[n - 2].name)) : null),
+          n ? h('button', { class: 'knopf mit-bild', onclick: () => { f.schliessen(); betreteStation(def, k, 'stollen', idx, n); } },
+            ZI.bildOder('stollen-tiefer', '', null, 'knopf-bild'), h('span', null, 'Noch tiefer graben', h('small', { class: 'knopf-unter' }, 'Tiefe ' + n + ': ' + def.tiefen[n - 2].name))) : null),
         h('button', { class: 'knopf-link', onclick: () => f.schliessen() }, 'Zurück zum Eingang'),
       ], { schliessbar: true });
     }
@@ -827,7 +831,7 @@
     const max = stollen ? ZI.Stand.maxTiefe(i) : 0;
     const def = stollen ? INHALT[k].stollen[i] : null;
     if (stollen && n === 1 && neu) titel = 'Stollen gemeistert!';
-    if (stollen && n > 1 && neu) { titel = 'Du hast Tiefe ' + jetzt + ' erreicht!'; datei = ['tiefe-' + jetzt].concat(datei); }
+    if (stollen && n > 1 && neu) titel = 'Du hast Tiefe ' + jetzt + ' erreicht!';
     // schon erreichte Stufe noch einmal geübt: keine zweite Belohnung
     if (stollen && !neu) { titel = 'Gut geübt!'; text = n > 1 ? 'Diese Tiefe hattest du schon. Edelsteine gibt es nur beim ersten Mal.' : 'Diesen Stollen hattest du schon. Das Material gibt es nur beim ersten Mal.'; }
     const tiefer = stollen && jetzt >= 1 ? naechsteTiefe(k, i, nach) : null;
@@ -835,7 +839,7 @@
     const weiter = (danach) => { if (erledigt) return; erledigt = true; f.schliessen(); fortschritt(eintragen, danach); };
     const f = ZI.fenster([
       h('div', { class: 'geschafft-reihe' },
-        h('div', { class: 'gross-bild strahlen' }, bild(datei, alt)),
+        stollen && n > 1 && neu ? h('div', { class: 'gross-bild strahlen' }, tiefeMedaille(jetzt, true, 'gross')) : h('div', { class: 'gross-bild strahlen' }, bild(datei, alt)),
         h('div', { class: 'huepf-zwerg' }, bild([z.datei + '-jubel', z.datei], z.name))),
       h('h2', null, titel),
       h('p', { style: { margin: 0, fontSize: '21px' } }, text),
@@ -844,7 +848,7 @@
       tiefer !== null ? h('p', { class: 'freiwillig' }, 'Du kannst jetzt einen anderen Stollen wählen. Tiefer graben ist freiwillig – in diesem Stollen wird es dann schwerer.') : null,
       h('div', { class: 'fenster-fuss' },
         h('button', { class: 'knopf', onclick: () => weiter(() => zeigeHalle()) }, 'Zurück zum Eingang'),
-        tiefer !== null ? h('button', { class: 'knopf holz', onclick: () => weiter(() => betreteStation(def, k, 'stollen', i, tiefer)) }, 'Noch tiefer graben') : null),
+        tiefer !== null ? h('button', { class: 'knopf holz mit-bild', onclick: () => weiter(() => betreteStation(def, k, 'stollen', i, tiefer)) }, ZI.bildOder('stollen-tiefer', '', null, 'knopf-bild'), 'Noch tiefer graben') : null),
     ]);
     f.el.classList.add('geschafft-fenster');
   }
@@ -2267,8 +2271,8 @@
     const seitenKarte = () => h('div', { class: 'seitenkarte pergament auf-pergament ' + ich.seite },
       ZI.seitenMarke(ich.seite, 'gross'),
       h('div', null, h('div', { class: 'klein' }, 'Deine Seite'), h('div', { class: 'seiten-titel' }, meineSeite)));
-    const tafelAnsicht = () => h('div', { class: 'pergament auf-pergament stamm-box argumenttafel' },
-      h('h3', { class: 'titel-mit-bild' }, ZI.bildOder('argumenttafel', '', null, 'titel-bild'), 'Eure Argumenttafel · ', meineSeite),
+    const tafelAnsicht = () => h('div', { class: 'stamm-box argumenttafel' },
+      h('h3', null, 'Eure Argumenttafel · ', meineSeite),
       h('ol', { class: 'saetze' }, tafel.filter((x) => x.trim()).map((x) => h('li', null, x))));
     let inhalt; let fuss;
     if (schritt === 1) {
@@ -2305,8 +2309,8 @@
         return h('label', { class: 'tafel-zeile' }, h('span', { class: 'tafel-nr' }, String(i + 1)), feld);
       }));
       zeichneFelder();
-      inhalt = [h('div', { class: 'pergament auf-pergament stamm-box argumenttafel' },
-        h('h3', { class: 'titel-mit-bild' }, ZI.bildOder('argumenttafel', '', null, 'titel-bild'), 'Argumenttafel · ', meineSeite),
+      inhalt = [h('div', { class: 'stamm-box argumenttafel' },
+        h('h3', null, 'Argumenttafel · ', meineSeite),
         h('p', { style: { margin: '0 0 8px' } }, h('b', null, partner.length ? 'Sammelt gemeinsam mindestens 3 Argumente.' : 'Sammle mindestens 3 Argumente.'), ' Ein Argument pro Feld. Stichwörter reichen. Die Tafel bleibt nur auf diesem iPad.'),
         felder,
         tafel.length < 5 ? h('button', { class: 'knopf holz klein', onclick: () => { tafel.push(''); sitzung.schreiben(tafelKey, tafel); zeigeStammesrat(c, 4); } }, '+ noch ein Argument') : null)];

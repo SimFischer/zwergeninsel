@@ -9,9 +9,9 @@ ZI.BILD = (name) => 'bilder/' + name + (ZI.JPG.includes(name) ? '.jpg' : '.png')
 /* Alle Bilder – werden nach dem Start gestaffelt in den Offline-Speicher geladen (ZI.vorladen) */
 /* Bildplätze, deren Dateien noch kommen: werden nicht geladen, es greift der Ersatz.
    Ist eine Datei da, den Namen hier streichen und in ALLE_BILDER eintragen. */
-ZI.BILD_KOMMT = ['rolle-pro', 'rolle-contra', 'argumenttafel', 'stollen-tiefer',
-  'tiefe-1', 'tiefe-2', 'tiefe-3', 'tiefe-4', 'tiefe-5', 'tiefe-krone'];
+ZI.BILD_KOMMT = [];
 ZI.ALLE_BILDER = [
+  'rolle-pro', 'rolle-contra', 'argumenttafel', 'stollen-tiefer', 'tiefe-1', 'tiefe-2', 'tiefe-3', 'tiefe-4', 'tiefe-5', 'tiefe-krone',
   'zwerg-01-brumm', 'zwerg-02-hilda', 'zwerg-03-tarek', 'zwerg-04-svea', 'zwerg-05-kira', 'zwerg-06-ole',
   'zwerg-07-fenno', 'zwerg-08-smaragda', 'zwerg-09-bodo', 'zwerg-10-amara', 'zwerg-11-grimbart', 'zwerg-12-rubina',
   'meisterin-erklaert', 'meisterin-jubelt', 'meisterin-tipp', 'meisterin-ermutigt', 'kobold-frech', 'kobold-chaos',
