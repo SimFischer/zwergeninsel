@@ -759,7 +759,7 @@
         zeit.uhr, zeit.knopf),
       h('div', { class: 'stamm-inhalt' }, ZI.ratsReise(1), kopf, raster,
         h('div', { class: 'stamm-unten' },
-          h('div', null, 'Auf den iPads: Frage → Seite → Partner → Argumenttafel → Diskussion im Stamm → Stammes-Abstimmung. Danach melden die Boten.'),
+          h('div', null, 'Auf den iPads: Frage → Seite → Partner → Argumenttafel → Diskussion im Stamm → Stammesentscheidung. Danach melden die Boten.'),
           h('button', { class: 'knopf', onclick: () => { zeit.stopp(); ui.remove(); oeffneRat(); } }, 'Zur Klassenabstimmung'))));
     document.body.appendChild(ui);
     sichern(); zeichne();
@@ -847,16 +847,20 @@
 
     function abschliessen() {
       if (!stimmen.a && !stimmen.b) { ZI.meldung('Tragt zuerst ein, wofür die Stämme gestimmt haben.'); ZI.ton.falsch(); return; }
-      if (stimmen.a === stimmen.b) {
-        const f = ZI.fenster([
-          h('h2', null, 'Gleichstand!'),
-          h('p', { style: { margin: 0, fontSize: '21px' } }, 'Stichwahl im Plenum: Jede und jeder zeigt per Handzeichen. Welche Seite hat die Mehrheit?'),
-          h('div', { class: 'knopf-reihe' },
-            h('button', { class: 'knopf', onclick: () => { f.schliessen(); entscheiden('a'); } }, t.pro),
-            h('button', { class: 'knopf', onclick: () => { f.schliessen(); entscheiden('b'); } }, t.contra))]);
-        return;
-      }
-      entscheiden(stimmen.a > stimmen.b ? 'a' : 'b');
+      const anzahl = ZI.stammesEinteilung(kartenNummern().length, st.seed || 0).length;
+      const summe = stimmen.a + stimmen.b;
+      const gleich = stimmen.a === stimmen.b;
+      const f = ZI.fenster([
+        h('h2', null, gleich ? 'Gleichstand!' : 'Abstimmung abschließen?'),
+        h('p', { class: 'abschluss-stand' }, h('span', null, ZI.seitenMarke('pro', 'klein'), ' ' + t.pro + ': ', h('b', null, String(stimmen.a))), h('span', null, ZI.seitenMarke('contra', 'klein'), ' ' + t.contra + ': ', h('b', null, String(stimmen.b)))),
+        summe !== anzahl ? h('p', { class: 'rueckmeldung schlecht', style: { margin: 0 } }, summe + ' Stimmen, aber ' + anzahl + ' Stämme. Bitte prüfen.') : null,
+        h('p', { style: { margin: 0, fontSize: '21px' } }, gleich ? 'Stichwahl im Plenum: Alle zeigen per Handzeichen, welche Seite sie überzeugt hat. Welche Seite hat die Mehrheit?' : 'Dann gewinnt: ' + (stimmen.a > stimmen.b ? t.pro : t.contra) + '.'),
+        h('div', { class: 'knopf-reihe' },
+          h('button', { class: 'knopf holz', onclick: () => f.schliessen() }, 'Noch ändern'),
+          ...(gleich ? [h('button', { class: 'knopf', onclick: () => { f.schliessen(); entscheiden('a'); } }, 'Pro: ' + t.pro),
+            h('button', { class: 'knopf', onclick: () => { f.schliessen(); entscheiden('b'); } }, 'Contra: ' + t.contra)]
+            : [h('button', { class: 'knopf', onclick: () => { f.schliessen(); entscheiden(stimmen.a > stimmen.b ? 'a' : 'b'); } }, 'Ja, abschließen')])),
+      ]);
     }
     function entscheiden(x) {
       zu();
@@ -869,9 +873,11 @@
       const f = ZI.fenster([
         ZI.ratsReise(geb ? 11 : 10),
         h('h2', null, 'Der Zwergenrat hat entschieden!'),
-        h('p', { style: { margin: 0, fontSize: '22px' } }, 'Die Klasse ist für: ', h('b', null, x === 'a' ? t.pro : t.contra)),
+        h('p', { style: { margin: 0, fontSize: '22px' } }, 'Gewonnen hat ', ZI.seitenMarke(x === 'a' ? 'pro' : 'contra', 'klein'), ' ', h('b', null, x === 'a' ? t.pro : t.contra)),
         geb ? h('div', { class: 'rat-ergebnis' }, h('div', { class: 'rat-ergebnis-bild' }, bild(geb.id, geb.name)),
-          h('p', { style: { margin: 0, fontSize: '22px' } }, 'Darum bauen die Zwerge jetzt: ', h('b', null, geb.name))) : null,
+          h('div', null,
+            h('p', { style: { margin: 0, fontSize: '22px' } }, 'Darum bauen die Zwerge jetzt: ', h('b', null, geb.name)),
+            h('p', { class: 'klein', style: { margin: '6px 0 0' } }, 'Hätte ' + (x === 'a' ? 'Contra' : 'Pro') + ' gewonnen, wäre ' + ZI.GEBAEUDE.find((g) => g.id === RF.optionen[x === 'a' ? 1 : 0]).name + ' zuerst entstanden.'))) : null,
         h('div', { class: 'knopf-reihe' },
           naechste ? h('button', { class: 'knopf holz', onclick: () => { f.schliessen(); st.thema = (st.thema + 1) % ZI.STREITFRAGEN.length; sichern(); oeffneStammesraete(); } }, 'Nächste Streitfrage') : null,
           h('button', { class: 'knopf', onclick: () => { f.schliessen(); allesZeigen(true); } }, geb ? 'Bauen!' : 'Zur Insel'))]);

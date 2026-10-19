@@ -395,14 +395,14 @@
   /* Streitfragen für den Zwergenrat: aus dem Schulalltag, ohne Fachwissen beide Seiten vertretbar.
      pro = Seite A (gewinnt sie, entsteht das erste Gebäude der Ratsfrage), contra = Seite B (das zweite). Höchstens 8 (Stammescode). */
   ZI.STREITFRAGEN = [
-    { frage: 'Soll die Schule erst um 9 Uhr beginnen?', pro: 'Schule ab 9 Uhr', contra: 'Schule ab 8 Uhr' },
-    { frage: 'Soll es längere Pausen geben – auch wenn die Schule dann später endet?', pro: 'Längere Pausen', contra: 'Pausen bleiben so' },
-    { frage: 'Soll es Hausaufgaben geben?', pro: 'Ja, Hausaufgaben', contra: 'Keine Hausaufgaben' },
+    { frage: 'Soll die Schule erst um 9 Uhr beginnen – und dafür später enden?', pro: 'Start um 9 Uhr', contra: 'Start um 8 Uhr' },
+    { frage: 'Sollen die Pausen länger sein – auch wenn die Schule dann später endet?', pro: 'Längere Pausen', contra: 'Pausen wie bisher' },
+    { frage: 'Soll es weiter Hausaufgaben geben?', pro: 'Mit Hausaufgaben', contra: 'Ohne Hausaufgaben' },
     { frage: 'Sollen Handys in der Pause erlaubt sein?', pro: 'Handys erlaubt', contra: 'Handys verboten' },
     { frage: 'Soll es in der Klasse einen festen Sitzplan geben?', pro: 'Fester Sitzplan', contra: 'Freie Platzwahl' },
-    { frage: 'Soll die Klassenfahrt ohne Smartphones stattfinden?', pro: 'Fahrt ohne Handy', contra: 'Handy darf mit' },
-    { frage: 'Soll unsere Klasse ein Tier bekommen, um das wir uns kümmern?', pro: 'Ja, ein Klassentier', contra: 'Kein Klassentier' },
-    { frage: 'Soll es an unserer Schule eine Schuluniform geben?', pro: 'Schuluniform', contra: 'Eigene Kleidung' },
+    { frage: 'Soll die Klassenfahrt ohne Handys stattfinden?', pro: 'Ohne Handys', contra: 'Mit Handys' },
+    { frage: 'Soll unsere Klasse ein Tier bekommen, um das wir uns kümmern?', pro: 'Mit Klassentier', contra: 'Ohne Klassentier' },
+    { frage: 'Soll es an unserer Schule eine Schuluniform geben?', pro: 'Mit Schuluniform', contra: 'Eigene Kleidung' },
   ];
   ZI.STAMMES_THEMEN = ZI.STREITFRAGEN; // ein Pool für Stammesrat und großen Rat
   /* Pro/Contra im Stamm: bei 4 Zwergen 2 gegen 2, bei 3 Zwergen 2 gegen 1. Gleiche Eingabe → gleiche Seite auf Board und iPad. */
@@ -414,7 +414,7 @@
     return m;
   };
   /* Die bisherigen Tiefen Stollen sind jetzt Stufen der Tiefen-Leiter: Kapitel k, Stollen i → Tiefe */
-  ZI.TIEFE_VON = [[3, 4, 5], [1, 3, 5], [1, 2, 5]];
+  ZI.TIEFE_VON = [[3, 4, 5], [1, 3, 5], [1, 3, 5]];
   ZI.tiefeVon = (k, i) => (ZI.TIEFE_VON[k] || [1, 2, 3])[i] || 5;
   ZI.ratsfrageNach = (id) => { for (const l of ZI.RATSFRAGEN) for (const f of l) if (f.id === id) return f; return null; };
   /* Stämme bilden: gleiche Eingabe → gleiche Einteilung, auf dem Board und auf jedem iPad */
@@ -455,7 +455,7 @@
       { text: 'Ich knüpfe an das an, was andere gesagt haben.', uebung: { art: 'kern', i: 1 } },
       { text: 'Ich nehme Einwände ernst und antworte mit einer Lösung.', uebung: { art: 'kern', i: 2 } },
       { text: 'Ich finde Gegenargumente.', uebung: { art: 'tief', i: 0 } },
-      { text: 'Ich wähle Argumente, die zu meinem Gegenüber passen.', uebung: { art: 'tief', i: 1 } },
+      { text: 'Ich wähle Argumente, die zu meinem Gegenüber passen.', uebung: { art: 'tief', i: 2 } },
     ],
   ];
   ZI.EINSCHAETZUNG = [

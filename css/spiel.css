@@ -843,3 +843,20 @@ a.lk-kachel:active { transform: translateY(2px); }
 .stationen.tiefen > .station:nth-child(3) { margin-left: 8%; }
 .stationen.tiefen > .station:nth-child(4) { margin-left: 12%; }
 .stationen.tiefen > .station:nth-child(5) { margin-left: 16%; }
+/* Feinschliff Zwergenrat und Tiefen */
+.seiten-marke b { text-transform: uppercase; letter-spacing: .04em; }
+.pro-contra-erklaerung { margin: 8px 0 4px; padding: 8px 12px; border-radius: 10px; background: #fffaf0; font-size: 21px; }
+.rat-hinweis-klein { display: block; margin-top: 6px; font-weight: 400; font-size: 19px; }
+.tafel-feld { font-size: 21px; min-height: 92px; line-height: 1.35; }
+.stammesrat-ipad { padding-bottom: calc(14px + var(--tastatur, 0px)); }
+.rat-fuss { position: sticky; bottom: 8px; z-index: 3; }
+.rat-fuss .knopf { min-height: 56px; }
+.tiefen-leiste { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 4px 0 10px; }
+.tiefen-abzeichen { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(58, 38, 23, 0.1); border: 2px dashed rgba(58, 38, 23, 0.3); font-family: var(--titel); font-size: 20px; color: var(--tinte-hell); overflow: hidden; }
+.tiefen-abzeichen img, .tiefen-abzeichen svg { width: 100%; height: 100%; object-fit: contain; }
+.tiefen-abzeichen.an { background: #3c6b8f; border: 2px solid #e8b23a; color: #fff; }
+.tiefen-abzeichen.krone { opacity: 0.35; filter: grayscale(1); background: none; border: none; }
+.tiefen-abzeichen.krone.an { opacity: 1; filter: none; }
+.tiefe-info { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 19px; font-weight: 700; }
+.tiefe-info .tiefen-leiste { margin: 0; justify-content: center; }
+.freiwillig { margin: 0; font-size: 19px; color: var(--tinte-hell); }

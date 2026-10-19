@@ -481,8 +481,8 @@
       ],
       tief: [
         { name: 'Gegenargument-Schmiede', info: 'Finde das Argument, das dagegen spricht.', icon: ['icon-gegenargument', 'axt-scharf'], spiel: () => spielGegenargument() },
-        { name: 'Wer überzeugt wen?', info: 'Das beste Argument passt zur Person.', icon: ['icon-situation', 'zwerg-10-amara'], spiel: () => spielSituation() },
         { name: 'Besser begründen', info: 'Mach schwache Begründungen stark.', icon: ['icon-stumpf-scharf', 'axt-scharf'], spiel: () => spielVerbessern() },
+        { name: 'Wer überzeugt wen?', info: 'Das beste Argument passt zur Person.', icon: ['icon-situation', 'zwerg-10-amara'], spiel: () => spielSituation() },
         { name: 'Auf Einwände reagieren', info: 'Antworte auf Gegenargumente – höflich und mit Grund.', icon: ['icon-inselrat', 'zwerg-11-grimbart'], spiel: () => spielEinwaende() },
         { name: 'Streitgespräch', gemeinschaft: true, info: 'Meinung, Zuhören und Gegenargument – mit Rollenwechsel.', icon: ['icon-streitgespraech', 'meisterin-jubelt'], spiel: () => spielMeisterstueck(3) },
       ],
@@ -502,6 +502,14 @@
   function naechsteTiefe(k, s) {
     const n = (s || stand).tiefe(k);
     return n < 5 && INHALT[k] ? n : null;
+  }
+
+  function tiefenLeiste(n) {
+    return h('div', { class: 'tiefen-leiste', 'aria-label': 'Erreichte Tiefe: ' + n + ' von 5' },
+      [1, 2, 3, 4, 5].map((i) => h('span', { class: 'tiefen-abzeichen' + (i <= n ? ' an' : '') },
+        ZI.bildOder('tiefe-' + i, 'Tiefe ' + i, h('b', null, String(i))))),
+      h('span', { class: 'tiefen-abzeichen krone' + (n >= 5 ? ' an' : ''), title: 'Tiefen-Krone' },
+        ZI.bildOder(['tiefe-krone', 'krone'], 'Tiefen-Krone', icon.krone())));
   }
 
   function kapitelOffen(k) {
@@ -557,10 +565,11 @@
           h('div', { class: 'stationen' }, inh.kern.map((d, i) => stationKarte(d, k, stand.hatKern(k, i), false, '', i, ROHSTOFF[i].name, 'kern', i)))),
         h('section', { class: 'pergament stollen auf-pergament tiefer-graben' },
           h('h2', { class: 'titel-mit-bild' }, ZI.bildOder('stollen-tiefer', '', null, 'titel-bild'), 'Noch tiefer graben'),
-          h('p', { class: 'erklaer' }, 'Freiwillig für Mutige: Jede Tiefe ist schwerer als die davor und bringt ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine. Für die Klasse zählt nur der Hauptstollen.'),
+          h('p', { class: 'erklaer' }, 'Freiwillig: Jede Tiefe ist schwerer als die davor und bringt einmal ' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine. Für die Klasse zählt nur der Hauptstollen.'),
+          tiefOffen ? tiefenLeiste(stand.tiefe(k)) : null,
           h('div', { class: 'stationen tiefen' }, inh.tief.map((d, i) => {
             const zu = !tiefOffen ? 'Schaffe zuerst den Hauptstollen.' : (!testmodus && i > stand.tiefe(k)) ? 'Grab zuerst bis Tiefe ' + i + '.' : '';
-            return stationKarte(Object.assign({}, d, { name: 'Tiefe ' + (i + 1) + ': ' + d.name }), k, stand.tiefe(k) > i, !!zu, zu, undefined, null, 'tief', i);
+            return stationKarte(Object.assign({}, d, { name: 'Tiefe ' + (i + 1) + ': ' + d.name, icon: ['tiefe-' + (i + 1)].concat(d.icon) }), k, stand.tiefe(k) > i, !!zu, zu, undefined, null, 'tief', i);
           }))),
         gebaeudeStollen(k),
         h('section', { class: 'pergament stollen auf-pergament' },
@@ -745,9 +754,12 @@
     const gemeistert = st && st.art === 'kern' && stand.coreCount(k) < 3 && nach.coreCount(k) === 3;
     const tiefeNeu = st && st.art === 'tief' && nach.tiefe(k) > stand.tiefe(k) ? nach.tiefe(k) : 0;
     if (gemeistert) { titel = 'Stollen gemeistert!'; text = text + ' Damit hast du den Hauptstollen geschafft – das zählt für die Klasse. Wer mag, kann jetzt noch tiefer graben.'; }
-    if (tiefeNeu) titel = 'Du hast Tiefe ' + tiefeNeu + ' erreicht.';
+    if (tiefeNeu) { titel = 'Du hast Tiefe ' + tiefeNeu + ' erreicht.'; datei = ['tiefe-' + tiefeNeu].concat(datei); }
+    // schon erreichte Tiefe noch einmal geübt: keine zweite Belohnung
+    if (st && st.art === 'tief' && !tiefeNeu) { titel = 'Gut geübt!'; text = 'Diese Tiefe hattest du schon. Edelsteine gibt es nur beim ersten Mal.'; }
     const tiefer = (gemeistert || tiefeNeu) && naechsteTiefe(k, nach) !== null ? naechsteTiefe(k, nach) : null;
-    const weiter = (danach) => { f.schliessen(); fortschritt((s) => { eintragen(s); if (krone) s.setzeKrone(st.k, st.i); }, danach); };
+    let erledigt = false;
+    const weiter = (danach) => { if (erledigt) return; erledigt = true; f.schliessen(); fortschritt((s) => { eintragen(s); if (krone) s.setzeKrone(st.k, st.i); }, danach); };
     const f = ZI.fenster([
       h('div', { class: 'geschafft-reihe' },
         h('div', { class: 'gross-bild strahlen' }, bild(datei, alt)),
@@ -755,10 +767,12 @@
       h('h2', null, titel),
       h('p', { style: { margin: 0, fontSize: '21px' } }, text),
       krone ? h('div', { class: 'krone-info' }, ZI.bildOder('krone', 'Krone', icon.krone()), h('span', null, schonKrone ? 'Wieder fehlerfrei – deine goldene Krone glänzt!' : 'Ganz ohne Fehler! Dafür bekommst du eine goldene Krone.')) : null,
+      tiefeNeu ? h('div', { class: 'tiefe-info' }, tiefenLeiste(nach.tiefe(k)), h('span', null, 'Tiefe ' + tiefeNeu + ' von 5 · +' + ZI.GEMS_PRO_STOLLEN + ' Edelsteine')) : null,
       tiefeNeu === 5 ? h('p', { style: { margin: 0, fontSize: '19px' } }, 'Tiefer geht es in diesem Kapitel nicht. Du bist ganz unten angekommen!') : null,
+      tiefer !== null ? h('p', { class: 'freiwillig' }, 'Du darfst jetzt aufhören. Weitergraben ist freiwillig – du kannst auch später wiederkommen.') : null,
       h('div', { class: 'fenster-fuss' },
-        h('button', { class: 'knopf' + (tiefer !== null ? ' holz' : ''), onclick: () => weiter(() => zeigeHalle()) }, 'Zurück zur Halle'),
-        tiefer !== null ? h('button', { class: 'knopf', onclick: () => weiter(() => betreteStation(INHALT[k].tief[tiefer], k, 'tief', tiefer)) }, 'Noch tiefer graben') : null),
+        h('button', { class: 'knopf', onclick: () => weiter(() => zeigeHalle()) }, 'Zurück zur Halle'),
+        tiefer !== null ? h('button', { class: 'knopf holz', onclick: () => weiter(() => betreteStation(INHALT[k].tief[tiefer], k, 'tief', tiefer)) }, 'Noch tiefer graben') : null),
     ]);
     f.el.classList.add('geschafft-fenster');
   }
@@ -2126,18 +2140,22 @@
     let inhalt; let fuss;
     if (schritt === 1) {
       inhalt = [h('div', { class: 'pergament auf-pergament stamm-box rat-gross' },
-        h('p', { class: 'klein', style: { margin: 0 } }, 'Ihr diskutiert jetzt diese Frage in eurem Zwergenstamm.'),
+        h('p', { style: { margin: 0 } }, 'Ihr diskutiert jetzt diese Frage in eurem Zwergenstamm.'),
         h('div', { class: 'streitfrage' }, t.frage),
-        h('div', { class: 'seiten-zeile' }, h('span', null, ZI.seitenMarke('pro', 'klein'), ' ', t.pro), h('span', null, ZI.seitenMarke('contra', 'klein'), ' ', t.contra)))];
+        h('div', { class: 'seiten-zeile' }, h('span', null, ZI.seitenMarke('pro', 'klein'), ' ', t.pro), h('span', null, ZI.seitenMarke('contra', 'klein'), ' ', t.contra)),
+        h('p', { class: 'pro-contra-erklaerung' }, h('b', null, 'Pro'), ' heißt: dafür. ', h('b', null, 'Contra'), ' heißt: dagegen.'),
+        h('p', { style: { margin: 0 } }, 'Lies die Frage. Noch nicht diskutieren – erst erfährst du deine Seite.'))];
       fuss = weiterKnopf('Welche Seite habe ich?', 2);
     } else if (schritt === 2) {
       inhalt = [seitenKarte(),
-        h('p', { class: 'rat-hinweis pergament auf-pergament' }, 'Das ist deine Rolle für die Diskussion. Du musst nicht persönlich dieser Meinung sein.'),
+        h('p', { class: 'rat-hinweis pergament auf-pergament' }, 'Das ist deine Rolle für die Diskussion. Du musst nicht persönlich dieser Meinung sein.',
+          h('span', { class: 'rat-hinweis-klein' }, ich.seite === 'pro' ? 'Du sammelst Argumente dafür.' : 'Du sammelst Argumente dagegen.', ' Deine eigene Meinung zählt erst bei der Stammesentscheidung.')),
         rollenKarte()];
       fuss = weiterKnopf('Weiter', 3);
     } else if (schritt === 3) {
       inhalt = [seitenKarte(), h('div', { class: 'pergament auf-pergament stamm-box rat-gross' },
         partner.length ? [h('p', { style: { margin: 0, fontSize: '22px' } }, 'Trefft euch jetzt mit dem Zwerg aus eurem Stamm, der dieselbe Position hat.'),
+          h('p', { style: { margin: '4px 0' } }, 'Ihr seid ein Team. Zu zweit sammelt ihr gleich eure Argumente.'),
           h('div', { class: 'stamm-liste' }, partner.map((m) => h('div', { class: 'stamm-person' }, h('b', null, 'Karte ' + m.karte), ZI.seitenMarke(m.seite, 'klein'))))]
           : h('p', { style: { margin: 0, fontSize: '22px' } }, 'Auf deiner Seite bist du allein. Sammle deine Argumente selbst. Dafür darfst du in der Diskussion als Erste oder Erster sprechen.'))];
       fuss = weiterKnopf(partner.length ? 'Wir haben uns gefunden' : 'Weiter', 4);
@@ -2146,29 +2164,31 @@
       const los = weiterKnopf('Fertig gesammelt', 5);
       const pruefe = () => { const n = tafel.filter((x) => x.trim().length >= 3).length; los.disabled = n < 3; los.textContent = n < 3 ? 'Noch ' + (3 - n) + ' Argument' + (3 - n === 1 ? '' : 'e') : 'Fertig gesammelt'; };
       const zeichneFelder = () => ZI.setze(felder, ...tafel.map((v, i) => {
-        const feld = h('textarea', { class: 'tafel-feld', rows: '2', maxlength: '160', 'aria-label': 'Argument ' + (i + 1), placeholder: i === 0 ? 'z. B. … weil …' : 'Argument ' + (i + 1) });
+        const feld = h('textarea', { class: 'tafel-feld', rows: '3', maxlength: '160', enterkeyhint: 'next', 'aria-label': 'Argument ' + (i + 1), placeholder: i === 0 ? 'z. B. … weil …' : 'Argument ' + (i + 1) });
         feld.value = v;
         feld.addEventListener('input', () => { tafel[i] = feld.value; sitzung.schreiben(tafelKey, tafel); pruefe(); });
+        // Bildschirmtastatur: Feld in die Mitte holen, damit es nicht verdeckt wird
+        feld.addEventListener('focus', () => setTimeout(() => feld.scrollIntoView({ block: 'center', behavior: 'smooth' }), 350));
         return h('label', { class: 'tafel-zeile' }, h('span', { class: 'tafel-nr' }, String(i + 1)), feld);
       }));
       zeichneFelder();
       inhalt = [h('div', { class: 'pergament auf-pergament stamm-box argumenttafel' },
         h('h3', { class: 'titel-mit-bild' }, ZI.bildOder('argumenttafel', '', null, 'titel-bild'), 'Argumenttafel · ', meineSeite),
-        h('p', { style: { margin: '0 0 8px' } }, h('b', null, partner.length ? 'Sammelt gemeinsam mindestens 3 Argumente.' : 'Sammle mindestens 3 Argumente.'), ' Stichwörter reichen. Die Tafel bleibt nur auf diesem iPad.'),
+        h('p', { style: { margin: '0 0 8px' } }, h('b', null, partner.length ? 'Sammelt gemeinsam mindestens 3 Argumente.' : 'Sammle mindestens 3 Argumente.'), ' Ein Argument pro Feld. Stichwörter reichen. Die Tafel bleibt nur auf diesem iPad.'),
         felder,
         tafel.length < 5 ? h('button', { class: 'knopf holz klein', onclick: () => { tafel.push(''); sitzung.schreiben(tafelKey, tafel); zeigeStammesrat(c, 4); } }, '+ noch ein Argument') : null)];
       fuss = los; pruefe();
     } else if (schritt === 5) {
       inhalt = [h('div', { class: 'pergament auf-pergament stamm-box' },
         h('h3', null, 'Euer Stamm: die ' + g.name),
-        h('p', { style: { margin: '0 0 8px' } }, 'Setzt euch jetzt als ganzer Stamm zusammen.'),
+        h('p', { style: { margin: '0 0 8px', fontSize: '20px' } }, h('b', null, 'Die Partnerarbeit ist vorbei.'), ' Setzt euch jetzt alle ' + mit.length + ' als ganzer Stamm zusammen – Pro und Contra an einen Tisch. Nehmt eure iPads mit.'),
         h('div', { class: 'stamm-liste' }, mit.map((m) => h('div', { class: 'stamm-person' + (m.karte === stand.karte ? ' ich' : '') },
           h('b', null, 'Karte ' + m.karte + (m.karte === stand.karte ? ' (du)' : '')), ZI.seitenMarke(m.seite, 'klein'),
           h('span', { class: 'stamm-rolle' }, ZI.rollenSymbol(m.rolle, 'klein'), ' ' + m.rolle.name))))), rollenKarte()];
       fuss = weiterKnopf('Wir sitzen zusammen', 6);
     } else if (schritt === 6) {
       inhalt = [h('div', { class: 'pergament auf-pergament stamm-box rat-gross' }, h('div', { class: 'streitfrage klein-frage' }, t.frage),
-        h('p', { style: { margin: 0, fontSize: '22px' } }, h('b', null, 'Jetzt diskutiert ihr als Stamm.'), ' Erst sagt PRO ein Argument, dann CONTRA. Danach antwortet ihr aufeinander.')),
+        h('p', { style: { margin: 0, fontSize: '22px' } }, h('b', null, 'Jetzt diskutiert ihr als Stamm.'), ' Erst sagt Pro ein Argument, dann Contra. Danach antwortet ihr aufeinander. Eure Argumente stehen links.')),
         h('div', { class: 'stamm-spalten' },
           tafelAnsicht(),
           h('div', { class: 'pergament auf-pergament stamm-box' },
@@ -2180,15 +2200,16 @@
           h('ul', { class: 'saetze' }, rolle.saetze.map((x) => h('li', null, x))))];
       fuss = weiterKnopf('Wir sind fertig – abstimmen', 7);
     } else if (schritt === 7) {
-      const wahl = (x) => h('button', { class: 'knopf abstimm-knopf ' + (x === 'a' ? 'pro' : 'contra') + (c.wahl === x ? ' gewaehlt' : ''), 'aria-pressed': String(c.wahl === x),
+      const wahl = (x) => h('button', { class: 'knopf abstimm-knopf ' + (x === 'a' ? 'pro' : 'contra') + (c.wahl === x ? ' gewaehlt' : c.wahl ? ' holz' : ''), 'aria-pressed': String(c.wahl === x),
         onclick: () => { c.wahl = x; sitzung.schreiben('zi-stamm', c); ZI.ton.plopp(); zeigeStammesrat(c, 7); } },
         ZI.seitenMarke(x === 'a' ? 'pro' : 'contra', 'klein'), h('span', null, x === 'a' ? t.pro : t.contra));
       inhalt = [h('div', { class: 'pergament auf-pergament stamm-box rat-gross' },
         h('div', { class: 'streitfrage klein-frage' }, t.frage),
-        h('p', { style: { margin: '0 0 10px' } }, 'Jetzt zählt nicht mehr deine Rolle. Wofür ist euer Stamm nach der Diskussion? Einigt euch und tippt auf eurem iPad dasselbe.'),
+        h('h3', null, 'Stammesentscheidung'),
+        h('p', { style: { margin: '0 0 10px' } }, 'Jetzt ist eure Rolle vorbei. Welche Seite hat euch nach der Diskussion mehr überzeugt? Das darf auch die andere Seite sein. Einigt euch und tippt alle dasselbe.'),
         h('div', { class: 'abstimm-wahl' }, wahl('a'), wahl('b')),
         c.wahl ? h('div', { class: 'rueckmeldung gut', style: { fontSize: '22px' } }, 'Die ' + g.name + ' stimmen für: ', h('b', null, c.wahl === 'a' ? t.pro : t.contra)) : null)];
-      fuss = weiterKnopf('Abstimmung bestätigen', 8, { disabled: c.wahl ? null : true });
+      fuss = weiterKnopf(c.wahl ? 'Stammesentscheidung bestätigen' : 'Erst eine Seite wählen', 8, { disabled: c.wahl ? null : true });
     } else {
       const ergebnis = c.wahl === 'a' ? t.pro : t.contra;
       inhalt = [h('div', { class: 'pergament auf-pergament stamm-box rat-gross' + (rolle.id === 'bote' ? ' bote-ich' : '') },
@@ -2205,7 +2226,7 @@
         h('button', { class: 'rund', 'aria-label': 'Zurück zur Halle', onclick: () => zeigeHalle() }, icon.zurueck()),
         h('div', null, h('div', { class: 'titel' }, 'Zwergenrat · ' + g.name), h('div', { class: 'untertitel' }, 'Stammescode ' + c.wort.match(/../g).join(' '))),
         h('div', { class: 'spacer' }),
-        schritt >= 6 && schritt < 8 ? h('button', { class: 'knopf holz klein', onclick: () => { const f = ZI.fenster([tafelAnsicht(), h('div', { class: 'knopf-reihe' }, h('button', { class: 'knopf', onclick: () => f.schliessen() }, 'Schließen'))]); } }, 'Meine Tafel') : null,
+        schritt === 7 ? h('button', { class: 'knopf holz klein', onclick: () => { const f = ZI.fenster([tafelAnsicht(), h('div', { class: 'knopf-reihe' }, h('button', { class: 'knopf', onclick: () => f.schliessen() }, 'Schließen'))]); } }, 'Meine Tafel') : null,
         h('button', { class: 'knopf holz klein', onclick: () => { sitzung.loeschen('zi-stamm'); stammesratEingeben(); } }, 'Neuer Code')),
       h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2 } },
         h('div', { class: 'stammesrat-ipad' }, ZI.ratsReise(schritt), ...inhalt,

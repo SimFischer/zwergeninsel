@@ -31,7 +31,8 @@
   /* Bild mit Platzhalter: Fehlt die Datei noch, erscheint ein beschrifteter Rahmen. */
   ZI.bild = function bild(datei, alt, cls) {
     /* datei darf auch eine Liste sein: dann wird das erste vorhandene Bild genommen */
-    const liste = Array.isArray(datei) ? datei.slice() : [datei];
+    const liste = (Array.isArray(datei) ? datei.slice() : [datei]).filter((n) => !(ZI.BILD_KOMMT || []).includes(n));
+    if (!liste.length) return h('div', { class: 'platzhalter' + (cls ? ' ' + cls : ''), role: 'img', 'aria-label': alt || '' }, alt || '');
     const img = h('img', { src: ZI.BILD(liste[0]), alt: alt || '', class: cls || null, draggable: 'false', decoding: 'async' });
     let n = 0;
     img.addEventListener('error', function weiter() {
@@ -46,7 +47,8 @@
 
   /* Bild mit eigenem Ersatz: Fehlt das Bild, erscheint ersatz (ein Element) – oder gar nichts */
   ZI.bildOder = function bildOder(datei, alt, ersatz, cls) {
-    const liste = Array.isArray(datei) ? datei.filter(Boolean) : [datei];
+    const liste = (Array.isArray(datei) ? datei.filter(Boolean) : [datei]).filter((n) => !(ZI.BILD_KOMMT || []).includes(n));
+    if (!liste.length) return ersatz || h('span', { hidden: true });
     const img = h('img', { src: ZI.BILD(liste[0]), alt: alt || '', class: cls || null, draggable: 'false', decoding: 'async' });
     let n = 0;
     img.addEventListener('error', function weiter() {
@@ -114,13 +116,13 @@
   ZI.zufall = (arr) => arr[Math.floor(Math.random() * arr.length)];
   /* Rollen-Symbol: Bild aus bilder/rolle-….png, solange es fehlt ein Ausweich-Zeichen */
   /* Weg durch den Zwergenrat: 1–8 im Stamm (iPad), 9–11 am Board */
-  ZI.RATS_REISE = ['Streitfrage', 'Seite', 'Partner', 'Tafel', 'Stamm trifft sich', 'Diskussion', 'Abstimmen', 'Bote', 'Klassen\u00ADabstimmung', 'Siegerseite', 'Gebäude'];
+  ZI.RATS_REISE = ['Streitfrage', 'Seite', 'Partner', 'Tafel', 'Stamm trifft sich', 'Diskussion', 'Stammes\u00ADentscheidung', 'Bote', 'Klassen\u00ADabstimmung', 'Siegerseite', 'Gebäude'];
   ZI.ratsReise = (aktiv) => h('ol', { class: 'rats-reise', 'aria-label': 'Ablauf des Zwergenrats' },
     ZI.RATS_REISE.map((name, i) => h('li', { class: (i + 1 < aktiv ? 'fertig' : i + 1 === aktiv ? 'jetzt' : '') + (i >= 8 ? ' board' : ''), 'aria-current': i + 1 === aktiv ? 'step' : null },
       h('span', { class: 'rr-nr' }, String(i + 1)), h('span', { class: 'rr-name' }, name))));
   /* PRO/CONTRA-Marke mit Bild-Slot (rolle-pro.png / rolle-contra.png), sonst Schriftzug */
   ZI.seitenMarke = (seite, cls) => h('span', { class: 'seiten-marke ' + seite + ' ' + (cls || '') },
-    ZI.bildOder('rolle-' + seite, '', null, 'seiten-bild'), h('b', null, seite === 'pro' ? 'PRO' : 'CONTRA'));
+    ZI.bildOder('rolle-' + seite, '', null, 'seiten-bild'), h('b', null, seite === 'pro' ? 'Pro' : 'Contra'));
   ZI.rollenSymbol = (rolle, cls) => h('span', { class: 'rollen-symbol ' + (cls || ''), 'aria-hidden': 'true' },
     ZI.bildOder(rolle.bild, rolle.name, h('span', { class: 'rollen-zeichen' }, rolle.zeichen)));
   /* Bausteine mischen, sodass der Satz NIE schon fertig oder fast fertig dasteht.

@@ -425,3 +425,5 @@ button.stamm-code { text-align: center; }
 .rats-reise li.board { border-style: dashed; }
 .stamm-code .klein { color: var(--tinte-hell); }
 @media (max-height: 820px) { .abstimm-zahl { font-size: clamp(64px, 12vh, 120px); } .abstimm-seite { padding: 10px; } }
+.abschluss-stand { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin: 0; font-size: 24px; }
+.abschluss-stand > span > b { font-family: var(--titel); font-size: 34px; }

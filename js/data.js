@@ -7,6 +7,10 @@ const ZI = window.ZI || (window.ZI = {});
 ZI.JPG = ['transition-schmiede', 'transition-stollen', 'transition-gemeinschaftsstollen', 'titel-hintergrund', 'schmiede-hintergrund', 'stollen-hintergrund', 'zwergenrat-hintergrund', 'vulkan-hintergrund', 'fest-szene', 'insel-grund'];
 ZI.BILD = (name) => 'bilder/' + name + (ZI.JPG.includes(name) ? '.jpg' : '.png');
 /* Alle Bilder – werden nach dem Start gestaffelt in den Offline-Speicher geladen (ZI.vorladen) */
+/* Bildplätze, deren Dateien noch kommen: werden nicht geladen, es greift der Ersatz.
+   Ist eine Datei da, den Namen hier streichen und in ALLE_BILDER eintragen. */
+ZI.BILD_KOMMT = ['rolle-pro', 'rolle-contra', 'argumenttafel', 'stollen-tiefer',
+  'tiefe-1', 'tiefe-2', 'tiefe-3', 'tiefe-4', 'tiefe-5', 'tiefe-krone'];
 ZI.ALLE_BILDER = [
   'zwerg-01-brumm', 'zwerg-02-hilda', 'zwerg-03-tarek', 'zwerg-04-svea', 'zwerg-05-kira', 'zwerg-06-ole',
   'zwerg-07-fenno', 'zwerg-08-smaragda', 'zwerg-09-bodo', 'zwerg-10-amara', 'zwerg-11-grimbart', 'zwerg-12-rubina',
