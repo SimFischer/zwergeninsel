@@ -413,9 +413,6 @@
     if (m.length > 1 && m.every((x) => x.seite === m[0].seite)) m[m.length - 1].seite = m[0].seite === 'pro' ? 'contra' : 'pro';
     return m;
   };
-  /* Die bisherigen Tiefen Stollen sind jetzt Stufen der Tiefen-Leiter: Kapitel k, Stollen i → Tiefe */
-  ZI.TIEFE_VON = [[3, 4, 5], [1, 3, 5], [1, 3, 5]];
-  ZI.tiefeVon = (k, i) => (ZI.TIEFE_VON[k] || [1, 2, 3])[i] || 5;
   ZI.ratsfrageNach = (id) => { for (const l of ZI.RATSFRAGEN) for (const f of l) if (f.id === id) return f; return null; };
   /* Stämme bilden: gleiche Eingabe → gleiche Einteilung, auf dem Board und auf jedem iPad */
   ZI.stammesEinteilung = function (n, seed) {
@@ -441,21 +438,21 @@
       { text: 'Ich erkenne, ob eine Begründung wirklich erklärt, WARUM.', uebung: { art: 'kern', i: 0 } },
       { text: 'Ich finde Begründungen, die zur Meinung passen.', uebung: { art: 'kern', i: 1 } },
       { text: 'Ich baue Sätze mit weil, da und denn richtig.', uebung: { art: 'kern', i: 2 } },
-      { text: 'Ich kann eine Begründung mit einem Beispiel stützen.', uebung: { art: 'tief', i: 3 } },
-      { text: 'Ich kann meine Meinung laut und begründet sagen.', uebung: { art: 'tief', i: 4 } },
+      { text: 'Ich kann eine Begründung mit einem Beispiel stützen.', uebung: { art: 'stollen', i: 3, n: 2 } },
+      { text: 'Ich kann meine Meinung laut und begründet sagen.', uebung: { art: 'stollen', i: 3 } },
     ],
     [
       { text: 'Ich kenne die drei Teile eines Arguments: Meinung, Begründung und Beispiel.', uebung: { art: 'kern', i: 0 } },
       { text: 'Ich erkenne Gesprächsmotoren und Gesprächsbremsen.', uebung: { art: 'kern', i: 1 } },
       { text: 'Ich höre genau zu und erkenne Meinung, Begründung und Beispiel.', uebung: { art: 'kern', i: 2 } },
-      { text: 'Ich unterscheide Stützen von neuen Argumenten.', uebung: { art: 'tief', i: 2 } },
+      { text: 'Ich unterscheide Stützen von neuen Argumenten.', uebung: { art: 'stollen', i: 0, n: 3 } },
     ],
     [
       { text: 'Ich erkenne, ob jemand zustimmt, widerspricht oder das Thema wechselt.', uebung: { art: 'kern', i: 0 } },
       { text: 'Ich knüpfe an das an, was andere gesagt haben.', uebung: { art: 'kern', i: 1 } },
       { text: 'Ich nehme Einwände ernst und antworte mit einer Lösung.', uebung: { art: 'kern', i: 2 } },
-      { text: 'Ich finde Gegenargumente.', uebung: { art: 'tief', i: 0 } },
-      { text: 'Ich wähle Argumente, die zu meinem Gegenüber passen.', uebung: { art: 'tief', i: 2 } },
+      { text: 'Ich finde Gegenargumente.', uebung: { art: 'stollen', i: 0, n: 3 } },
+      { text: 'Ich wähle Argumente, die zu meinem Gegenüber passen.', uebung: { art: 'stollen', i: 1, n: 3 } },
     ],
   ];
   ZI.EINSCHAETZUNG = [
@@ -466,9 +463,9 @@
 
   /* Stationsnamen für Überblick und Urkunde am Board */
   ZI.STATIONS_NAMEN = [
-    { kern: ['Stumpf oder scharf?', 'Erz oder Schlacke?', 'Weil-Denn-Amboss'], tief: ['Fehlerjagd', 'Beispiel-Edelstein', 'Meisterstück'], bonus: 'Funkenregen' },
-    { kern: ['Argument-Puzzle', 'Motor oder Bremse?', 'Hör-Stollen'], tief: ['Kobold-Kampf', 'Argument-Kette', 'Meisterstück II'], bonus: 'Beispiel-Regen' },
-    { kern: ['Ja, und – ja, aber?', 'Wer hört zu?', 'Überzeug den Inselrat'], tief: ['Gegenargument-Schmiede', 'Wer überzeugt wen?', 'Streitgespräch'], bonus: 'Sprecherwechsel' },
+    { kern: ['Stumpf oder scharf?', 'Erz oder Schlacke?', 'Weil-Denn-Amboss'], gem: 'Meisterstück', bonus: 'Funkenregen' },
+    { kern: ['Argument-Puzzle', 'Motor oder Bremse?', 'Hör-Stollen'], gem: 'Meisterstück II', bonus: 'Beispiel-Regen' },
+    { kern: ['Ja, und – ja, aber?', 'Wer hört zu?', 'Überzeug den Inselrat'], gem: 'Streitgespräch', bonus: 'Sprecherwechsel' },
   ];
 
   ZI.bauUebung = (id) => ZI.BAU_UEBUNGEN.find((u) => u.id === id) || null;

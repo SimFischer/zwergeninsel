@@ -18,8 +18,13 @@
   const kap = () => Math.min(insel.kapitel || 0, ZI.BAUPLAN.length - 1);
 
   /* ---------- Berechnungen ---------- */
+  function standVon(e) {
+    const s = e && ZI.Stand.ausCode(e.code);
+    if (s && e.liefer) s.liefer = e.liefer.slice();
+    return s;
+  }
   function staende() {
-    return Object.values(insel.zwerge).map((e) => ZI.Stand.ausCode(e.code)).filter(Boolean);
+    return Object.values(insel.zwerge).map(standVon).filter(Boolean);
   }
   function material(k = kap()) { return staende().reduce((a, s) => a + s.coreCount(k), 0); }
   function ziel() { return Math.max(1, insel.klassengroesse * 3); }
@@ -323,7 +328,7 @@
   function zeigeZwerge(neueIds) {
     const liste = Object.entries(insel.zwerge).sort((a, b) => a[1].erst - b[1].erst);
     ZI.setze(zwergSchicht, ...liste.map(([id, e], i) => {
-      const s = ZI.Stand.ausCode(e.code); if (!s) return null;
+      const s = standVon(e); if (!s) return null;
       const z = ZI.ZWERGE.find((d) => d.nr === s.zwerg);
       const p = platz(i);
       return h('div', { class: 'mini-zwerg' + (neueIds && neueIds.includes(id) ? ' neu' : ''),
@@ -521,14 +526,14 @@
   function annehmenSchein(info, erzwingen) {
     const key = 'karte-' + info.karte;
     const alt = insel.zwerge[key];
-    const altStand = alt ? ZI.Stand.ausCode(alt.code) : null;
+    const altStand = alt ? standVon(alt) : null;
     if (altStand && altStand.zwerg !== info.zwerg && !erzwingen) return { konflikt: true, altZwerg: altStand.zwerg, info };
     const s = altStand || new ZI.Stand({ id: info.karte });
     s.id = info.karte; s.zwerg = info.zwerg;
     const k = info.kapitel;
-    s.kern[k] |= info.kern; s.tief[k] = Math.max(s.tief[k], info.tief); s.bonus[k] = Math.max(s.bonus[k], info.bonus);
+    s.setzeKernBits(k, info.kern); s.liefer[k] = Math.max(s.liefer[k] || 0, info.tief); s.bonus[k] = Math.max(s.bonus[k], info.bonus);
     s.offen = Math.max(s.offen, k);
-    insel.zwerge[key] = { code: s.code(), erst: alt ? alt.erst : Date.now(), zeit: Date.now(), tag: heute(), karte: info.karte, lang: !!(alt && alt.lang) };
+    insel.zwerge[key] = { code: s.code(), liefer: s.liefer.slice(), erst: alt ? alt.erst : Date.now(), zeit: Date.now(), tag: heute(), karte: info.karte, lang: !!(alt && alt.lang) };
     sichern();
     return { id: key, stand: s, neu: !alt, vorher: alt ? Object.assign({}, alt) : null, info };
   }
@@ -544,12 +549,12 @@
     }
     let erg = null;
     for (let k = 0; k <= s.offen; k++) {
-      erg = annehmenSchein({ karte: s.karte, zwerg: s.zwerg, kapitel: k, kern: s.kern[k], tief: s.tief[k], bonus: s.bonus[k] }, true) || erg;
+      erg = annehmenSchein({ karte: s.karte, zwerg: s.zwerg, kapitel: k, kern: s.kern[k], tief: Math.min(7, s.extra(k)), bonus: s.bonus[k] }, true) || erg;
     }
-    // Kronen und Gebäude-Übungen stecken nur im langen Code – dazurechnen
+    // Tiefen je Stollen und Gebäude-Übungen stecken nur im langen Code – dazurechnen
     const key = 'karte-' + s.karte;
-    const ges = ZI.Stand.ausCode(insel.zwerge[key].code);
-    for (let k = 0; k < 3; k++) ges.kronen[k] |= s.kronen[k];
+    const ges = standVon(insel.zwerge[key]);
+    for (let k = 0; k < 3; k++) for (let i = 0; i < 4; i++) ges.setzeTiefe(k, i, s.tiefe(k, i));
     ges.bau |= s.bau;
     insel.zwerge[key].code = ges.code(); insel.zwerge[key].lang = true;
     sichern();
@@ -611,7 +616,7 @@
       letzte = erg;
       const z = ZI.ZWERGE.find((d) => d.nr === erg.stand.zwerg);
       const i = erg.info;
-      const teile = [i.kapitel !== kap() ? 'Kapitel ' + (i.kapitel + 1) : null, ZI.Stand.bits(i.kern) + ' Material', i.tief ? 'Tiefe ' + Math.min(5, i.tief) : null].filter(Boolean);
+      const teile = [i.kapitel !== kap() ? 'Kapitel ' + (i.kapitel + 1) : null, ZI.Stand.bits(i.kern) + ' Material', i.tief ? i.tief + '× tiefer gegraben' : null].filter(Boolean);
       ZI.setze(rueck, h('div', { class: 'liefer-ok' },
         h('div', { class: 'liefer-ok-bild' }, bild(z.datei, z.name)),
         h('div', null, h('div', { class: 'liefer-ok-titel' }, 'Karte ' + i.karte + ' · ' + z.name), h('div', null, teile.join(' · '))),
@@ -645,7 +650,7 @@
       const ok = () => {
         const erg = annehmenPass(eingabe.value);
         if (!erg) { ZI.ton.falsch(); ZI.setze(hin, h('div', { class: 'rueckmeldung schlecht' }, 'Der Code stimmt nicht.')); return; }
-        g.schliessen(); if (!erg.info) erg.info = { karte: erg.stand.karte || '–', kapitel: kap(), kern: erg.stand.kern[kap()], tief: erg.stand.tief[kap()] };
+        g.schliessen(); if (!erg.info) erg.info = { karte: erg.stand.karte || '–', kapitel: kap(), kern: erg.stand.kern[kap()], tief: Math.min(7, erg.stand.extra(kap())) };
         gelungen(erg);
       };
       eingabe.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') ok(); });
@@ -684,7 +689,7 @@
   }
   function zwergDerKarte(n) {
     const e = insel.zwerge['karte-' + n];
-    const s = e && ZI.Stand.ausCode(e.code);
+    const s = e && standVon(e);
     return s ? ZI.ZWERGE.find((d) => d.nr === s.zwerg) : null;
   }
   function kartenKopf(n) {
@@ -913,7 +918,7 @@
     function zeichne() {
       ZI.setze(reiter, ...ZI.STATIONS_NAMEN.map((_, i) => h('button', { class: 'knopf klein' + (i === k ? '' : ' holz'), onclick: () => { k = i; zeichne(); } }, 'Kapitel ' + (i + 1))));
       const nummern = kartenNummern();
-      const st = nummern.map((n) => { const e = insel.zwerge['karte-' + n]; return { n, s: e ? ZI.Stand.ausCode(e.code) : null, e }; });
+      const st = nummern.map((n) => { const e = insel.zwerge['karte-' + n]; return { n, s: e ? standVon(e) : null, e }; });
       const da = st.filter((x) => x.s);
       const lang = da.filter((x) => x.e.lang);
       const N = ZI.STATIONS_NAMEN[k];
@@ -923,29 +928,27 @@
         h('div', { class: 'ue-zahl' }, zahl + ' / ' + gesamt));
       const kernZeilen = N.kern.map((name, i) => {
         const geschafft = da.filter((x) => x.s.hatKern(k, i)).length;
-        const gl = lang.filter((x) => x.s.hatKern(k, i)).length;
-        const krone = lang.filter((x) => x.s.hatKrone(k, i)).length;
-        return h('div', null, balken(name, geschafft, nummern.length, geschafft < nummern.length * 0.6),
-          gl ? h('div', { class: 'ue-krone' }, 'fehlerfrei: ' + krone + ' von ' + gl + ' (' + Math.round((krone / gl) * 100) + ' %)') : null);
+        return balken(name, geschafft, nummern.length, geschafft < nummern.length * 0.6);
       });
-      const tiefZeilen = [1, 2, 3, 4, 5].map((n) => balken('Tiefe ' + n, da.filter((x) => x.s.tiefe(k) >= n).length, nummern.length, false));
+      // freiwillige Bonus-Tiefen: aus Lieferscheinen nur als Anzahl, aus langen Codes je Stollen
+      const tiefZeilen = [
+        balken('Mindestens einmal tiefer gegraben', da.filter((x) => Math.max(x.s.extra(k), x.s.liefer[k] || 0) > 0).length, nummern.length, false),
+        ...(lang.length ? [balken(N.gem + ' (Gemeinschaftsstollen)', lang.filter((x) => x.s.hatGemeinschaft(k)).length, lang.length, false),
+          ...N.kern.map((name, i) => balken(name + ' – ab Tiefe 3', lang.filter((x) => x.s.tiefe(k, i) >= 3).length, lang.length, false))] : []),
+      ];
       const bauZeilen = lang.length ? ZI.BAU_UEBUNGEN.filter((u) => u.kapitel === k).map((u) => balken(u.name, lang.filter((x) => x.s.hatBau(u.bit)).length, lang.length, false)) : [];
-      // Kronen-Quote als Hinweis auf schwierige Stationen
-      const quote = N.kern.map((name, i) => { const g = lang.filter((x) => x.s.hatKern(k, i)).length; const kr = lang.filter((x) => x.s.hatKrone(k, i)).length; return { name, q: g ? kr / g : 1, g }; }).filter((x) => x.g >= 3).sort((a, b) => a.q - b.q);
       const offen = st.filter((x) => !x.s || x.s.coreCount(k) < 3);
       ZI.setze(inhalt,
         h('div', { class: 'ue-spalten' },
           h('div', null,
             h('h3', null, 'Hauptstollen'), ...kernZeilen,
-            h('h3', null, 'Noch tiefer graben (freiwillig)'), ...tiefZeilen,
+            h('h3', null, 'Freiwillig tiefer gegraben' + (lang.length ? ' (Stollen-Werte aus ' + lang.length + ' langen Codes)' : '')), ...tiefZeilen,
             bauZeilen.length ? h('h3', null, 'Gebäude-Stollen (aus ' + lang.length + ' langen Codes)') : null, ...bauZeilen),
           h('div', null,
-            h('h3', null, 'Hauptstollen noch nicht fertig (' + offen.length + ')'),
+            h('h3', null, 'Hauptstollen noch nicht alle fertig (' + offen.length + ')'),
             offen.length ? h('div', { class: 'ue-offen' }, offen.map((x) => h('div', { class: 'ue-karte' + (x.s ? '' : ' nie') },
-              kartenKopf(x.n), h('span', null, x.s ? x.s.coreCount(k) + '/3' : 'nie geliefert')))) : h('p', null, 'Alle haben den Hauptstollen geschafft!'),
-            quote.length && quote[0].q < 0.6 ? h('div', { class: 'rueckmeldung tipp', style: { marginTop: '14px' } },
-              h('b', null, 'Tipp fürs Plenum: '), '„' + quote[0].name + '“ gelingt nur ' + Math.round(quote[0].q * 100) + ' % fehlerfrei. Das lohnt sich, gemeinsam noch einmal anzuschauen.') : null,
-            h('p', { class: 'klein', style: { marginTop: '14px' } }, 'Die 4-stelligen Lieferscheine zeigen, welche Stationen geschafft sind. Fehlerfrei-Werte und Gebäude-Stollen kennt die Insel nur, wenn Kinder ihren langen Zwergenpass eingeben (Lieferungen → „Langen Zwergenpass-Code eintippen“).'))));
+              kartenKopf(x.n), h('span', null, x.s ? x.s.coreCount(k) + '/3' : 'nie geliefert')))) : h('p', null, 'Alle haben die drei Hauptstollen geschafft!'),
+            h('p', { class: 'klein', style: { marginTop: '14px' } }, 'Die 4-stelligen Lieferscheine zeigen, welche Hauptstollen geschafft sind und wie oft ein Kind freiwillig tiefer gegraben hat. Gemeinschaftsstollen, Tiefen je Stollen und Gebäude-Stollen kennt die Insel nur, wenn Kinder ihren langen Zwergenpass eingeben (Lieferungen → „Langen Zwergenpass-Code eintippen“).'))));
     }
     zeichne();
     const f = ZI.fenster([h('h2', null, 'Klassenüberblick'), reiter, inhalt,
@@ -957,7 +960,7 @@
 
   /* ---------- Urkunden für alle Kinder ---------- */
   function oeffneUrkunden() {
-    const daten = kartenNummern().map((n) => { const e = insel.zwerge['karte-' + n]; const s = e && ZI.Stand.ausCode(e.code); return s ? { n, s, lang: !!e.lang } : null; }).filter(Boolean);
+    const daten = kartenNummern().map((n) => { const e = insel.zwerge['karte-' + n]; const s = e && standVon(e); return s ? { n, s, lang: !!e.lang } : null; }).filter(Boolean);
     if (!daten.length) { ZI.meldung('Noch keine Lieferungen – es gibt noch keine Urkunden.'); return; }
     const w = window.open('', '_blank');
     if (!w) { ZI.meldung('Bitte Pop-ups für diese Seite erlauben.'); return; }
@@ -974,9 +977,9 @@
         <p class="name">Name: <span></span></p>
         <p>hat als <b>${esc(z.name)}</b> den Rang <b>${esc(rang.name)}</b> erreicht.</p>
         <ul class="werte">
-          <li>${zahl(s.coreTotal(), 'Station', 'Stationen')} im Hauptstollen</li>
-          <li>${zahl(s.deepTotal(), 'Tiefe', 'Tiefen')} tiefer gegraben</li>
-          ${lang ? `<li>${zahl(s.bauTotal(), 'Gebäude-Stollen', 'Gebäude-Stollen')}</li><li>${zahl(s.kronenTotal(), 'goldene Krone', 'goldene Kronen')}</li>` : ''}
+          <li>${zahl(s.coreTotal(), 'Hauptstollen', 'Hauptstollen')} geschafft</li>
+          <li>${zahl(s.deepTotal(), 'Bonus-Stufe', 'Bonus-Stufen')} (Gemeinschaftsstollen und Tiefen)</li>
+          ${lang ? `<li>${zahl(s.bauTotal(), 'Gebäude-Stollen', 'Gebäude-Stollen')}</li><li>${zahl(s.kronenTotal(), 'Tiefen-Krone', 'Tiefen-Kronen')}</li>` : ''}
           <li>${zahl(s.gems(), 'Edelstein', 'Edelsteine')}</li>
         </ul>
         <table class="ichkann"><thead><tr><th>Ich kann …</th><th>sicher</th><th>fast</th><th>üben</th></tr></thead><tbody>
@@ -1017,7 +1020,7 @@
     const tabelle = h('table', { class: 'lieferliste' },
       h('thead', null, h('tr', null, h('th', null, 'Zwerg'), h('th', null, 'Hauptstollen'), h('th', null, 'Edelsteine'), h('th', null, 'Zuletzt'), h('th', null, ''))),
       h('tbody', null, Object.entries(insel.zwerge).sort((x, y) => y[1].zeit - x[1].zeit).map(([id, e]) => {
-        const s = ZI.Stand.ausCode(e.code); if (!s) return null;
+        const s = standVon(e); if (!s) return null;
         const z = ZI.ZWERGE.find((d) => d.nr === s.zwerg);
         return h('tr', null,
           h('td', null, bild(z.datei, z.name), ' ', z.name),

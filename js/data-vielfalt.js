@@ -685,4 +685,43 @@
       ['Nach der Schule ist man oft müde.', true, 'Dafür: Es stützt die Meinung.'],
       ['Man lernt, sich die Zeit selbst einzuteilen.', false, 'Dagegen: ein Vorteil von Hausaufgaben.']),
   ];
+
+  /* Antwort-Begründungen, die nicht zählen („Warum?“-Nachfrage in tiefen Stufen) */
+  ZI.WARUM_FALSCH = ['Diese Antwort ist am längsten.', 'Sie klingt am schönsten.', 'Sie enthält ein schwieriges Wort.',
+    'Die meisten würden das so sagen.', 'Man kann sie am schnellsten sagen.'];
+  /* Motor-oder-Bremse-Stollen, Tiefe 3 und 5: Aus einer Bremse wird ein Motor */
+  ZI.BREMSE_MOTOR = [
+    { bremse: 'Nele: „Deine Idee ist doch total blöd.“', optionen: [
+      o('„Ich sehe das anders, weil dann nicht alle mitmachen können.“', true, 'Motor: Eine eigene Meinung mit Grund – ohne den anderen schlechtzumachen.'),
+      o('„Deine Idee ist wirklich sehr blöd.“', false, 'Immer noch eine Bremse – nur lauter.'),
+      o('„Egal, lass uns über etwas anderes reden.“', false, 'Das lenkt ab. Das Gespräch kommt nicht weiter.')] },
+    { bremse: 'Tom: „Das klappt sowieso nie.“', optionen: [
+      o('„Das klappt nie, glaub mir.“', false, 'Wieder eine Bremse ohne Grund.'),
+      o('„Ich glaube, das wird schwierig, weil wir wenig Zeit haben. Wie könnten wir das lösen?“', true, 'Motor: Er nennt einen Grund und fragt nach einer Lösung.'),
+      o('„Du hast ja nie gute Ideen.“', false, 'Ein Angriff auf die Person – keine Begründung.')] },
+    { bremse: 'Lara: „Du redest immer nur Quatsch.“', optionen: [
+      o('„Und du redest noch mehr Quatsch!“', false, 'Zurückschimpfen bremst noch mehr.'),
+      o('„Ich habe das noch nicht verstanden. Kannst du es noch einmal erklären?“', true, 'Motor: Eine Nachfrage hält das Gespräch am Laufen.'),
+      o('„Ich höre jetzt nicht mehr zu.“', false, 'Das beendet das Gespräch.')] },
+    { bremse: 'Ben: „Ist mir doch egal, macht was ihr wollt.“', optionen: [
+      o('„Mir ist es wichtig, dass wir fair abwechseln. Deshalb bin ich für einen Plan.“', true, 'Motor: Er sagt, was ihm wichtig ist, und macht einen Vorschlag.'),
+      o('„Mir auch, macht doch.“', false, 'So kommt keine Entscheidung zustande.'),
+      o('„Ihr seid alle langweilig.“', false, 'Ein Angriff, kein Beitrag.')] },
+    { bremse: 'Greta: „Das haben wir schon immer so gemacht.“', optionen: [
+      o('„Genau, das bleibt so.“', false, 'Das ist kein Grund – das Gespräch bleibt stehen.'),
+      o('„Was ist an der alten Lösung gut? Und was könnte die neue besser machen?“', true, 'Motor: Fragen, die beide Seiten prüfen.'),
+      o('„Früher war alles besser.“', false, 'Das hilft der Entscheidung nicht.')] },
+    { bremse: 'Jan: „Nein. Einfach nein.“', optionen: [
+      o('„Ich bin dagegen, weil es in der Pause dann zu laut wird.“', true, 'Motor: Aus dem Nein wird eine Meinung mit Grund.'),
+      o('„Nein, nein und nochmal nein.“', false, 'Lauter, aber nicht besser.'),
+      o('„Warum fragt ihr mich überhaupt?“', false, 'Das bremst das Gespräch.')] },
+    { bremse: 'Sina: „Das ist unfair, das weiß doch jeder!“', optionen: [
+      o('„Das ist unfair – Punkt.“', false, 'Noch immer kein Grund.'),
+      o('„Ich finde das unfair, weil immer dieselben drankommen. Wir könnten auslosen.“', true, 'Motor: Meinung, Grund und ein Vorschlag.'),
+      o('„Jeder weiß, dass du unfair bist.“', false, 'Ein Angriff auf die Person.')] },
+    { bremse: 'Leo: „Hör auf, du hast keine Ahnung.“', optionen: [
+      o('„Ich sehe das anders. Darf ich kurz erklären, warum?“', true, 'Motor: Er bleibt freundlich und will begründen.'),
+      o('„Du hast selbst keine Ahnung.“', false, 'Zurückschimpfen bremst.'),
+      o('„Ich sag jetzt gar nichts mehr.“', false, 'Das beendet das Gespräch.')] },
+  ];
 })();

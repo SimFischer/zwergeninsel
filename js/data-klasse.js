@@ -161,7 +161,7 @@
   /* ---------- Rückblick: Ich-kann-Sätze wie im Unterricht ---------- */
   ZI.ICH_KANN[0].splice(1, 0, { text: 'Ich erkenne, ob eine Meinung begründet ist oder nicht.', uebung: { art: 'kern', i: 1 } });
   ZI.ICH_KANN[1].splice(2, 0, { text: 'Ich kann im Echo-Spiel wiederholen, was der andere gesagt hat.', uebung: { art: 'kern', i: 2 } });
-  ZI.ICH_KANN[2].push({ text: 'Ich kann ein Argument der anderen Seite nachvollziehen und nennen.', uebung: { art: 'tief', i: 0 } });
+  ZI.ICH_KANN[2].push({ text: 'Ich kann ein Argument der anderen Seite nachvollziehen und nennen.', uebung: { art: 'stollen', i: 0, n: 4 } });
 
   /* ---------- Inselrätsel: Wahr oder falsch? (Lernerfolgskontrolle) ---------- */
   ZI.RICHTIG_FALSCH = [

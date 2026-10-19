@@ -837,12 +837,6 @@ a.lk-kachel:active { transform: translateY(2px); }
 .rat-fuss { justify-content: flex-end; }
 .tiefer-graben .titel-bild { width: 44px; height: 44px; }
 @media (max-width: 760px) { .abstimm-wahl { grid-template-columns: 1fr; } .rats-reise .rr-name { display: none; } }
-/* Tiefen als Schacht: jede Stufe ein Stück tiefer */
-.stationen.tiefen { grid-template-columns: 1fr; gap: 10px; }
-.stationen.tiefen > .station:nth-child(2) { margin-left: 4%; }
-.stationen.tiefen > .station:nth-child(3) { margin-left: 8%; }
-.stationen.tiefen > .station:nth-child(4) { margin-left: 12%; }
-.stationen.tiefen > .station:nth-child(5) { margin-left: 16%; }
 /* Feinschliff Zwergenrat und Tiefen */
 .seiten-marke b { text-transform: uppercase; letter-spacing: .04em; }
 .pro-contra-erklaerung { margin: 8px 0 4px; padding: 8px 12px; border-radius: 10px; background: #fffaf0; font-size: 21px; }
@@ -860,3 +854,15 @@ a.lk-kachel:active { transform: translateY(2px); }
 .tiefe-info { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 19px; font-weight: 700; }
 .tiefe-info .tiefen-leiste { margin: 0; justify-content: center; }
 .freiwillig { margin: 0; font-size: 19px; color: var(--tinte-hell); }
+/* Stollen-Karten mit eigener Tiefe */
+.st-tiefe { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; font-size: 15px; font-weight: 700; color: #3c6b8f; }
+.tiefen-leiste.klein { margin: 0; gap: 3px; }
+.tiefen-leiste.klein .tiefen-abzeichen { width: 22px; height: 22px; font-size: 12px; border-width: 1px; }
+.stufen-wahl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+.stufen-wahl .knopf { display: flex; flex-direction: column; white-space: normal; min-height: 72px; justify-content: center; }
+.stufen-wahl + .knopf-link { align-self: center; min-height: 44px; font-size: 18px; }
+.warum { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 12px; background: #eef4fb; border: 2px dashed #3c6b8f; }
+@media (max-width: 700px) { .stufen-wahl { grid-template-columns: 1fr; } }
+.stationen.stollen-wahl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 1500px) { .stationen.stollen-wahl { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .stationen.stollen-wahl { grid-template-columns: 1fr; } }

@@ -2,197 +2,124 @@
    Der ganze Spielstand eines Kindes passt in einen 12-stelligen Code (XXXX-XXXX-XXXX).
    So kann jedes Kind auf jedem Koffer-iPad weiterspielen, ganz ohne Server.
 
-   Aufbau (60 Bit):
-   id 15 | zwerg 4 | kern 3x3 | tief 3x3 | bonus 3x2 | kapitel offen 2 | kronen 3x3 | prüfsumme 5 | 1 frei
-   Ältere 10-stellige Codes (ohne Kronen) werden weiterhin gelesen. */
+   Jeder Stollen hat seine eigene Tiefe: 0 = noch nicht gespielt, 1 = Grundstufe geschafft,
+   2–5 = freiwillig tiefer gegraben. Je Kapitel gibt es 3 Hauptstollen (Tiefe 0–5) und
+   einen Gemeinschaftsstollen (Tiefe 0–3).
+   Code (gemischte Basis, < 2^60): karte 0–32 | zwerg | offen | bonus 3×(0–3) | Tiefen 3×(6·6·6·4) | bau 10 | prüf 16 */
 
 (function () {
   const ZI = window.ZI || (window.ZI = {});
   const ALPHA = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // ohne 0, 1, I, O
-  const MASK10 = 0x2A5F3C91B7n;                // alter 10-stelliger Code
-  const MASK12 = 0x9D3A5F3C91B7E4n;            // neuer 12-stelliger Code
+  const GEM = 3;                                // Index des Gemeinschaftsstollens
+  const MAXT = [5, 5, 5, 3];                    // tiefste Stufe je Stollen
 
   class Stand {
     constructor(o = {}) {
-      this.id = o.id ?? Math.floor(Math.random() * 32768);
+      this.id = o.id ?? 0;                  // Kartennummer 1–32 (0 = noch keine)
       this.zwerg = o.zwerg ?? 1;            // 1–12
-      this.kern = o.kern ?? [0, 0, 0];      // je Kapitel Bitmaske der 3 Stationen
-      this.tief = o.tief ?? [0, 0, 0];      // je Kapitel erreichte Tiefe 0–5 („Noch tiefer graben“)
+      this.t = o.t ? o.t.map((r) => r.slice()) : [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]; // Tiefe je Kapitel und Stollen
       this.bonus = o.bonus ?? [0, 0, 0];    // je Kapitel beste Sterne im Bonusspiel (0–3)
       this.offen = o.offen ?? 0;            // höchstes freigeschaltetes Kapitel (0 = Kapitel 1)
-      this.kronen = o.kronen ?? [0, 0, 0];  // je Kapitel: Hauptstollen-Stationen fehlerfrei geschafft
       this.bau = o.bau ?? 0;                // Bitmaske der geschafften Gebäude-Übungen (10 Bit)
+      this.liefer = o.liefer ? o.liefer.slice() : [0, 0, 0]; // nur am Board: Tiefen-Schritte aus dem Lieferschein
     }
     static bits(m) { let n = 0; for (let i = 0; i < 3; i++) if (m & (1 << i)) n++; return n; }
-    coreCount(k) { return Stand.bits(this.kern[k]); }
-    tiefe(k) { return Math.min(5, this.tief[k] || 0); }
-    deepCount(k) { return this.tiefe(k); }
-    deepTotal() { return [0, 1, 2].reduce((a, k) => a + this.tiefe(k), 0); }
-    coreTotal() { return this.kern.reduce((a, m) => a + Stand.bits(m), 0); }
-    kronenTotal() { return this.kronen.reduce((a, m) => a + Stand.bits(m), 0); }
+    static maxTiefe(i) { return MAXT[i]; }
+    /* Tiefe eines Stollens (i = 0–2 Hauptstollen, 3 = Gemeinschaftsstollen) */
+    tiefe(k, i) { return Math.min(MAXT[i], this.t[k][i] || 0); }
+    setzeTiefe(k, i, n) { this.t[k][i] = Math.max(this.tiefe(k, i), Math.min(MAXT[i], n)); }
+    /* Grundstufe der Hauptstollen = Baumaterial für das Dorf */
+    get kern() { return this.t.map((r) => (r[0] ? 1 : 0) | (r[1] ? 2 : 0) | (r[2] ? 4 : 0)); }
+    hatKern(k, i) { return this.tiefe(k, i) >= 1; }
+    setzeKern(k, i) { this.setzeTiefe(k, i, 1); }
+    setzeKernBits(k, m) { for (let i = 0; i < 3; i++) if (m & (1 << i)) this.setzeKern(k, i); }
+    coreCount(k) { return [0, 1, 2].filter((i) => this.hatKern(k, i)).length; }
+    coreTotal() { return [0, 1, 2].reduce((a, k) => a + this.coreCount(k), 0); }
+    hatGemeinschaft(k) { return this.tiefe(k, GEM) >= 1; }
+    /* freiwillige Schritte eines Kapitels: jede Zusatztiefe + der Gemeinschaftsstollen (je 5 Edelsteine) */
+    extra(k) { return [0, 1, 2].reduce((a, i) => a + Math.max(0, this.tiefe(k, i) - 1), 0) + this.tiefe(k, GEM); }
+    tiefer(k) { return [0, 1, 2, 3].reduce((a, i) => a + Math.max(0, this.tiefe(k, i) - 1), 0); }
+    tieferTotal() { return [0, 1, 2].reduce((a, k) => a + this.tiefer(k), 0); }
+    tiefsteIn(k) { return Math.max(...[0, 1, 2, 3].map((i) => this.tiefe(k, i))); }
+    deepTotal() { return [0, 1, 2].reduce((a, k) => a + Math.max(this.extra(k), this.liefer[k] || 0), 0); }
+    /* Tiefen-Krone: tiefste Stufe eines Stollens erreicht */
+    hatKrone(k, i) { return this.tiefe(k, i) >= MAXT[i]; }
+    kronenTotal() { let n = 0; for (let k = 0; k < 3; k++) for (let i = 0; i < 4; i++) if (this.hatKrone(k, i)) n++; return n; }
     bonusMax() { return Math.max(...this.bonus); }
     bonusTotal() { return this.bonus.reduce((a, b) => a + b, 0); }
     gems() { return this.deepTotal() * (ZI.GEMS_PRO_STOLLEN || 5) + this.bonusTotal(); }
-    hatKern(k, i) { return !!(this.kern[k] & (1 << i)); }
-    // i = einer der bisherigen Tiefen Stollen; er ist geschafft, wenn seine Tiefe erreicht ist
-    hatTief(k, i) { return this.tiefe(k) >= ZI.tiefeVon(k, i); }
-    hatKrone(k, i) { return !!(this.kronen[k] & (1 << i)); }
-    setzeKern(k, i) { this.kern[k] |= (1 << i); }
-    setzeTief(k, i) { this.setzeTiefe(k, ZI.tiefeVon(k, i)); }
-    setzeTiefe(k, n) { this.tief[k] = Math.max(this.tiefe(k), Math.min(5, n)); }
-    setzeKrone(k, i) { this.kronen[k] |= (1 << i); }
     hatBau(bit) { return !!(this.bau & (1 << bit)); }
     setzeBau(bit) { this.bau |= (1 << bit); }
-    bauTotal() { let n = 0; for (let i = 0; i < 11; i++) if (this.bau & (1 << i)) n++; return n; }
+    bauTotal() { let n = 0; for (let i = 0; i < 10; i++) if (this.bau & (1 << i)) n++; return n; }
     zwergFrei(nr) {
       const z = ZI.ZWERGE.find((d) => d.nr === nr);
       return !!z && (z.start || (z.unlock && z.unlock(this)));
     }
     freieZwerge() { return ZI.ZWERGE.filter((z) => this.zwergFrei(z.nr)).map((z) => z.nr); }
 
-    /* die 45 Bit des alten Codes */
-    kernBits() {
-      let v = BigInt(this.id & 0x7fff);
-      v = (v << 4n) | BigInt((this.zwerg - 1) & 15);
-      for (let k = 0; k < 3; k++) v = (v << 3n) | BigInt(this.kern[k] & 7);
-      for (let k = 0; k < 3; k++) v = (v << 3n) | BigInt(this.tief[k] & 7);
-      for (let k = 0; k < 3; k++) v = (v << 2n) | BigInt(this.bonus[k] & 3);
-      v = (v << 2n) | BigInt(this.offen & 3);
-      return v;
+    /* ---------- Zwergenpass: gemischte Basis, Prüfzahl, Verwürfelung ---------- */
+    static basen() {
+      const b = [33n, 12n, 3n, 4n, 4n, 4n];
+      for (let k = 0; k < 3; k++) b.push(6n, 6n, 6n, 4n);
+      b.push(1024n, 16n);
+      return b;
     }
-    static ausKernBits(v, s) {
-      s.offen = Number(v & 3n); v >>= 2n;
-      for (let k = 2; k >= 0; k--) { s.bonus[k] = Number(v & 3n); v >>= 2n; }
-      for (let k = 2; k >= 0; k--) { s.tief[k] = Number(v & 7n); v >>= 3n; }
-      for (let k = 2; k >= 0; k--) { s.kern[k] = Number(v & 7n); v >>= 3n; }
-      s.zwerg = Number(v & 15n) + 1; v >>= 4n;
-      s.id = Number(v & 0x7fffn);
+    werte() {
+      const w = [this.karte || 0, this.zwerg - 1, Math.min(2, this.offen), ...this.bonus.map((x) => x & 3)];
+      for (let k = 0; k < 3; k++) for (let i = 0; i < 4; i++) w.push(this.tiefe(k, i));
+      w.push(this.bau & 0x3ff);
+      return w;
+    }
+    static pruef(w) { let h = 11; w.forEach((x, i) => { h = (h * 31 + x * (i + 7)) % 32719; }); return h & 15; }
+    code() {
+      const w = this.werte(); w.push(Stand.pruef(w));
+      let v = 0n;
+      Stand.basen().forEach((b, i) => { v = v * b + BigInt(w[i]); });
+      let all = Stand.verschluesseln(v);
+      let s = '';
+      for (let i = 0; i < 12; i++) { s = ALPHA[Number(all & 31n)] + s; all >>= 5n; }
+      return s.slice(0, 4) + '-' + s.slice(4, 8) + '-' + s.slice(8);
+    }
+    static ausCode(text) {
+      const clean = String(text || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
+      if (clean.length !== 12) return null;
+      let all = 0n;
+      for (const ch of clean) { const n = ALPHA.indexOf(ch); if (n < 0) return null; all = (all << 5n) | BigInt(n); }
+      let v = Stand.entschluesseln(all);
+      const basen = Stand.basen(); const w = new Array(basen.length);
+      for (let i = basen.length - 1; i >= 0; i--) { w[i] = Number(v % basen[i]); v /= basen[i]; }
+      if (v !== 0n) return null;                       // außerhalb des gültigen Bereichs = Tippfehler
+      const p = w.pop();
+      if (Stand.pruef(w) !== p) return null;
+      const s = new Stand({ id: w[0], zwerg: w[1] + 1, offen: w[2], bonus: w.slice(3, 6), bau: w[w.length - 1] });
+      for (let k = 0; k < 3; k++) for (let i = 0; i < 4; i++) s.t[k][i] = w[6 + k * 4 + i];
       return s;
     }
-    static pruef(v) {
-      let h = 7n;
-      let x = v;
-      for (let i = 0; i < 11; i++) { h = (h * 31n + (x & 31n)) % 32749n; x >>= 5n; }
-      return h & 31n;
-    }
-    /* verteilt die id über den ganzen Code (umkehrbar: zweimal anwenden = Original) */
-    static misch(all, breite) {
-      const unten = BigInt(breite - 15);
-      const LOW = (1n << unten) - 1n;
-      const id = all >> unten;
-      const h = (id * 2654435761n + 12345n) & LOW;
-      return (id << unten) | ((all & LOW) ^ h);
-    }
-    code() {
-      if (this.id >= 1 && this.id <= 32) return this.codeV2();
-      let v = this.kernBits();
-      for (let k = 0; k < 3; k++) v = (v << 3n) | BigInt(this.kronen[k] & 7);   // 54 Bit
-      let all = (v << 5n) | Stand.pruef(v);                                      // 59 Bit
-      all = Stand.misch(all, 59) ^ MASK12;
-      let s = '';
-      for (let i = 0; i < 12; i++) { s = ALPHA[Number(all & 31n)] + s; all >>= 5n; }
-      return s.slice(0, 4) + '-' + s.slice(4, 8) + '-' + s.slice(8);
-    }
-    /* Version 2 (oberstes Bit = 1): Kartennummer statt Zufalls-id, dafür Platz für 11 Gebäude-Bits.
-       karte 5 | zwerg 4 | kern 3x3 | tief 3x3 | bonus 3x2 | offen 2 | kronen 3x3 | bau 11 | prüfsumme 4 */
-    datenV2() {
-      let v = BigInt((this.id - 1) & 31);
-      v = (v << 4n) | BigInt((this.zwerg - 1) & 15);
-      for (let k = 0; k < 3; k++) v = (v << 3n) | BigInt(this.kern[k] & 7);
-      for (let k = 0; k < 3; k++) v = (v << 3n) | BigInt(this.tief[k] & 7);
-      for (let k = 0; k < 3; k++) v = (v << 2n) | BigInt(this.bonus[k] & 3);
-      v = (v << 2n) | BigInt(this.offen & 3);
-      for (let k = 0; k < 3; k++) v = (v << 3n) | BigInt(this.kronen[k] & 7);
-      v = (v << 11n) | BigInt(this.bau & 0x7ff);
-      return v; // 55 Bit
-    }
-    static pruefV2(v) {
-      let h = 11n; let x = v;
-      for (let i = 0; i < 14; i++) { h = (h * 37n + (x & 15n)) % 32719n; x >>= 4n; }
-      return h & 15n;
-    }
-    codeV2() {
-      const d = this.datenV2();
-      const all59 = (d << 4n) | Stand.pruefV2(d);
-      const x = Stand.verschluesseln(all59);
-      let all = (1n << 59n) | x;
-      let s = '';
-      for (let i = 0; i < 12; i++) { s = ALPHA[Number(all & 31n)] + s; all >>= 5n; }
-      return s.slice(0, 4) + '-' + s.slice(4, 8) + '-' + s.slice(8);
-    }
-    /* einfache umkehrbare 59-Bit-Verwürfelung: Multiplikation mit ungerader Zahl, XOR, Rotation */
+    /* umkehrbare Verwürfelung auf 60 Bit: Multiplikation mit ungerader Zahl, XOR, Rotation */
     static verschluesseln(v) {
-      const M = (1n << 59n) - 1n;
+      const M = (1n << 60n) - 1n;
       v = (v * 0x5DEECE66Dn) & M;
-      v ^= 0x2A5F3C91B7E4D1n & M;
-      v = ((v << 17n) | (v >> 42n)) & M;
+      v ^= 0x2A5F3C91B7E4D1n;
+      v = ((v << 17n) | (v >> 43n)) & M;
       v = (v * 0x9E3779B1n) & M;
       return v;
     }
     static entschluesseln(v) {
-      const M = (1n << 59n) - 1n;
+      const M = (1n << 60n) - 1n;
       v = (v * Stand.inverse(0x9E3779B1n)) & M;
-      v = ((v >> 17n) | (v << 42n)) & M;
-      v ^= 0x2A5F3C91B7E4D1n & M;
+      v = ((v >> 17n) | (v << 43n)) & M;
+      v ^= 0x2A5F3C91B7E4D1n;
       v = (v * Stand.inverse(0x5DEECE66Dn)) & M;
       return v;
     }
-    static inverse(a) { // Inverses von a modulo 2^59 (Newton)
-      const M = (1n << 59n) - 1n;
+    static inverse(a) { // Inverses von a modulo 2^60 (Newton)
+      const M = (1n << 60n) - 1n;
       let x = a;
       for (let i = 0; i < 7; i++) x = (x * (2n - a * x)) & M;
       return x;
     }
-    static ausV2(all, s) {
-      const x = Stand.entschluesseln(all & ((1n << 59n) - 1n));
-      const p = x & 15n; let v = x >> 4n;
-      if (Stand.pruefV2(v) !== p) return null;
-      s.bau = Number(v & 0x7ffn); v >>= 11n;
-      for (let k = 2; k >= 0; k--) { s.kronen[k] = Number(v & 7n); v >>= 3n; }
-      s.offen = Number(v & 3n); v >>= 2n;
-      for (let k = 2; k >= 0; k--) { s.bonus[k] = Number(v & 3n); v >>= 2n; }
-      for (let k = 2; k >= 0; k--) { s.tief[k] = Number(v & 7n); v >>= 3n; }
-      for (let k = 2; k >= 0; k--) { s.kern[k] = Number(v & 7n); v >>= 3n; }
-      s.zwerg = Number(v & 15n) + 1; v >>= 4n;
-      s.id = Number(v & 31n) + 1;
-      if (s.offen > 2) return null;
-      return s;
-    }
-    static ausCode(text) {
-      const clean = String(text || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
-      if (clean.length !== 10 && clean.length !== 12) return null;
-      let all = 0n;
-      for (const ch of clean) {
-        const n = ALPHA.indexOf(ch);
-        if (n < 0) return null;
-        all = (all << 5n) | BigInt(n);
-      }
-      const s = new Stand();
-      if (clean.length === 10) {                       // alter Code ohne Kronen
-        all = Stand.misch(all ^ MASK10, 50);
-        const p = all & 31n; const v = all >> 5n;
-        if (Stand.pruefAlt(v) !== p) return null;
-        Stand.ausKernBits(v, s);
-      } else {
-        if (all >> 59n) { if (!Stand.ausV2(all, s)) return null; }   // Version 2
-        else {
-        all = Stand.misch(all ^ MASK12, 59);
-        const p = all & 31n; let v = all >> 5n;
-        if (Stand.pruef(v) !== p) return null;
-        for (let k = 2; k >= 0; k--) { s.kronen[k] = Number(v & 7n); v >>= 3n; }
-        Stand.ausKernBits(v, s);
-        }
-      }
-      if (s.zwerg < 1 || s.zwerg > 12) return null;
-      return s;
-    }
-    static pruefAlt(v) {
-      let h = 7n;
-      let x = v;
-      for (let i = 0; i < 9; i++) { h = (h * 31n + (x & 31n)) % 32749n; x >>= 5n; }
-      return h & 31n;
-    }
   }
+  Stand.GEM = GEM;
 
   /* =========================================================
      LIEFERSCHEIN – 4 Zeichen, die die Lehrkraft am Board eintippt.
@@ -226,7 +153,7 @@
     v = (v << 4) | ((this.zwerg - 1) & 15);
     v = (v << 2) | (k & 3);
     v = (v << 3) | (this.kern[k] & 7);
-    v = (v << 3) | (this.tief[k] & 7);
+    v = (v << 3) | Math.min(7, this.extra(k));
     v = (v << 2) | (this.bonus[k] & 3);
     v = (v << 1) | paritaet(v);
     v = mischVor(v);
