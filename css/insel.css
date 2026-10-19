@@ -70,7 +70,7 @@
 
 /* Zwergenrat */
 .rat { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; }
-.rat-inhalt { position: relative; z-index: 2; flex: 1; display: grid; grid-template-columns: 1fr 1fr 0.9fr; gap: 2vw; padding: 2vw; min-height: 0; }
+.rat-inhalt { position: relative; z-index: 2; flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.9fr); gap: 2vw; padding: 2vw; min-height: 0; }
 .rat-frage { grid-column: 1 / -1; text-align: center; padding: 14px 20px; font-size: clamp(26px, 2.9vw, 60px); font-family: var(--titel); }
 .stimmen { display: flex; align-items: center; gap: 16px; font-family: var(--titel); font-size: 44px; }
 .rat-regeln { padding: 18px 20px; font-size: clamp(17px, 1.3vw, 22px); overflow-y: auto; }
@@ -107,14 +107,6 @@
 .moewe-flug { position: absolute; z-index: 12; width: 7%; left: 105%; top: 20%; pointer-events: none; animation: geschenkFlug 4s ease-in-out forwards; }
 .moewe-flug .moewe { position: static; width: 100%; animation: none; }
 @keyframes geschenkFlug { 0% { left: 105%; top: 15%; } 60% { left: 50%; top: 45%; } 70% { left: 47%; top: 47%; } 100% { left: -12%; top: 10%; } }
-.nacht-schicht { position: absolute; inset: 0; z-index: 7; pointer-events: none; background: #0b1d3a; mix-blend-mode: multiply; opacity: 0; transition: opacity 2.5s; }
-.insel-screen.nacht .nacht-schicht { opacity: 0.62; }
-.insel-screen.nacht .moewen { opacity: 0; transition: opacity 2s; }
-.schmuck.lampe::after { content: ''; position: absolute; left: 50%; top: 10%; width: 260%; aspect-ratio: 1; transform: translate(-50%, -30%); border-radius: 50%; z-index: 10; pointer-events: none;
-  background: radial-gradient(circle, rgba(255, 210, 120, 0.85), rgba(255, 180, 80, 0) 65%); opacity: 0; transition: opacity 2.5s; mix-blend-mode: screen; }
-.insel-screen.nacht .schmuck.lampe::after { opacity: 1; }
-.insel-screen.nacht .bau.gebaut::after { content: ''; position: absolute; left: 50%; top: 55%; width: 70%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; z-index: 10; pointer-events: none;
-  background: radial-gradient(circle, rgba(255, 200, 110, 0.55), rgba(255, 180, 80, 0) 65%); mix-blend-mode: screen; }
 .rauch { position: absolute; width: 18%; height: 40%; transform: translate(-50%, -100%); pointer-events: none; display: none; }
 .bau.mit-rauch .rauch { display: block; }
 .rauch span { position: absolute; bottom: 0; left: 30%; width: 50%; aspect-ratio: 1; border-radius: 50%; background: rgba(235, 230, 222, 0.7); animation: rauch 4.5s ease-out infinite; }
@@ -174,7 +166,6 @@
 .tier-delfin.zwei { animation-delay: -6s; }
 @keyframes delfin { 0%, 60%, 100% { opacity: 0; transform: translate(-50%, -60%) rotate(-30deg); }
   65% { opacity: 1; transform: translate(-30%, -140%) rotate(-10deg); } 72% { opacity: 1; transform: translate(-5%, -170%) rotate(15deg); } 79% { opacity: 1; transform: translate(20%, -100%) rotate(40deg); } 82% { opacity: 0; } }
-.insel-screen.nacht .tiere { opacity: 0.4; transition: opacity 2s; }
 .auftrag-titel { display: flex; align-items: center; gap: 8px; }
 .auftrag-bild { width: 34px; height: 34px; object-fit: contain; }
 @media (prefers-reduced-motion: reduce) { .tier, .tier img { animation: none !important; opacity: 1; } }
@@ -265,7 +256,7 @@ body.insel-seite .meldungen { top: calc(3vh * var(--ui, 1)); bottom: auto; flex-
 .rollen-leiste { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: -0.8vw; }
 .rolle-chip { display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; background: rgba(255, 250, 240, 0.92); border: 2px solid #b08a5a; font-size: clamp(15px, 1.1vw, 24px); }
 .rolle-zeichen { font-size: 1.2em; }
-.rollen-karten { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-self: stretch; }
+.rollen-karten { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; align-self: stretch; }
 .rollen-karte { padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
 .rollen-karte h3 { margin: 0; font-size: 22px; }
 .rollen-karte p { margin: 0; font-size: 15px; color: var(--tinte-hell); flex: 1; }
@@ -306,7 +297,7 @@ body.insel-seite .meldungen { top: calc(3vh * var(--ui, 1)); bottom: auto; flex-
 
 /* ---------- Stammesräte ---------- */
 .stamm-inhalt { position: relative; z-index: 2; flex: 1; min-height: 0; overflow-y: auto; padding: 1.4vw 2vw 2vw; display: flex; flex-direction: column; gap: 1.2vw; }
-.stamm-kopf { display: grid; grid-template-columns: 1fr auto; gap: 1.2vw; }
+.stamm-kopf { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1.2vw; }
 .stamm-thema, .stamm-code { padding: 12px 18px; }
 .stamm-frage { font-family: var(--titel); font-size: clamp(24px, 2.2vw, 44px); line-height: 1.15; }
 .stamm-code { text-align: center; display: flex; flex-direction: column; justify-content: center; max-width: 360px; }
@@ -318,7 +309,7 @@ body.insel-seite .meldungen { top: calc(3vh * var(--ui, 1)); bottom: auto; flex-
 .stamm-mitglied { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: clamp(15px, 1vw, 21px); }
 .stamm-mitglied .karten-kopf img, .stamm-mitglied .karten-kopf-leer { width: 34px; height: 34px; }
 .stamm-mitglied .karten-kopf b { font-size: clamp(20px, 1.4vw, 28px); }
-.stamm-rolle { color: var(--tinte-hell); white-space: nowrap; }
+.stamm-rolle { color: var(--tinte-hell); white-space: normal; overflow-wrap: anywhere; text-align: right; }
 .stamm-unten { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 10px 16px; border-radius: 14px; background: rgba(255, 250, 240, 0.94); color: var(--tinte); font-size: clamp(17px, 1.3vw, 26px); }
 @media (max-width: 900px) { .stamm-kopf { grid-template-columns: 1fr; } }
 .stamm-kopf { align-items: start; }
@@ -367,24 +358,6 @@ button.stamm-code { text-align: center; }
 .geschenk-fall img { width: 100%; display: block; }
 @keyframes geschenk-fall { from { transform: translateY(0) rotate(0); opacity: 1; } 80% { opacity: 1; } to { transform: translateY(22vh) rotate(18deg); opacity: 0; } }
 
-/* ---------- Nachtmodus: Wolken und Dunst passen sich an, Gebäude leuchten ---------- */
-.insel-screen.nacht .wolken span img { filter: brightness(0.38) saturate(0.45) hue-rotate(190deg); opacity: 0.55; transition: filter 2.5s, opacity 2.5s; }
-.wolken span img { transition: filter 2.5s, opacity 2.5s; }
-.insel-screen.nacht .rauch { opacity: 0.35; }
-.insel-screen.nacht .wellen { opacity: 0.35; }
-.licht-schicht { position: absolute; inset: 0; z-index: 8; pointer-events: none; opacity: 0; transition: opacity 2.5s; }
-.insel-screen.nacht .licht-schicht { opacity: 1; }
-.licht { position: absolute; transform: translate(-50%, -50%); aspect-ratio: 1; border-radius: 50%; mix-blend-mode: screen; }
-.licht.fensterlicht { background: radial-gradient(circle, rgba(255, 214, 130, 0.75) 0 8%, rgba(255, 190, 90, 0.35) 22%, rgba(255, 170, 70, 0) 62%); animation: fenster-flackern 4s ease-in-out infinite; }
-.licht.feuer { background: radial-gradient(circle, rgba(255, 230, 150, 0.95) 0 10%, rgba(255, 140, 40, 0.55) 30%, rgba(255, 110, 30, 0) 66%); animation: feuer-flackern 0.9s ease-in-out infinite alternate; }
-.licht.glut { background: radial-gradient(circle, rgba(255, 170, 80, 0.85) 0 9%, rgba(240, 90, 30, 0.45) 30%, rgba(220, 70, 20, 0) 64%); animation: feuer-flackern 1.6s ease-in-out infinite alternate; }
-.licht.laterne { background: radial-gradient(circle, rgba(255, 230, 160, 0.9) 0 7%, rgba(255, 200, 110, 0.35) 25%, rgba(255, 190, 90, 0) 60%); }
-.licht.leuchtfeuer { background: radial-gradient(circle, rgba(255, 250, 210, 1) 0 9%, rgba(255, 230, 150, 0.55) 26%, rgba(255, 220, 120, 0) 64%); animation: leuchtfeuer 3s ease-in-out infinite; }
-@keyframes fenster-flackern { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.7; } }
-@keyframes feuer-flackern { from { opacity: 0.75; transform: translate(-50%, -50%) scale(0.95); } to { opacity: 1; transform: translate(-50%, -50%) scale(1.06); } }
-@keyframes leuchtfeuer { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .licht { animation: none !important; } }
-
 /* Rollen-Symbole (Bild mit Ausweich-Zeichen) */
 .rollen-symbol { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; width: 1.4em; height: 1.4em; }
 .rollen-symbol img { width: 100%; height: 100%; object-fit: contain; }
@@ -395,19 +368,9 @@ button.stamm-code { text-align: center; }
 .tafel-kopf h2 { min-width: 0; flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tafel-kopf-knoepfe { flex: none; }
 .tafel { min-width: 270px; max-width: calc(100% - 4vw); }
-/* gemalte Nachtlichter */
-.licht-sprite { position: absolute; transform: translate(-50%, -50%); pointer-events: none; }
-.licht-sprite img { width: 100%; display: block; }
-.licht-sprite.kern { mix-blend-mode: screen; filter: blur(3px); opacity: 0.85; }
-.licht-sprite.kern.feuer { filter: blur(5px); opacity: 0.7; animation: feuer-flackern 0.9s ease-in-out infinite alternate; }
-.licht-sprite.kern.glut { filter: blur(4px); opacity: 0.8; animation: feuer-flackern 1.6s ease-in-out infinite alternate; }
-.licht-sprite.fackel, .licht-sprite.feuerstelle { transform: translate(-50%, -100%); filter: drop-shadow(0 0 10px rgba(255, 170, 70, 0.9)); }
-.licht-sprite.fackel img { animation: fenster-flackern 1.2s ease-in-out infinite; }
-@media (prefers-reduced-motion: reduce) { .licht-sprite, .licht-sprite img { animation: none !important; } }
-
 /* ---------- Zwergenrat: Klassenabstimmung über eine Streitfrage ---------- */
 .rat-inhalt.abstimmung { display: flex; flex-direction: column; gap: 1.4vw; overflow-y: auto; }
-.abstimm-seiten { display: grid; grid-template-columns: 1fr 1fr; gap: 2vw; }
+.abstimm-seiten { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2vw; }
 .abstimm-seite { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px; text-align: center; border-top: 10px solid #4f8a2a; }
 .abstimm-seite.contra { border-top-color: #b4532a; }
 .abstimm-seite h3 { margin: 0; font-size: clamp(26px, 2.6vw, 52px); }
@@ -430,3 +393,16 @@ button.stamm-code { text-align: center; }
 
 .abstimm-seite .seiten-marke .seiten-bild { width: clamp(40px, 3.6vw, 72px); height: clamp(40px, 3.6vw, 72px); }
 .abstimm-seite .seiten-marke { font-size: clamp(16px, 1.3vw, 26px); }
+
+/* Boardtexte dürfen in ihren Karten umbrechen. */
+.rat-inhalt > *, .stamm-inhalt > *, .stamm-karte, .stamm-mitglied > *,
+.abstimm-seite, .rolle-chip, .rollen-karte { min-width: 0; }
+.rat-frage, .stamm-frage, .stamm-karte h3, .abstimm-seite h3,
+.rollen-karte h3, .rolle-chip { overflow-wrap: anywhere; hyphens: auto; }
+.rat-frage { flex-shrink: 0; line-height: 1.2; }
+.rat .leiste { flex-wrap: wrap; }
+.rat .leiste .titel { min-width: 0; overflow-wrap: anywhere; }
+.rolle-chip { white-space: normal; }
+.rollen-symbol { flex-shrink: 0; }
+.stamm-mitglied { flex-wrap: wrap; }
+.stamm-mitglied .seiten-marke { flex-shrink: 0; }

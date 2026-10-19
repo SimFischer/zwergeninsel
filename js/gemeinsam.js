@@ -83,8 +83,6 @@
     zurueck: () => svg('<path d="M15 5 L8 12 L15 19"/>'),
     laterne: () => svg('<path d="M9 3 H15"/><path d="M12 3 V5"/><path d="M7 8 Q12 4 17 8 V17 Q12 21 7 17 Z"/><path d="M12 10 Q10 13 12 15 Q14 13 12 10 Z"/>'),
     haken: () => svg('<path d="M5 12.5 L10 17 L19 7"/>'),
-    ton: () => svg('<path d="M4 9 H8 L13 5 V19 L8 15 H4 Z"/><path d="M16.5 9.5 Q18 12 16.5 14.5"/>'),
-    stumm: () => svg('<path d="M4 9 H8 L13 5 V19 L8 15 H4 Z"/><path d="M17 9 L21 15 M21 9 L17 15"/>'),
     flamme: () => svg('<path d="M12 3 Q17 9 16 14 A4 4 0 0 1 8 14 Q8 11 10 9 Q10 12 12 12 Q11 8 12 3 Z"/>'),
     hammer: () => svg('<rect x="4" y="4" width="11" height="6" rx="1.5"/><path d="M10 10 L10 20"/>'),
     lupe: () => svg('<circle cx="10" cy="10" r="6"/><path d="M14.5 14.5 L20 20"/>'),
@@ -95,10 +93,8 @@
     stern: () => svg('<path d="M12 3 L14.6 9 L21 9.4 L16 13.6 L17.6 20 L12 16.6 L6.4 20 L8 13.6 L3 9.4 L9.4 9 Z"/>'),
     edelstein: () => svg('<path d="M7 4 H17 L21 9 L12 20 L3 9 Z"/><path d="M3 9 H21 M9 4 L12 9 L15 4"/>'),
     helm: () => svg('<path d="M4 15 Q4 6 12 6 Q20 6 20 15 Z"/><path d="M3 15 H21 M12 6 V3"/>'),
-    mond: () => svg('<path d="M20 14 A8 8 0 1 1 10 4 A6.5 6.5 0 0 0 20 14 Z"/>'),
     vollbild: () => svg('<path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/>'),
     vollbildAus: () => svg('<path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/>'),
-    musik: () => svg('<path d="M9 18 V6 L19 4 V16"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="16" r="2"/>'),
     album: () => svg('<circle cx="12" cy="9" r="5"/><path d="M9 13 L7 21 L12 18.5 L17 21 L15 13"/>'),
     buch: () => svg('<path d="M4 5 Q8 3 12 5 Q16 3 20 5 V19 Q16 17 12 19 Q8 17 4 19 Z"/><path d="M12 5 V19"/>'),
     schloss: () => svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11 V8 a4 4 0 0 1 8 0 V11"/>'),
@@ -185,43 +181,6 @@
     } catch (e) { /* egal */ }
   };
 
-  /* ---------- Klänge (ohne Dateien, mit Web Audio erzeugt) ---------- */
-  let ctx = null;
-  ZI.ton = {
-    an: ZI.speicher.lesen('zi-ton', true),
-    umschalten() { this.an = !this.an; ZI.speicher.schreiben('zi-ton', this.an); return this.an; },
-    ctx() {
-      if (!this.an) return null;
-      try {
-        if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-        if (ctx.state === 'suspended') ctx.resume();
-        return ctx;
-      } catch (e) { return null; }
-    },
-    klang(freq, dauer, typ, laut, start) {
-      const c = this.ctx(); if (!c) return;
-      const t = c.currentTime + (start || 0);
-      const o = c.createOscillator(); const g = c.createGain();
-      o.type = typ || 'sine'; o.frequency.setValueAtTime(freq, t);
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(laut || 0.2, t + 0.01);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + dauer);
-      o.connect(g).connect(c.destination); o.start(t); o.stop(t + dauer + 0.05);
-    },
-    amboss() {
-      const c = this.ctx(); if (!c) return;
-      [1320, 1980, 2640, 3520].forEach((f, i) => this.klang(f, 0.6 - i * 0.1, 'sine', 0.12 / (i + 1)));
-      const t = c.currentTime; const n = c.createBufferSource();
-      const buf = c.createBuffer(1, c.sampleRate * 0.08, c.sampleRate);
-      const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
-      n.buffer = buf; const g = c.createGain(); g.gain.value = 0.25; n.connect(g).connect(c.destination); n.start(t);
-    },
-    richtig() { [523, 659, 784].forEach((f, i) => this.klang(f, 0.25, 'triangle', 0.15, i * 0.09)); },
-    falsch() { this.klang(196, 0.25, 'triangle', 0.15); this.klang(165, 0.3, 'triangle', 0.12, 0.12); },
-    fanfare() { [523, 659, 784, 1047, 784, 1047].forEach((f, i) => this.klang(f, 0.3, 'triangle', 0.15, i * 0.12)); },
-    plopp() { this.klang(880, 0.12, 'sine', 0.15); },
-  };
-
   /* ---------- Kurze Meldung unten ---------- */
   /* Meldungen erscheinen in einem Stapel, damit sich gleichzeitige nicht überdecken */
   ZI.meldung = function (text, ms) {
@@ -281,7 +240,6 @@
         const w = Math.random() * Math.PI * 2, v = (2 + Math.random() * 5) * (W / 1400);
         teile.push({ x, y, vx: Math.cos(w) * v, vy: Math.sin(w) * v, life: 60 + Math.random() * 30, farbe });
       }
-      ZI.ton.klang(180 + Math.random() * 80, 0.4, 'sine', 0.08);
     }
     let zaehler = 0;
     (function schleife() {
@@ -299,36 +257,6 @@
       ctx.globalAlpha = 1;
       if (Date.now() < ende || teile.length) requestAnimationFrame(schleife); else c.remove();
     })();
-  };
-
-  /* ---------- Ruhige Schmiede-Melodie (Web Audio, standardmäßig aus) ---------- */
-  ZI.musik = {
-    an: false, timer: null, schritt: 0, naechste: 0,
-    noten: [0, 3, 5, 7, 10, 7, 5, 3, 0, 5, 7, 12, 10, 7, 5, 7], // Moll-Pentatonik
-    umschalten() { if (this.an) this.stop(); else this.start(); return this.an; },
-    start() {
-      const c = ZI.ton.ctx(); if (!c) return;
-      this.an = true; this.naechste = c.currentTime + 0.1; this.schritt = 0;
-      this.timer = setInterval(() => this.planen(), 120);
-    },
-    stop() { this.an = false; clearInterval(this.timer); this.timer = null; },
-    planen() {
-      const c = ZI.ton.ctx(); if (!c || !this.an) return;
-      const takt = 0.42;
-      while (this.naechste < c.currentTime + 0.4) {
-        const n = this.noten[this.schritt % this.noten.length];
-        const f = 220 * Math.pow(2, n / 12);
-        this.ton(c, f, this.naechste, 0.38, 0.035, 'triangle');
-        if (this.schritt % 4 === 0) this.ton(c, 110 * Math.pow(2, (this.schritt % 16 < 8 ? 0 : -2) / 12), this.naechste, 1.5, 0.03, 'sine');
-        this.naechste += takt; this.schritt++;
-      }
-    },
-    ton(c, f, t, d, laut, typ) {
-      const o = c.createOscillator(); const g = c.createGain();
-      o.type = typ; o.frequency.setValueAtTime(f, t);
-      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(laut, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
-      o.connect(g).connect(c.destination); o.start(t); o.stop(t + d + 0.05);
-    },
   };
 
   /* ---------- Funken sprühen lassen ---------- */

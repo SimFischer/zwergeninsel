@@ -2,7 +2,7 @@
    Beim Start werden Seiten, Code und Schriften gespeichert (gut 600 KB); die Bilder lädt die Seite danach
    gestaffelt nach. Danach läuft die App auch ohne WLAN.
    Nach jeder Änderung an der App die Versionsnummer erhöhen. */
-const VERSION = 'zwergeninsel-v29';
+const VERSION = 'zwergeninsel-v30';
 const KERN = [
   './', 'index.html', 'insel.html', 'karten.html', 'lehrkraft.html', 'manifest.webmanifest',
   'css/spiel.css', 'css/insel.css',

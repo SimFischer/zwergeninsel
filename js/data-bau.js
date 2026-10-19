@@ -371,7 +371,7 @@
     { name: 'Eisenhämmer', farbe: '#8a4b1c' }, { name: 'Funkenschläger', farbe: '#d9732f' },
     { name: 'Kristallgräber', farbe: '#3b7fa6' }, { name: 'Moosbärte', farbe: '#55812a' },
     { name: 'Felsenfäuste', farbe: '#6b5d52' }, { name: 'Goldadern', farbe: '#c89a2a' },
-    { name: 'Wellenreiter', farbe: '#2c8f8a' }, { name: 'Glutherzen', farbe: '#b03a3a' },
+    { name: 'Erzklopfer', farbe: '#2c8f8a' }, { name: 'Glutherzen', farbe: '#b03a3a' },
     { name: 'Sternenschmiede', farbe: '#6a4fa0' },
   ];
   /* Reihenfolge = Vergabe im Stamm. Bei drei Zwergen fällt die Wache weg (die Älteste übernimmt sie). */

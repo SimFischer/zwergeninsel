@@ -1,7 +1,7 @@
 /* Zwergeninsel – gemeinsames Aussehen für Schüler-App und Insel */
 
 :root {
-  --nacht: #1d140f;
+  --hintergrund-dunkel: #1d140f;
   --holz-dunkel: #3a2417;
   --holz: #6b4226;
   --holz-hell: #9a6a3e;
@@ -29,7 +29,7 @@ html, body { margin: 0; height: 100%; }
 /* iPad: kein Zoom durch Doppeltippen, kein Gummiband-Effekt beim Wischen */
 html { touch-action: manipulation; overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
 body {
-  background: var(--nacht);
+  background: var(--hintergrund-dunkel);
   color: var(--pergament);
   font-family: var(--schrift);
   font-size: 20px;
@@ -872,3 +872,10 @@ a.lk-kachel:active { transform: translateY(2px); }
 .stationen.stollen-wahl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 1500px) { .stationen.stollen-wahl { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .stationen.stollen-wahl { grid-template-columns: 1fr; } }
+
+/* Text und Status bleiben innerhalb der Stollenkarte. */
+.station { min-width: 0; }
+.station .st-text { flex: 1; min-width: 0; overflow-wrap: anywhere; hyphens: auto; }
+.station.gesperrt { padding-right: 44px; }
+.st-marke { max-width: 100%; white-space: normal; line-height: 1.3; }
+.st-marke-bild { flex-shrink: 0; }

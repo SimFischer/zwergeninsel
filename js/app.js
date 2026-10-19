@@ -12,11 +12,9 @@
   let aktStation = null;            // { k, art: 'kern' | 'tief' | 'bonus', i }
   let fehlerZaehler = 0;            // Fehler in der laufenden Station
   let kombo = 0;                    // richtige Antworten hintereinander
-  /* Jede richtige oder falsche Antwort läuft über diese Klänge – so zählen wir Kombo und Fehler mit */
-  const tonRichtig = ZI.ton.richtig.bind(ZI.ton);
-  const tonFalsch = ZI.ton.falsch.bind(ZI.ton);
-  ZI.ton.richtig = () => { kombo++; zeigeKombo(); tonRichtig(); };
-  ZI.ton.falsch = () => { fehlerZaehler++; kombo = 0; zeigeKombo(); tonFalsch(); };
+  /* Antworten zählen unabhängig von visuellen Effekten. */
+  function antwortRichtig() { kombo++; zeigeKombo(); }
+  function antwortFalsch() { fehlerZaehler++; kombo = 0; zeigeKombo(); }
   function zeigeKombo() {
     const el = document.querySelector('.kombo');
     const glut = document.querySelector('.glut-flackern');
@@ -138,7 +136,6 @@
       blase.textContent = st.sagt;
       if (st.zeigt) liste.appendChild(zeile(st.zeigt));
       knopf.textContent = n + 1 < v.schritte.length ? 'Weiter' : 'Jetzt du!';
-      ZI.ton.plopp();
     }
     knopf.addEventListener('click', () => {
       n++;
@@ -163,7 +160,7 @@
   function zeigeFreischaltungen(liste, danach) {
     if (!liste.length) { danach && danach(); return; }
     const z = ZI.ZWERGE.find((d) => d.nr === liste[0]);
-    ZI.ton.fanfare(); ZI.konfetti();
+    ZI.konfetti();
     const f = ZI.fenster([
       bild('truhe-offen', 'Offene Schatztruhe', 'truhe-klein'),
       h('h2', null, 'Neuer Zwerg freigeschaltet!'),
@@ -218,13 +215,12 @@
     const ov = h('div', { class: 'uebergang ue-' + art + (ruhig ? ' ruhig' : ''), 'aria-live': 'polite', role: 'status' },
       h('div', { class: 'ue-hg' }, bild(sz.hg, '')),
       h('div', { class: 'ue-dunkel' }),
-      sz.deko === 'laternen' || sz.deko === 'abstieg' ? [h('div', { class: 'ue-laterne links' }, bild(sz.deko === 'laternen' ? 'nacht-fackel' : 'laterne', '')), h('div', { class: 'ue-laterne rechts' }, bild(sz.deko === 'laternen' ? 'nacht-fackel' : 'laterne', ''))] : null,
-      sz.deko === 'feuer' ? h('div', { class: 'ue-feuer' }, bild('nacht-lagerfeuer', '')) : null,
+      sz.deko === 'laternen' || sz.deko === 'abstieg' ? [h('div', { class: 'ue-laterne links' }, bild('laterne', '')), h('div', { class: 'ue-laterne rechts' }, bild('laterne', ''))] : null,
+      sz.deko === 'feuer' ? h('div', { class: 'ue-feuer' }, bild('lagerfeuer', '')) : null,
       sz.deko === 'funken' ? h('div', { class: 'ue-funken' }, ...Array.from({ length: 14 }, (_, i) => h('span', { style: { left: (8 + i * 6.5) + '%', animationDelay: (i % 5) * 0.15 + 's' } }))) : null,
       h('div', { class: 'ue-figuren' }, ...figuren),
       h('div', { class: 'ue-text' }, text));
     document.body.append(ov);
-    ZI.ton.plopp();
     setTimeout(() => { danach && danach(); ov.classList.add('aus'); setTimeout(() => ov.remove(), 400); }, dauer);
   }
 
@@ -250,11 +246,6 @@
     if (!kannVollbild) return null;
     return h('button', { class: 'rund vollbild-knopf' + (extra ? ' ' + extra : ''), 'aria-label': imVollbild() ? 'Vollbild beenden' : 'Vollbild', title: 'Vollbild', onclick: vollbildUmschalten },
       imVollbild() ? icon.vollbildAus() : icon.vollbild());
-  }
-  function tonKnopf() {
-    const b = h('button', { class: 'rund', 'aria-label': 'Ton an oder aus' }, ZI.ton.an ? icon.ton() : icon.stumm());
-    b.addEventListener('click', () => { const an = ZI.ton.umschalten(); ZI.setze(b, an ? icon.ton() : icon.stumm()); });
-    return [vollbildKnopf(), b];
   }
   function zaehler(datei, name, wert) {
     return h('div', { class: 'zaehler', 'aria-label': name + ': ' + wert }, bild(datei, name), String(wert));
@@ -359,8 +350,8 @@
         frei ? h('div', { class: 'rolle' }, z.rolle) : h('div', { class: 'bedingung' }, z.bedingung),
         frei ? null : h('div', { class: 'schloss', style: { color: 'var(--tinte)' } }, icon.schloss()));
       karte.addEventListener('click', () => {
-        if (!frei) { ZI.meldung(z.bedingung); ZI.ton.falsch(); return; }
-        gewaehlt = z.nr; ZI.ton.plopp();
+        if (!frei) { ZI.meldung(z.bedingung); antwortFalsch(); return; }
+        gewaehlt = z.nr;
         karten.forEach((k) => k.classList.remove('gewaehlt'));
         karte.classList.add('gewaehlt');
         weiterKnopf.disabled = false;
@@ -407,12 +398,12 @@
     const pruefen = () => {
       const s = ZI.Stand.ausCode(eingabe.value);
       if (!s) {
-        ZI.ton.falsch();
+        antwortFalsch();
         hinweis.style.display = '';
         hinweis.textContent = 'Dieser Code stimmt nicht. Prüfe jedes Zeichen. Im Zwergenpass gibt es keine 0, 1, I oder O.';
         return;
       }
-      stand = s; speichern(); ZI.ton.richtig();
+      stand = s; speichern(); antwortRichtig();
       const z = aktuellerZwerg();
       const f = ZI.fenster([
         h('div', { class: 'gross-bild' }, bild(z.datei, z.name)),
@@ -545,6 +536,7 @@
 
   /* Stollen betreten: n = Tiefe (1 = Grundstufe) */
   function betreteStation(def, k, art, idx, n) {
+    if (def.gemeinschaft && !stand.gemeinschaftOffen(k)) { ZI.meldung('Schaffe zwei andere Stollen bis Tiefe 2.'); return; }
     n = n || 1;
     K = k; letzterReiter = k; aktStation = { k, art, i: idx, n };
     const stollen = art === 'stollen';
@@ -601,10 +593,10 @@
       const tiefe = stollen ? stand.tiefe(k, idx) : 0;
       const max = stollen ? ZI.Stand.maxTiefe(idx) : 0;
       const krone = stollen && stand.hatKrone(k, idx);
-      const b = h('button', { class: 'station' + (geschafft ? ' geschafft' : '') + (gesperrt ? ' gesperrt' : '') + (krone ? ' gekroent' : '') },
+      const b = h('button', { 'aria-disabled': String(!!gesperrt), class: 'station' + (geschafft ? ' geschafft' : '') + (gesperrt ? ' gesperrt' : '') + (krone ? ' gekroent' : '') },
         krone ? h('div', { class: 'krone-marke', 'aria-label': 'Tiefen-Krone: ganz unten angekommen' }, ZI.bildOder(['tiefe-krone', 'krone'], 'Tiefen-Krone', icon.krone())) : null,
         h('div', { class: 'icon' }, bild(def.icon, def.name)),
-        h('div', null,
+        h('div', { class: 'st-text' },
           def.gemeinschaft ? h('div', { class: 'st-marke gemeinschaft' }, h('span', { class: 'st-marke-bild', 'aria-hidden': 'true' }, bild('gemeinschaftsstollen-icon', '')), 'Gemeinschaftsstollen') : def.zuZweit ? h('div', { class: 'st-marke' }, 'Zu zweit') : null,
           h('div', { class: 'st-name' }, (i !== undefined ? i + 1 + '. ' : '') + def.name),
           h('div', { class: 'st-info' }, gesperrt ? sperrText : def.info),
@@ -614,7 +606,7 @@
         geschafft ? h('div', { class: 'haken' }, icon.haken()) : null,
         gesperrt ? h('div', { class: 'schloss', style: { top: '8px', right: '8px', width: '28px', height: '28px' } }, icon.schloss()) : null);
       b.addEventListener('click', () => {
-        if (gesperrt) { ZI.meldung(sperrText); ZI.ton.falsch(); return; }
+        if (gesperrt) { ZI.meldung(sperrText); antwortFalsch(); return; }
         if (stollen && tiefe >= 1) { stufeWaehlen(def, k, idx); return; }
         betreteStation(def, k, art, idx, 1);
       });
@@ -642,7 +634,7 @@
         h('section', { class: 'pergament stollen auf-pergament' },
           h('h2', null, 'Stollen'),
           h('p', { class: 'erklaer' }, 'Wähle einen Stollen. Jeder Hauptstollen bringt Baumaterial für unser Dorf. Wer einen Stollen geschafft hat, darf dort freiwillig noch tiefer graben.'),
-          h('div', { class: 'stationen stollen-wahl' }, inh.stollen.map((d, i) => stationKarte(d, k, stand.tiefe(k, i) >= 1, false, '',
+          h('div', { class: 'stationen stollen-wahl' }, inh.stollen.map((d, i) => stationKarte(d, k, stand.tiefe(k, i) >= 1, d.gemeinschaft && !stand.gemeinschaftOffen(k), 'Schaffe zwei andere Stollen bis Tiefe 2.',
             i < GEM ? i : undefined, i < GEM ? ROHSTOFF[i].name : ZI.GEMS_PRO_STOLLEN + ' Edelsteine', 'stollen', i)))),
         gebaeudeStollen(k),
         h('section', { class: 'pergament stollen auf-pergament' },
@@ -715,8 +707,7 @@
         h('div', { class: 'rohstoff-reihe' }, ...rohstoffe, zaehler('edelstein', 'Edelsteine', stand.gems())),
         h('button', { class: 'rund', 'aria-label': 'Zwergen-Wissensbuch öffnen', onclick: zeigeWissensbuch }, icon.buch()),
         h('button', { class: 'rund', 'aria-label': 'Abzeichen-Album öffnen', onclick: zeigeAlbum }, icon.album()),
-        musikKnopf(),
-        tonKnopf(),
+        vollbildKnopf(),
         h('button', { class: 'knopf', onclick: zeigeLieferung }, 'Lieferung')),
       h('div', { class: 'screen-scroll', style: { position: 'relative', zIndex: 2 } }, inhalt)));
 
@@ -775,7 +766,6 @@
         hammer.classList.remove('schlag'); void hammer.offsetWidth;
         hammer.classList.add('schlag');
         setTimeout(() => {
-          ZI.ton.amboss();
           const r = platz.getBoundingClientRect();
           ZI.funken(platz, r.width / 2, r.height * 0.45, 22);
           const b = h('div', { class: 'blitz' }); platz.appendChild(b); setTimeout(() => b.remove(), 520);
@@ -800,7 +790,7 @@
         h('div', null, h('div', { class: 'titel' }, titel), pips),
         h('div', { class: 'spacer' }),
         h('div', { class: 'kombo', hidden: true, 'aria-live': 'polite' }),
-        tonKnopf()),
+        vollbildKnopf()),
       h('div', { class: 'spiel' }, aufgabe, bue.el));
     zeige(screen);
     return { fortschritt: setze };
@@ -815,7 +805,6 @@
   /* Station oder Stollen geschafft */
   function geschafft({ titel, text, datei, alt, eintragen }) {
     if (document.querySelector('.fenster.geschafft-fenster')) return; // schon offen (z. B. Doppeltippen)
-    ZI.ton.fanfare();
     ZI.konfetti();
     const st = aktStation;
     const z = aktuellerZwerg();
@@ -869,7 +858,7 @@
   function zeigeErfolge(neuerRang, abzeichen, seiten, danach) {
     seiten = seiten || [];
     if (!neuerRang && !abzeichen.length && !seiten.length) { danach && danach(); return; }
-    if (neuerRang || abzeichen.length) { ZI.ton.fanfare(); ZI.konfetti(120); }
+    if (neuerRang || abzeichen.length) { ZI.konfetti(120); }
     const f = ZI.fenster([
       seiten.length ? h('div', { class: 'belohnung-seiten' },
         h('h2', { style: { fontSize: '26px' } }, seiten.length === 1 ? 'Neue Seite im Wissensbuch!' : seiten.length + ' neue Seiten im Wissensbuch!'),
@@ -908,11 +897,6 @@
             h('h2', null, 'Abzeichen'),
             h('div', { class: 'medaillen' }, ZI.ABZEICHEN.map((a) => medaille(a, frei.includes(a)))))))));
   }
-  function musikKnopf() {
-    const b = h('button', { class: 'rund' + (ZI.musik.an ? ' gold' : ''), 'aria-label': 'Musik an oder aus', 'aria-pressed': String(ZI.musik.an) }, icon.musik());
-    b.addEventListener('click', () => { const an = ZI.musik.umschalten(); b.classList.toggle('gold', an); b.setAttribute('aria-pressed', String(an)); });
-    return b;
-  }
 
   /* =========================================================
      Auswahlspiel: eine richtige Antwort aus mehreren
@@ -948,7 +932,7 @@
           if (o.ok) {
             geloest = true;
             b.classList.add('richtig');
-            ZI.ton.richtig();
+            antwortRichtig();
             const lob = zufall(ZI.LOB);
             ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, h('b', null, lob + ' '), o.info || ''));
             bue.sage(lob, 'jubelt');
@@ -961,7 +945,7 @@
           } else {
             fehler++;
             b.classList.remove('falsch'); void b.offsetWidth; b.classList.add('falsch');
-            ZI.ton.falsch();
+            antwortFalsch();
             ZI.setze(rueck, h('div', { class: 'rueckmeldung schlecht' }, o.info || zufall(ZI.TROST)));
             bue.sage(boss ? 'Der Kobold kichert! Lass dich nicht ärgern – versuch es noch einmal.' : (L && L.wachsen ? 'Hm, das überzeugt noch nicht. Versuch es anders.' : zufall(ZI.TROST)), 'ermutigt');
             setTimeout(() => b.classList.add('weg'), 450);
@@ -983,8 +967,8 @@
           const b = h('button', { class: 'option' }, w.text);
           b.addEventListener('click', () => {
             if (b.classList.contains('weg') || weiter.style.display === '') return;
-            if (w.ok) { b.classList.add('richtig'); ZI.ton.richtig(); ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, h('b', null, 'Gut begründet! '), 'So kannst du dein Urteil auch im Gespräch erklären.')); knoepfe.forEach((x) => { if (x !== b) x.classList.add('weg'); }); weiter.style.display = ''; }
-            else { ZI.ton.falsch(); b.classList.add('falsch'); setTimeout(() => b.classList.add('weg'), 450); ZI.setze(rueck, h('div', { class: 'rueckmeldung schlecht' }, 'Das ist kein guter Grund. Frag dich: Was macht die Antwort inhaltlich besser?')); }
+            if (w.ok) { b.classList.add('richtig'); antwortRichtig(); ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, h('b', null, 'Gut begründet! '), 'So kannst du dein Urteil auch im Gespräch erklären.')); knoepfe.forEach((x) => { if (x !== b) x.classList.add('weg'); }); weiter.style.display = ''; }
+            else { antwortFalsch(); b.classList.add('falsch'); setTimeout(() => b.classList.add('weg'), 450); ZI.setze(rueck, h('div', { class: 'rueckmeldung schlecht' }, 'Das ist kein guter Grund. Frag dich: Was macht die Antwort inhaltlich besser?')); }
           });
           return b;
         });
@@ -1230,7 +1214,7 @@
         const karte = karteBox.firstChild;
         if (alsJa === g.ja) {
           sperre = true;
-          ZI.ton.richtig();
+          antwortRichtig();
           ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, g.info));
           bue.sage(zufall(ZI.LOB), 'jubelt');
           koerbe.appendChild(h('span', { class: 'marke' + (g.ja ? '' : ' grau') }, (g.ja ? jaText : neinText) + ': ' + g.text.replace('… ', '').slice(0, 60) + (g.text.length > 62 ? '…' : '')));
@@ -1246,7 +1230,7 @@
               r < runden.length ? 'Weiter' : 'Fertig!'));
           }, 900);
         } else {
-          ZI.ton.falsch();
+          antwortFalsch();
           karte.style.animation = 'wackeln 0.4s';
           setTimeout(() => { karte.style.animation = ''; }, 420);
           ZI.setze(rueck, h('div', { class: 'rueckmeldung schlecht' }, g.info));
@@ -1342,12 +1326,12 @@
       });
 
       function zeichne(markiereVerb) {
-        ZI.setze(zeile, 
+        ZI.setze(zeile,
           h('div', { class: 'platte fest' }, it.haupt),
           h('div', { class: 'platte bindewort' }, it.bindewort),
           ...gelegt.map((w, i) => {
             const b = h('button', { class: 'platte' + (markiereVerb && w === it.verb ? ' verb-markiert' : '') }, w);
-            b.addEventListener('click', () => { if (fertig) return; gelegt.splice(i, 1); vorrat.push(w); ZI.ton.plopp(); ZI.setze(rueck, ); zeichne(); });
+            b.addEventListener('click', () => { if (fertig) return; gelegt.splice(i, 1); vorrat.push(w); ZI.setze(rueck, ); zeichne(); });
             return b;
           }),
           ...vorrat.map(() => h('div', { class: 'platte leer', 'aria-hidden': 'true' })),
@@ -1356,7 +1340,7 @@
           const b = h('button', { class: 'platte' }, w);
           b.addEventListener('click', () => {
             if (fertig) return;
-            vorrat.splice(i, 1); gelegt.push(w); ZI.ton.plopp(); zeichne();
+            vorrat.splice(i, 1); gelegt.push(w); zeichne();
             if (!vorrat.length) pruefen();
           });
           return b;
@@ -1368,7 +1352,7 @@
         const ok = it.loesungen.some((l) => l.join('|') === gelegt.join('|'));
         if (ok) {
           fertig = true;
-          ZI.ton.richtig();
+          antwortRichtig();
           const satz = it.haupt + ' ' + it.bindewort + ' ' + gelegt.join(' ') + punkt;
           ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, h('b', null, zufall(ZI.LOB) + ' '), satz));
           bue.sage(it.bindewort === 'denn' ? 'Richtig: Nach „denn“ steht das Verb an zweiter Stelle.' : 'Richtig: Nach „' + it.bindewort + '“ steht das Verb am Ende.', 'jubelt');
@@ -1384,7 +1368,7 @@
           return;
         }
         fehler++;
-        ZI.ton.falsch();
+        antwortFalsch();
         const pos = gelegt.indexOf(it.verb);
         let text;
         if (it.bindewort === 'denn' && pos !== 1) text = 'Nach „denn“ kommt ein ganz normaler Satz: Das Verb „' + it.verb.replace('.', '') + '“ steht an zweiter Stelle.';
@@ -1405,7 +1389,7 @@
         zeichne(!schwer);
       }
 
-      ZI.setze(box, 
+      ZI.setze(box,
         aufgabenKopf('Bau den Begründungssatz. Tippe die Bausteine in der richtigen Reihenfolge an.', schwer ? null : ZI.TIPPS.weil, bue),
         zeile, vorratBox, rueck, weiter);
       zeichne();
@@ -1473,7 +1457,7 @@
     /* 2) Rolle wählen */
     function rolleWaehlen() {
       bue.sage('Macht aus, wer zuerst spricht.', 'erklaert');
-      const karte = (r, kopf, text) => h('button', { class: 'gem-rolle pergament auf-pergament', onclick: () => { rolle = r; ZI.ton.plopp(); zusammen(); } },
+      const karte = (r, kopf, text) => h('button', { class: 'gem-rolle pergament auf-pergament', onclick: () => { rolle = r; zusammen(); } },
         h('span', { class: 'gem-rolle-buchstabe' }, r), h('b', null, kopf), h('span', null, text));
       ZI.setze(box,
         kopfZeile('Wer bist du?', 'marke'),
@@ -1530,7 +1514,7 @@
       ZI.setze(box,
         kopfZeile('Du sprichst' + zaehler, 'sprechen'),
         aufgabenKopf('Wähle ein Thema.', tippText, bue),
-        h('div', { class: 'themen' }, angebot.map((t) => h('button', { class: 'option', onclick: () => { genutzt.add(t.frage); ZI.ton.plopp(); seite(t, nr, zaehler); } }, t.frage))));
+        h('div', { class: 'themen' }, angebot.map((t) => h('button', { class: 'option', onclick: () => { genutzt.add(t.frage); seite(t, nr, zaehler); } }, t.frage))));
     }
     function seite(thema, nr, zaehler) {
       ZI.setze(box,
@@ -1565,7 +1549,7 @@
         h('p', { class: 'gem-text' }, 'Dein Partner prüft auf seinem iPad. Was sagt er?'),
         h('div', { class: 'knopf-reihe', style: { justifyContent: 'flex-end' } },
           h('button', { class: 'knopf holz', onclick: () => sagen(satz, zaehler) }, 'Noch einmal sagen'),
-          h('button', { class: 'knopf', onclick: (e) => { e.currentTarget.disabled = true; erledigt++; ZI.ton.richtig(); weiter(); } }, 'Mein Partner sagt: geschafft!')));
+          h('button', { class: 'knopf', onclick: (e) => { e.currentTarget.disabled = true; erledigt++; antwortRichtig(); weiter(); } }, 'Mein Partner sagt: geschafft!')));
     }
 
     /* Prüfen: zuhören und Kriterien abhaken */
@@ -1577,7 +1561,7 @@
       const rueck = h('div');
       function zeichne() {
         ZI.setze(liste, ...kriterien.map((p, i) => h('button', { class: 'check' + (an[i] ? ' an' : ''), 'aria-pressed': String(an[i]),
-          onclick: () => { an[i] = !an[i]; ZI.ton.plopp(); zeichne(); } }, h('span', { class: 'kasten' }, an[i] ? icon.haken() : null), p)));
+          onclick: () => { an[i] = !an[i]; zeichne(); } }, h('span', { class: 'kasten' }, an[i] ? icon.haken() : null), p)));
       }
       zeichne();
       let geprueft = false; // nach dem Prüfen wird derselbe Knopf zu „Weiter“ – nur einmal zählen
@@ -1585,12 +1569,12 @@
         if (geprueft) { fertig.disabled = true; weiter(); return; }
         if (an.every(Boolean)) {
           geprueft = true;
-          ZI.ton.richtig(); bue.schlag(() => bue.werkstueck('axt-scharf'));
+          antwortRichtig(); bue.schlag(() => bue.werkstueck('axt-scharf'));
           erledigt++;
           ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, 'Super! Sag deinem Partner: „Geschafft!“'));
           fertig.textContent = 'Weiter';
         } else {
-          ZI.ton.falsch();
+          antwortFalsch();
           ZI.setze(rueck, h('div', { class: 'rueckmeldung tipp' }, 'Sag freundlich, was gefehlt hat: „Mir hat noch … gefehlt.“ Dann versucht ihr es noch einmal.'));
           an.fill(false); zeichne();
         }
@@ -1631,13 +1615,13 @@
       b.addEventListener('click', () => {
         if (geloest || b.classList.contains('weg')) return;
         if (o.ok) {
-          geloest = true; b.classList.add('richtig'); ZI.ton.richtig();
+          geloest = true; b.classList.add('richtig'); antwortRichtig();
           els.forEach((x) => { if (x !== b) x.classList.add('weg'); });
           fertig(o);
         } else {
           fehler++;
           b.classList.remove('falsch'); void b.offsetWidth; b.classList.add('falsch');
-          ZI.ton.falsch();
+          antwortFalsch();
           ZI.setze(rueck, h('div', { class: 'rueckmeldung schlecht' }, o.info || falschText || zufall(ZI.TROST)));
           bue.sage(zufall(ZI.TROST), 'ermutigt');
           setTimeout(() => b.classList.add('weg'), 450);
@@ -1736,14 +1720,14 @@
         bue.sage('Sag deinem Partner, was du gehört hast.', 'erklaert');
         ZI.setze(bereich, h('div', { class: 'sprechblase-gross' }, '„Du hast gesagt, dass …, weil …“'),
           h('p', { class: 'gem-text' }, 'Sag es mit eigenen Worten. Dein Partner hört zu und sagt, ob es stimmt.'),
-          h('button', { class: 'knopf', style: { alignSelf: 'flex-end' }, onclick: () => { ZI.ton.richtig(); frage(); } }, 'Partner: Das stimmt!'));
+          h('button', { class: 'knopf', style: { alignSelf: 'flex-end' }, onclick: () => { antwortRichtig(); frage(); } }, 'Partner: Das stimmt!'));
       }
       // Tiefe 4+: zum Schluss auf das Gehörte antworten
       function antwort() {
         bue.sage('Jetzt antwortest du deinem Partner.', 'erklaert');
         ZI.setze(bereich, h('div', { class: 'sprechblase-gross' }, '„Ja, und außerdem …“  oder  „Ja, aber …, weil …“'),
           h('p', { class: 'gem-text' }, 'Antworte deinem Partner laut auf das Argument – mit einem Grund.'),
-          h('button', { class: 'knopf', style: { alignSelf: 'flex-end' }, onclick: () => { ZI.ton.richtig(); bue.schlag(() => bue.werkstueck('eisen-gluehend')); ZI.setze(bereich); weiter.style.display = ''; } }, 'Ich habe geantwortet'));
+          h('button', { class: 'knopf', style: { alignSelf: 'flex-end' }, onclick: () => { antwortRichtig(); bue.schlag(() => bue.werkstueck('eisen-gluehend')); ZI.setze(bereich); weiter.style.display = ''; } }, 'Ich habe geantwortet'));
       }
       function frage() {
         const f = it.fragen[q];
@@ -1796,21 +1780,21 @@
           return h('button', { class: kl, 'aria-pressed': String(an), onclick: () => {
             if (fertig) return;
             if (an) gewaehlt.delete(i); else if (gewaehlt.size < 2) gewaehlt.add(i); else { ZI.meldung('Wähle genau zwei Stützen.'); return; }
-            ZI.ton.plopp(); pruefKnopf.disabled = gewaehlt.size !== 2; zeichne();
+            pruefKnopf.disabled = gewaehlt.size !== 2; zeichne();
           } }, h('span', { class: 'kasten' }, an || (markiereLoesung && k.ok) ? icon.haken() : null), k.text);
         }));
       }
       pruefKnopf.addEventListener('click', () => {
         const falsche = [...gewaehlt].filter((i) => !karten[i].ok);
         if (!falsche.length) {
-          fertig = true; ZI.ton.richtig();
+          fertig = true; antwortRichtig();
           ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, h('b', null, zufall(ZI.LOB) + ' '), 'Beide Sätze stützen das Hauptargument und bauen darauf auf.'));
           bue.sage('Die Kette hält! So wird ein Argument richtig stark.', 'jubelt');
           bue.schlag(() => bue.werkstueck('eisen-gluehend'));
           pruefKnopf.style.display = 'none'; weiter.style.display = '';
           return;
         }
-        versuche++; ZI.ton.falsch();
+        versuche++; antwortFalsch();
         ZI.setze(rueck, h('div', { class: 'rueckmeldung schlecht' }, falsche.map((i) => h('div', null, '„' + karten[i].text + '“ – ' + karten[i].info))));
         falsche.forEach((i) => gewaehlt.delete(i));
         pruefKnopf.disabled = true;
@@ -1926,8 +1910,8 @@
     function bewerte(art) {
       clearTimeout(timer);
       zustand = 'vorbei'; knopf.disabled = true;
-      if (art === 'glatt') { treffer++; punktEl.textContent = String(treffer); ZI.ton.richtig(); ZI.setze(ergebnis, h('div', { class: 'rueckmeldung gut' }, h('b', null, 'Glatter Wechsel! '), 'Du hast gewartet, bis der Satz zu Ende war.')); }
-      else if (art === 'frueh') { ZI.ton.falsch(); ZI.setze(ergebnis, h('div', { class: 'rueckmeldung schlecht' }, h('b', null, 'Unterbrochen! '), 'Der Satz war noch nicht fertig.')); }
+      if (art === 'glatt') { treffer++; punktEl.textContent = String(treffer); antwortRichtig(); ZI.setze(ergebnis, h('div', { class: 'rueckmeldung gut' }, h('b', null, 'Glatter Wechsel! '), 'Du hast gewartet, bis der Satz zu Ende war.')); }
+      else if (art === 'frueh') { antwortFalsch(); ZI.setze(ergebnis, h('div', { class: 'rueckmeldung schlecht' }, h('b', null, 'Unterbrochen! '), 'Der Satz war noch nicht fertig.')); }
       else { ZI.setze(ergebnis, h('div', { class: 'rueckmeldung tipp' }, h('b', null, 'Zu lange gewartet. '), 'Das Gespräch ist ins Stocken geraten.')); }
       nr++;
       setTimeout(() => { if (laeuft) runde(); }, 2600);
@@ -1942,7 +1926,6 @@
       laeuft = false;
       const sterne = treffer >= 9 ? 3 : treffer >= 7 ? 2 : treffer >= 5 ? 1 : 0;
       const vorher = stand.bonus[K];
-      ZI.ton.fanfare();
       const f = ZI.fenster([
         h('div', { class: 'gross-bild strahlen' }, bild('stern', 'Stern')),
         h('h2', null, treffer + ' von ' + saetze.length + ' glatten Wechseln!'),
@@ -1958,7 +1941,7 @@
       h('div', { class: 'leiste' },
         h('button', { class: 'rund', 'aria-label': 'Zurück zur Halle', onclick: () => { laeuft = false; clearTimeout(timer); zeigeHalle(); } }, icon.zurueck()),
         h('div', { class: 'titel' }, 'Sprecherwechsel'),
-        h('div', { class: 'spacer' }), zaehlerEl, h('div', { class: 'zaehler', 'aria-label': 'Glatte Wechsel' }, bild('stern', 'Punkte'), punktEl), tonKnopf()),
+        h('div', { class: 'spacer' }), zaehlerEl, h('div', { class: 'zaehler', 'aria-label': 'Glatte Wechsel' }, bild('stern', 'Punkte'), punktEl), vollbildKnopf()),
       h('div', { class: 'sw-buehne' }, h('div', { class: 'sw-reihe' }, sprecherBild, blase), ergebnis, knopf)));
 
     const f = ZI.fenster([
@@ -2007,12 +1990,12 @@
         b.dataset.weg = '1';
         const r = b.getBoundingClientRect(); const a = arena.getBoundingClientRect();
         if (scharf) {
-          punkte++; ZI.ton.plopp();
+          punkte++;
           ZI.funken(arena, r.left - a.left + r.width / 2, r.top - a.top + r.height / 2, 12);
           b.style.top = (r.top - a.top) + 'px'; b.style.transform = 'none';
           b.classList.add('gefangen');
         } else {
-          punkte = Math.max(0, punkte - 1); ZI.ton.falsch();
+          punkte = Math.max(0, punkte - 1); antwortFalsch();
           b.style.top = (r.top - a.top) + 'px'; b.style.transform = 'none';
           b.classList.add('zisch');
         }
@@ -2052,7 +2035,6 @@
       arena.querySelectorAll('.spark').forEach((s) => s.remove());
       const sterne = punkte >= 14 ? 3 : punkte >= 10 ? 2 : punkte >= 6 ? 1 : 0;
       const vorher = stand.bonus[K];
-      ZI.ton.fanfare();
       const f = ZI.fenster([
         h('div', { class: 'gross-bild strahlen' }, bild('stern', 'Stern')),
         h('h2', null, punkte + ' Funken gefangen!'),
@@ -2068,7 +2050,7 @@
       h('div', { class: 'leiste' },
         h('button', { class: 'rund', 'aria-label': 'Zurück zur Halle', onclick: () => { laeuft = false; clearInterval(timer); clearTimeout(spawner); zeigeHalle(); } }, icon.zurueck()),
         h('div', { class: 'titel' }, titel),
-        h('div', { class: 'spacer' }), h('div', { class: 'zaehler', 'aria-label': 'Punkte' }, bild('stern', 'Punkte'), punktEl), zeitEl, tonKnopf()),
+        h('div', { class: 'spacer' }), h('div', { class: 'zaehler', 'aria-label': 'Punkte' }, bild('stern', 'Punkte'), punktEl), zeitEl, vollbildKnopf()),
       arena));
 
     const f = ZI.fenster([
@@ -2113,7 +2095,7 @@
           h('div', { class: 'rueckblick-text' }, it.text),
           h('div', { class: 'rueckblick-wahl', role: 'radiogroup', 'aria-label': it.text },
             ZI.EINSCHAETZUNG.map((e) => h('button', { class: 'einschaetzung ' + e.klasse + (w === e.wert ? ' gewaehlt' : ''), role: 'radio', 'aria-checked': String(w === e.wert),
-              onclick: () => { werte[key] = e.wert; sitzung.schreiben(rueckblickSpeicher(), werte); ZI.ton.plopp(); zeichne(); } }, e.text))),
+              onclick: () => { werte[key] = e.wert; sitzung.schreiben(rueckblickSpeicher(), werte); zeichne(); } }, e.text))),
           w && w < 3 ? h('div', { class: 'rueckblick-tipp' },
             h('span', null, w === 1 ? 'Übe noch einmal: ' : 'Zum Festigen: ', h('b', null, '„' + def.name + '“')),
             offen ? h('button', { class: 'knopf klein', onclick: () => starteUebung(k, it.uebung) }, 'Jetzt üben') : null) : null);
@@ -2185,7 +2167,7 @@
       const alt = ZI.KAPITEL.findIndex((kap) => kap.runenwort && kap.runenwort === roh);
       const b = ZI.botschaft.lese(roh);
       if (!b && alt < 0) {
-        ZI.ton.falsch();
+        antwortFalsch();
         ZI.setze(hinweis, h('div', { class: 'rueckmeldung schlecht' }, 'Diese Botschaft stimmt nicht. Schau genau aufs Board: drei Silben, zum Beispiel „BO KA MI“.'));
         return;
       }
@@ -2193,7 +2175,6 @@
       if (b) sitzung.schreiben('zi-botschaft', { wort: roh, kapitel: b.kapitel, bau: b.bau, zeit: Date.now() });
       f.schliessen();
       const neuKapitel = kapitel > stand.offen && ZI.KAPITEL[kapitel] && ZI.KAPITEL[kapitel].fertig;
-      ZI.ton.fanfare();
       const gebaut = b ? ZI.BAU_UEBUNGEN.filter((u) => b.bau & (1 << u.bit)) : [];
       const fertig = () => {
         if (neuKapitel) { letzterReiter = kapitel; ZI.meldung('Kapitel ' + ZI.KAPITEL[kapitel].nr + ' ist offen!', 3500); }
@@ -2224,11 +2205,11 @@
     const pruefen = () => {
       const roh = eingabe.value.trim().toUpperCase().replace(/[^A-Z]/g, '');
       const c = ZI.stammescode.lese(roh);
-      if (!c) { ZI.ton.falsch(); ZI.setze(hinweis, h('div', { class: 'rueckmeldung schlecht' }, 'Dieser Stammescode stimmt nicht. Er steht am Board bei den Stammesräten.')); return; }
-      if (!stand.karte || stand.karte > c.n) { ZI.ton.falsch(); ZI.setze(hinweis, h('div', { class: 'rueckmeldung schlecht' }, 'Deine Kartennummer kommt in diesem Rat nicht vor. Frag deine Lehrkraft.')); return; }
+      if (!c) { antwortFalsch(); ZI.setze(hinweis, h('div', { class: 'rueckmeldung schlecht' }, 'Dieser Stammescode stimmt nicht. Er steht am Board bei den Stammesräten.')); return; }
+      if (!stand.karte || stand.karte > c.n) { antwortFalsch(); ZI.setze(hinweis, h('div', { class: 'rueckmeldung schlecht' }, 'Deine Kartennummer kommt in diesem Rat nicht vor. Frag deine Lehrkraft.')); return; }
       const daten = { wort: roh, ...c, zeit: Date.now() };
       sitzung.schreiben('zi-stamm', daten);
-      f.schliessen(); ZI.ton.fanfare();
+      f.schliessen();
       uebergang('rat', 'Dein Stamm trifft sich am Feuer.', () => zeigeStammesrat(daten));
     };
     eingabe.addEventListener('keydown', (e) => { if (e.key === 'Enter') pruefen(); });
@@ -2257,7 +2238,7 @@
     const tafel = sitzung.lesen(tafelKey, ['', '', '']);
     schritt = schritt || c.schritt || 1;
     c.schritt = schritt; sitzung.schreiben('zi-stamm', c);
-    const geh = (n) => { ZI.ton.plopp(); zeigeStammesrat(c, n); };
+    const geh = (n) => { zeigeStammesrat(c, n); };
     const weiterKnopf = (text, n, extra) => h('button', Object.assign({ class: 'knopf', onclick: () => geh(n) }, extra || {}), text);
     const zurueck = schritt > 1 ? h('button', { class: 'knopf holz', onclick: () => geh(schritt - 1) }, 'Zurück') : null;
     const rollenKarte = () => h('div', { class: 'rollenkarte pergament auf-pergament', style: { borderColor: g.farbe } },
@@ -2338,7 +2319,7 @@
       fuss = weiterKnopf('Wir sind fertig – abstimmen', 7);
     } else if (schritt === 7) {
       const wahl = (x) => h('button', { class: 'knopf abstimm-knopf ' + (x === 'a' ? 'pro' : 'contra') + (c.wahl === x ? ' gewaehlt' : c.wahl ? ' holz' : ''), 'aria-pressed': String(c.wahl === x),
-        onclick: () => { c.wahl = x; sitzung.schreiben('zi-stamm', c); ZI.ton.plopp(); zeigeStammesrat(c, 7); } },
+        onclick: () => { c.wahl = x; sitzung.schreiben('zi-stamm', c); zeigeStammesrat(c, 7); } },
         ZI.seitenMarke(x === 'a' ? 'pro' : 'contra', 'klein'), h('span', null, x === 'a' ? t.pro : t.contra));
       inhalt = [h('div', { class: 'pergament auf-pergament stamm-box rat-gross' },
         h('div', { class: 'streitfrage klein-frage' }, t.frage),
@@ -2395,21 +2376,21 @@
           return h('button', { class: 'check' + (an ? ' an' : ''), 'aria-pressed': String(an), onclick: () => {
             if (fertig) return;
             if (gewaehlt.has(i)) gewaehlt.delete(i); else if (gewaehlt.size < 2) gewaehlt.add(i); else { ZI.meldung('Wähle genau zwei Begründungen.'); return; }
-            ZI.ton.plopp(); pruefKnopf.disabled = gewaehlt.size !== 2; zeichne();
+            pruefKnopf.disabled = gewaehlt.size !== 2; zeichne();
           } }, h('span', { class: 'finger', 'aria-hidden': 'true' }, String(i + 1)), h('span', { class: 'kasten' }, an ? icon.haken() : null), k.text);
         }));
       }
       pruefKnopf.addEventListener('click', () => {
         const falsche = [...gewaehlt].filter((i) => !karten[i].ok);
         if (!falsche.length) {
-          fertig = true; ZI.ton.richtig();
+          fertig = true; antwortRichtig();
           ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, h('b', null, zufall(ZI.LOB) + ' '), 'Das sind die zwei stärksten Begründungen: wichtig und für viele gültig.'));
           bue.sage('Mit diesen zwei Fingern der Begründungshand überzeugst du am meisten.', 'jubelt');
           bue.schlag(() => bue.werkstueck('eisen-gluehend'));
           pruefKnopf.style.display = 'none'; weiter.style.display = '';
           return;
         }
-        versuche++; ZI.ton.falsch();
+        versuche++; antwortFalsch();
         ZI.setze(rueck, h('div', { class: 'rueckmeldung schlecht' }, falsche.map((i) => h('div', null, '„' + karten[i].text + '“ – ' + karten[i].info))));
         falsche.forEach((i) => gewaehlt.delete(i));
         pruefKnopf.disabled = true;
@@ -2460,7 +2441,6 @@
     for (let n = 1; n <= 32; n++) {
       knoepfe.push(h('button', { class: 'karten-nr' + (n === aktuell ? ' gewaehlt' : ''), 'aria-label': 'Karte ' + n,
         onclick: () => {
-          ZI.ton.plopp();
           const f = ZI.fenster([
             h('div', { class: 'karten-nr-gross' }, String(n)),
             h('h2', null, 'Steht die ' + n + ' auf deiner Karte?'),
