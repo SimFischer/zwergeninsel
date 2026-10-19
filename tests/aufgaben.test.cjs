@@ -1,0 +1,120 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+
+const root = path.join(__dirname, '..');
+function bank(stored = new Map()) {
+  const storage = { getItem: (key) => stored.get(key) ?? null, setItem: (key, value) => stored.set(key, value) };
+  let seed = 42;
+  const math = Object.create(Math);
+  math.random = () => ((seed = (1664525 * seed + 1013904223) >>> 0) / 2 ** 32);
+  const ctx = vm.createContext({ window: {}, Math: math, sessionStorage: storage, localStorage: storage });
+  for (const name of ['data', 'data-k2', 'data-k3', 'data-mehr', 'data-spiel', 'data-bau', 'data-klasse', 'data-vielfalt', 'gemeinsam']) {
+    vm.runInContext(fs.readFileSync(path.join(root, 'js', name + '.js'), 'utf8'), ctx);
+  }
+  return ctx.window.ZI;
+}
+const names = ['STUMPF_SCHARF', 'ERZ_SCHLACKE', 'WEIL_DENN', 'FEHLERJAGD', 'BEISPIELE', 'PUZZLE',
+  'MOTOR_BREMSE', 'HOEREN', 'KETTEN', 'TEIL_ERKENNEN', 'JA_UND', 'ZUHOEREN', 'INSELRAT',
+  'GEGENARGUMENTE', 'SITUATIONEN', 'STAERKER', 'VERBESSERN', 'DAFUER_DAGEGEN', 'BREMSE_MOTOR',
+  'BEGRUENDET_RUNDEN', 'STAERKER_BELEGT', 'ABWAEGEN', 'ERZ_BELEGT', 'AMBOSS_BELEGT',
+  'MOTOR_BELEGT', 'GEGEN_BELEGT', 'ZUHOEREN_BELEGT', 'INSELRAT_ABWAEGEN'];
+function choices(value, result = []) {
+  if (!value || typeof value !== 'object') return result;
+  if (Array.isArray(value) && value.length > 1 && value.every((x) => typeof x?.text === 'string' && typeof x.ok === 'boolean')) result.push(value);
+  else for (const child of Object.values(value)) choices(child, result);
+  return result;
+}
+
+test('jeder Aufgabentyp hat mindestens 30 eindeutige Varianten und gültige Antworten', () => {
+  const z = bank();
+  for (const name of names) {
+    assert.ok(z[name].length >= 30, name);
+    assert.equal(new Set(z[name].map((x) => x.id)).size, z[name].length, name + ': doppelte ID');
+    for (const set of choices(z[name])) {
+      assert.equal(new Set(set.map((x) => x.text.trim())).size, set.length, name + ': doppelte Antwort');
+      assert.ok(set.some((x) => x.ok) && set.some((x) => !x.ok), name);
+    }
+  }
+  for (const u of z.BAU_UEBUNGEN.filter((x) => x.typ !== 'sortier')) assert.ok(u.items.length >= 30, u.id);
+  for (const item of z.KETTEN) assert.equal(item.stuetzen.filter((x) => x.ok).length, 2);
+});
+
+test('Vorrat verhindert Wiederholung, auch beim Überqueren einer Mischgrenze und nach einem erneuten Aufruf', () => {
+  const z = bank();
+  let previous = new Set();
+  const firstCycle = [];
+  for (let i = 0; i < 25; i++) {
+    const next = z.ziehen(z.STUMPF_SCHARF, 6).map((x) => x.id);
+    assert.equal(new Set(next).size, 6);
+    assert.ok(next.every((id) => !previous.has(id)));
+    if (i < 5) firstCycle.push(...next);
+    previous = new Set(next);
+  }
+  assert.equal(new Set(firstCycle).size, 30);
+  // Ein anderer Pool mit denselben Fällen setzt unmittelbar danach andere Themen ein.
+  const next = z.ziehen(z.STAERKER, 6).map((x) => x.id.split(':')[1]);
+  assert.ok(next.every((id) => ![...previous].some((x) => x.split(':')[1] === id)));
+  const seven = z.ziehen(z.PUZZLE, 7);
+  const after = z.ziehen(z.PUZZLE, 7);
+  assert.ok(after.every((x) => !seven.some((y) => y.id === x.id)));
+  assert.equal(new Set(z.ziehen(z.JA_UND, 6).map((x) => x.vorher)).size, 6);
+  assert.equal(z.ziehen([], 5).length, 0);
+  assert.equal(z.ziehen(z.PUZZLE, 99).length, 30);
+});
+
+test('Neuladen desselben Tabs erhält den Vorrat, einschließlich ungleich großer Durchgänge', () => {
+  const storage = new Map();
+  let z = bank(storage);
+  let previous = [];
+  for (let i = 0; i < 20; i++) {
+    const next = z.ziehen(z.PUZZLE, 7).map((x) => x.id);
+    assert.equal(new Set(next).size, 7);
+    assert.ok(next.every((id) => !previous.includes(id)));
+    previous = next;
+    z = bank(storage);
+  }
+});
+
+test('Grammatiklösungen verwenden alle Bausteine und markieren das gebeugte Verb korrekt', () => {
+  const z = bank();
+  for (const item of z.WEIL_DENN) {
+    for (const solution of item.loesungen) assert.equal([...solution].sort().join('|'), [...item.kacheln].sort().join('|'));
+    const solution = item.loesungen[0];
+    assert.equal(solution.indexOf(item.verb), item.bindewort === 'denn' ? 1 : solution.length - 1, item.haupt);
+  }
+  for (const item of z.FEHLERJAGD) assert.equal(item.saetze.filter((x) => x.ok).length, 1);
+});
+
+test('kein Aufgabentyp verrät die Lösung regelmäßig durch deutlich längere Antworten', () => {
+  const z = bank();
+  for (const [name, values] of [...names.map((name) => [name, z[name]]), ...z.BAU_UEBUNGEN.map((u) => [u.id, u.items || []])]) {
+    const sets = choices(values).filter((s) => s.filter((x) => x.ok).length === 1);
+    let long = 0, short = 0;
+    for (const set of sets) {
+      const right = set.find((x) => x.ok).text.length;
+      const wrong = set.filter((x) => !x.ok).map((x) => x.text.length);
+      const min = Math.min(...set.map((x) => x.text.length));
+      if (min < 15) continue; // Feste Fachbegriffe und Bindewörter sind keine ausformulierten Antworten.
+      assert.ok(Math.max(...set.map((x) => x.text.length)) / min < 1.55, name);
+      long += right > Math.max(...wrong) * 1.15;
+      short += right < Math.min(...wrong) * 0.85;
+    }
+    if (sets.length >= 20) {
+      assert.ok(long / sets.length < 0.4, name + ': längste Antwort als Muster');
+      assert.ok(short / sets.length < 0.4, name + ': kürzeste Antwort als Muster');
+    }
+  }
+});
+
+test('Antwortpositionen werden unabhängig vom Aufgaben-Vorrat gemischt', () => {
+  const z = bank();
+  const positions = [0, 0, 0];
+  for (let i = 0; i < 3000; i++) {
+    const opts = z.mischen(z.STUMPF_SCHARF[i % 30].optionen);
+    positions[opts.findIndex((x) => x.ok)]++;
+  }
+  assert.ok(positions.every((n) => n > 850 && n < 1150), positions.join('/'));
+});

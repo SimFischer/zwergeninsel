@@ -443,7 +443,7 @@
           tiefen: [
             tf('Welche ist stärker?', 'Beide Begründungen passen. Welche überzeugt mehr?', () => tiefStaerker()),
             tf('Besser begründen', 'Mach aus einer schwachen Begründung eine starke.', () => tiefVerbessern()),
-            tf('Stärker – und warum?', 'Wähle die stärkere Begründung und sag, warum sie stärker ist.', () => tiefStaerker(true)),
+            tf('Stärker – und warum?', 'Prüfe, ob Grund und Beispiel gemeinsam das Ziel stützen.', () => tiefStaerker(true)),
             tf('Meister der Schärfe', 'Gemischte schwere Aufgaben – ohne Hilfe, ohne Laterne.', () => tiefSchaerfe()),
           ] },
         { name: 'Erz oder Schlacke?', info: 'Sortiere: Welche Begründung passt zur Meinung?', icon: ['icon-erz-schlacke', 'eisen-roh'], spiel: () => spielErz(), vor: 'k1s2',
@@ -457,8 +457,8 @@
           tiefen: [
             tf('Welches Wort passt?', 'weil, denn oder deshalb – Grund oder Folge?', () => tiefLuecke()),
             tf('Fehlerjagd', 'Der Kobold hat Sätze verbogen. Komma und Verb prüfen!', () => tiefFehlerjagd()),
-            tf('Amboss ohne Hilfe', 'Lange Sätze bauen – das Verb wird nicht mehr markiert.', () => spielWeilDenn(true)),
-            tf('Kobold-Meister', 'Lücken und verbogene Sätze gemischt – ohne Hilfe, ohne Laterne.', () => tiefFehlerjagd(true)),
+            tf('Grund und Beispiel', 'Welcher weil-Satz wird vom Beispiel wirklich gestützt?', () => spielWeilDenn(true)),
+            tf('Kobold-Meister', 'Grund, Folge und Einwände prüfen – ohne Hilfe, ohne Laterne.', () => tiefFehlerjagd(true)),
           ] },
         { name: 'Meisterstück', gemeinschaft: true, info: 'Zu zweit: Jeder sagt 3 Argumente. Der andere prüft.', icon: ['icon-meisterstueck', 'meisterin-erklaert'], spiel: () => spielMeisterstueck(1),
           tiefen: [
@@ -505,7 +505,7 @@
           tiefen: [
             tf('Finde das „Ja, aber“', 'Drei Antworten – welche widerspricht mit einem Grund?', () => tiefJaAber()),
             tf('Gegenargument-Schmiede', 'Finde das Argument, das wirklich dagegen spricht.', () => tiefGegen()),
-            tf('Dafür oder dagegen?', 'Erkenne die Argumente beider Seiten.', () => tiefDafuerDagegen()),
+            tf('Gegenargument und Beleg', 'Prüfe ein Argument mit Beispiel und finde einen echten Einwand.', () => tiefGegenBeleg()),
             tf('Gegenargument – und warum?', 'Echtes Gegenargument finden und begründen – ohne Hilfe.', () => tiefGegen(true)),
           ] },
         { name: 'Wer hört zu?', info: 'Finde die Antwort, die wirklich anknüpft.', icon: ['icon-zuhoeren', 'meisterin-tipp'], spiel: () => spielZuhoeren(), vor: 'k3s2',
@@ -520,7 +520,7 @@
             tf('Mehr Einwände', 'Drei Vorhaben, viele Einwände hintereinander.', () => tiefEinwaende(2)),
             tf('Einwände – und warum?', 'Antworte und sag, warum deine Antwort überzeugt.', () => tiefEinwaende(3)),
             tf('Ohne Hilfe', 'Der Inselrat bleibt hart: Es gibt keine Hilfe mehr.', () => tiefEinwaende(4)),
-            tf('Großer Inselrat', 'Vier Vorhaben, alle Einwände – ohne Hilfe, ohne Laterne.', () => tiefEinwaende(5)),
+            tf('Großer Inselrat', 'Mehrere Vorhaben, je zwei Einwände zugleich – ohne Hilfe.', () => tiefEinwaende(5)),
           ] },
         { name: 'Streitgespräch', gemeinschaft: true, info: 'Zu zweit: Meinung, Zuhören und Gegenargument – mit Rollenwechsel.', icon: ['icon-streitgespraech', 'meisterin-jubelt'], spiel: () => spielMeisterstueck(3),
           tiefen: [
@@ -902,7 +902,8 @@
      Auswahlspiel: eine richtige Antwort aus mehreren
      (Stumpf oder scharf? · Fehlerjagd · Beispiel-Edelstein)
      ========================================================= */
-  function auswahlSpiel({ titel, frageText, items, tipp, wsVorher, wsNachher, start, ende, boss, fest, leiste, hilfe = true, laterne = true, warum = false }) {
+  function auswahlSpiel({ titel, frageText, items, tipp, wsVorher, wsNachher, start, ende, boss, leiste, hilfe = true, laterne = true, warum = false }) {
+    items = [...new Map(items.map((it) => [it.kopf || it.vorher || JSON.stringify(it), it])).values()];
     const L = leiste || (boss ? { text: 'Kobold-Kraft', wachsen: false } : null);
     const breite = (n) => ((L && L.wachsen ? n : items.length - n) / items.length) * 100 + '%';
     const bue = buehne(wsVorher);
@@ -924,7 +925,7 @@
         rahmen.fortschritt(nr);
         if (nr < items.length) zeigeItem(); else ende();
       });
-      const opts = (it.fest !== undefined ? it.fest : fest) ? it.optionen.slice() : mischen(it.optionen);
+      const opts = mischen(it.optionen);
       opts.forEach((o) => {
         const b = h('button', { class: 'option' }, o.text);
         b.addEventListener('click', () => {
@@ -934,13 +935,13 @@
             b.classList.add('richtig');
             antwortRichtig();
             const lob = zufall(ZI.LOB);
-            ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, h('b', null, lob + ' '), o.info || ''));
+            ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, h('b', null, lob + ' '), warum && o.warum ? '' : o.info || ''));
             bue.sage(lob, 'jubelt');
             bue.schlag(() => { if (!it.ws) bue.werkstueck(boss ? (nr + 1 < items.length ? 'kobold-frech' : wsNachher) : wsNachher); });
             if (kraft) kraft.querySelector('.balken div').style.width = breite(nr + 1);
             optEls.forEach((x) => { if (x !== b) x.classList.add('weg'); });
             // „Warum?“: Das eigene Urteil begründen (nur wenn die richtige Antwort eine Erklärung hat)
-            if (warum && o.info) { warumFrage(o.info); return; }
+            if (warum && o.warum) { warumFrage(o); return; }
             weiter.style.display = '';
           } else {
             fehler++;
@@ -959,15 +960,14 @@
       });
       const kraft = L ? h('div', { class: 'boss-leiste', 'aria-label': L.text },
         h('span', null, L.text), h('div', { class: 'balken ' + (L.wachsen ? 'ueberzeugung' : 'boss') }, h('div', { style: { width: breite(nr) } }))) : null;
-      function warumFrage(info) {
-        const grund = info.replace(/^[^.!?:]{1,18}[!:]\s+/, '');
-        const wahl = mischen([{ text: grund, ok: true }, ...mischen(ZI.WARUM_FALSCH).slice(0, 2).map((x) => ({ text: x, ok: false }))]);
+      function warumFrage(o) {
+        const wahl = mischen(o.warum);
         const box2 = h('div', { class: 'warum' }, h('div', { class: 'frage', style: { fontWeight: 700 } }, 'Und warum ist das die beste Antwort?'));
         const knoepfe = wahl.map((w) => {
           const b = h('button', { class: 'option' }, w.text);
           b.addEventListener('click', () => {
             if (b.classList.contains('weg') || weiter.style.display === '') return;
-            if (w.ok) { b.classList.add('richtig'); antwortRichtig(); ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, h('b', null, 'Gut begründet! '), 'So kannst du dein Urteil auch im Gespräch erklären.')); knoepfe.forEach((x) => { if (x !== b) x.classList.add('weg'); }); weiter.style.display = ''; }
+            if (w.ok) { b.classList.add('richtig'); antwortRichtig(); ZI.setze(rueck, h('div', { class: 'rueckmeldung gut' }, h('b', null, 'Gut begründet! '), o.info || 'Du hast dein Urteil passend erklärt.')); knoepfe.forEach((x) => { if (x !== b) x.classList.add('weg'); }); weiter.style.display = ''; }
             else { antwortFalsch(); b.classList.add('falsch'); setTimeout(() => b.classList.add('weg'), 450); ZI.setze(rueck, h('div', { class: 'rueckmeldung schlecht' }, 'Das ist kein guter Grund. Frag dich: Was macht die Antwort inhaltlich besser?')); }
           });
           return b;
@@ -991,8 +991,8 @@
   function spielStumpfScharf() {
     auswahlSpiel({
       titel: 'Stumpf oder scharf?',
-      frageText: 'Welche Begründung ist scharf wie eine gute Axt?',
-      items: mischen(ZI.STUMPF_SCHARF).slice(0, 6).map((it) => ({ kopf: it.meinung, optionen: it.optionen.map((o) => ({ text: o.text, ok: o.scharf, info: o.info })) })),
+      frageText: 'Welche Begründung erklärt das genannte Ziel am genauesten?',
+      items: ZI.ziehen(ZI.STUMPF_SCHARF, 6).map((it) => ({ kopf: it.meinung, optionen: it.optionen.map((o) => ({ text: o.text, ok: o.scharf, info: o.info, warum: o.warum })) })),
       tipp: ZI.TIPPS.stumpf,
       wsVorher: 'schmiede-axt-werkstueck', wsNachher: 'axt-scharf',
       start: 'Eine scharfe Begründung erklärt, WARUM. Eine stumpfe sagt nur dasselbe noch einmal.',
@@ -1003,17 +1003,17 @@
 
   /* ---------- Bausteine für längere Tiefe Stollen (8–12 Aufgaben, leicht ansteigend) ---------- */
   const TEILE = ['Meinung', 'Begründung', 'Beispiel'];
-  const aufgabeTeil = (it, frage) => ({ frage: frage || 'Welcher Teil des Arguments ist das?', kopf: it.satz, fest: true,
+  const aufgabeTeil = (it, frage) => ({ frage: frage || 'Welcher Teil des Arguments ist das?', kopf: it.satz,
     optionen: TEILE.map((t) => ({ text: t, ok: t === it.teil, info: ZI.TEIL_INFO[t] })) });
-  const aufgabeFehler = (it) => ({ frage: 'Welcher Satz ist richtig?', kopf: '', optionen: it.saetze.map((o) => ({ text: o.text, ok: o.ok, info: o.info })) });
+  const aufgabeFehler = (it) => ({ frage: 'Welcher Satz ist richtig?', kopf: '', optionen: it.saetze.map((o) => ({ text: o.text, ok: o.ok, info: o.info, warum: o.warum })) });
   const aufgabeBeispiel = (it) => ({ frage: 'Welches Beispiel stützt genau diese Begründung?', kopf: it.argument, optionen: it.optionen });
-  const aufgabeScharf = (it) => ({ frage: 'Welche Begründung ist scharf?', kopf: it.meinung, optionen: it.optionen.map((o) => ({ text: o.text, ok: o.scharf, info: o.info })) });
-  const aufgabeLuecke = (it) => ({ frage: 'Welches Wort passt in die Lücke?', kopf: it.kopf, optionen: it.optionen, fest: true });
-  const aufgabeArt = (it) => ({ frage: 'Wie reagiert die zweite Person?', vorher: it.vorher, kopf: it.antwort, fest: true,
+  const aufgabeScharf = (it) => ({ frage: 'Welche Begründung ist scharf?', kopf: it.meinung, optionen: it.optionen.map((o) => ({ text: o.text, ok: o.scharf, info: o.info, warum: o.warum })) });
+  const aufgabeLuecke = (it) => ({ frage: 'Welches Wort passt in die Lücke?', kopf: it.kopf, optionen: it.optionen });
+  const aufgabeArt = (it) => ({ frage: 'Wie reagiert die zweite Person?', vorher: it.vorher, kopf: it.antwort,
     optionen: ZI.ARTEN.map((a) => ({ text: a, ok: a === it.art, info: ZI.ARTEN_INFO[a] })) });
   const aufgabeGegen = (it) => ({ frage: 'Welcher Satz ist ein echtes Gegenargument?', kopf: it.argument, optionen: it.optionen });
   const aufgabeSituation = (it) => ({ frage: 'Welches Argument überzeugt diese Person am besten?', kopf: it.situation, optionen: it.optionen });
-  const aufgabeEinwand = (fall, e) => ({ frage: e.wer + ' hat einen Einwand. Was antwortest du?', vorher: fall.meinung, kopf: e.wer + ': ' + e.einwand, ws: e.datei, optionen: e.optionen });
+  const aufgabeEinwand = (fall, e) => ({ frage: e.wer + (tiefeJetzt() >= 5 ? ' haben zwei Einwände. Was antwortest du?' : ' hat einen Einwand. Was antwortest du?'), vorher: fall.meinung + (tiefeJetzt() >= 4 && fall.beispiel ? ' Beispiel: ' + fall.beispiel : ''), kopf: e.wer + ': ' + e.einwand, ws: e.datei, optionen: e.optionen });
 
 
   /* =========================================================
@@ -1038,89 +1038,102 @@
       ende: () => tiefGeschafft(c.lob[0], c.lob[1], c.lobBild),
     }, c, { titel: c.titel + ' · Tiefe ' + n, start: c.start + (n >= 5 ? ' In dieser Tiefe gibt es keine Laterne.' : n >= 4 ? ' Ab jetzt hilft dir niemand nach zwei Fehlern.' : '') }));
   }
+  const tiefAmbossBeleg = () => tiefAuswahl({
+    titel: 'Grund und Beispiel', frageText: 'Welcher weil-Satz erklärt die Meinung und wird vom Beispiel gestützt?', warum: true,
+    items: ZI.ziehen(ZI.AMBOSS_BELEGT, 7).map((it) => ({ kopf: it.meinung, optionen: it.optionen })),
+    tipp: 'Verbinde Meinung und Grund. Prüfe dann, ob das Beispiel genau diesen Grund zeigt.',
+    start: 'Nicht nur die Wörter müssen passen. Jetzt prüfst du auch den Grund und seinen Beleg.',
+    lob: ['Gut verknüpft!', 'Deine Gründe und Beispiele passen zusammen.'] });
+  const tiefGegenBeleg = () => tiefAuswahl({
+    titel: 'Gegenargument und Beleg', frageText: 'Welcher Einwand bleibt trotz des Beispiels zu prüfen?', warum: true,
+    items: ZI.ziehen(ZI.GEGEN_BELEGT, 7).map((it) => ({ ...aufgabeGegen(it), frage: 'Welcher Einwand bleibt trotz des Beispiels zu prüfen?' })),
+    tipp: 'Ein Beispiel zeigt einen Nutzen. Trotzdem kann es noch einen Nachteil geben.',
+    start: 'Prüfe den Nutzen am Beispiel und suche dann einen echten Einwand.',
+    lob: ['Beide Seiten geprüft!', 'Du prüfst Belege und Nachteile zusammen.'] });
   const staerkerItem = (it, frage) => ({ frage, kopf: it.meinung, optionen: it.optionen });
   const tiefStaerker = (warum) => tiefAuswahl({
-    titel: 'Welche ist stärker?', frageText: 'Beide Begründungen passen. Welche ist stärker?', warum,
-    items: mischen(ZI.STAERKER).slice(0, 7).map((it) => staerkerItem(it)),
-    tipp: 'Ein starkes Argument erklärt genau, WAS besser wird – und gilt nicht nur für dich, sondern für viele.',
+    titel: 'Welche ist stärker?', frageText: warum ? 'Welche Verbindung aus Grund und Beispiel stützt das Ziel?' : 'Welcher Grund passt genauer zum genannten Ziel?', warum,
+    items: ZI.ziehen(warum ? ZI.STAERKER_BELEGT : ZI.STAERKER, 7).map((it) => staerkerItem(it)),
+    tipp: 'Prüfe, ob der Grund genau das genannte Ziel erklärt. Ein anderer Vorteil kann trotzdem am Ziel vorbeigehen.',
     start: 'Diesmal passen beide Begründungen. Aber eine überzeugt viel mehr.' + (warum ? ' Danach sagst du, warum.' : ''),
     lob: ['Scharfer Blick!', 'Du erkennst starke Argumente.'] });
   const tiefVerbessern = () => tiefAuswahl({
     titel: 'Besser begründen', frageText: 'Diese Begründung ist schwach. Womit wird sie stärker?',
-    items: mischen(ZI.VERBESSERN).slice(0, 7).map(aufgabeVerbessern),
+    items: ZI.ziehen(ZI.VERBESSERN, 7).map(aufgabeVerbessern),
     tipp: 'Lauter ist nicht besser. Eine starke Begründung erklärt, WARUM – und gilt nicht nur für dich.',
     start: 'Im Rat hört man oft schwache Begründungen. Du machst sie stark!',
     lob: ['Stark begründet!', 'Du machst aus schwachen Begründungen starke.'] });
   const tiefSchaerfe = () => tiefAuswahl({
-    titel: 'Meister der Schärfe', frageText: 'Welche Begründung ist die stärkste?', warum: true,
-    items: mischen([...mischen(ZI.VERBESSERN).slice(0, 3).map(aufgabeVerbessern),
-      ...mischen(ZI.STAERKER).slice(0, 3).map((it) => staerkerItem(it, 'Welche Begründung ist stärker?')),
-      ...mischen(ZI.STUMPF_SCHARF).slice(0, 2).map(aufgabeScharf)]),
+    titel: 'Meister der Schärfe', frageText: 'Welche Antwort wägt die Einwände ab?', warum: true,
+    items: ZI.ziehen(ZI.ABWAEGEN, 8).map((it) => staerkerItem(it, 'Welche Antwort berücksichtigt beide Einwände?')),
     tipp: ZI.TIPPS.stumpf,
-    start: 'Die schwerste Schmiedeprobe: Alles gemischt, und jedes Mal sagst du, warum.',
+    start: 'Zwei Einwände auf einmal: Prüfe, welche Antwort beide berücksichtigt, und begründe dein Urteil.',
     lob: ['Meister der Schärfe!', 'Deine Begründungen sind scharf wie eine Zwergenaxt.'] });
   const tiefPasst = (warum) => tiefAuswahl({
     titel: 'Nur eine passt', frageText: 'Welche Begründung passt wirklich zur Meinung?', warum,
-    items: mischen(ZI.ERZ_SCHLACKE.filter((rd) => rd.gruende.filter((g) => !g.erz).length >= 2)).slice(0, 6).map((rd) => {
-      const erz = mischen(rd.gruende.filter((g) => g.erz))[0];
+    items: warum ? ZI.ziehen(ZI.ERZ_BELEGT, 7).map((it) => ({ kopf: it.meinung, frage: 'Welche Begründung wird vom Beispiel gestützt?', optionen: it.optionen })) : ZI.ziehen(ZI.ERZ_SCHLACKE.filter((rd) => rd.gruende.filter((g) => !g.erz).length >= 2), 6).map((rd) => {
+      const erz = rd.gruende.find((g) => g.erz);
       const schlacke = mischen(rd.gruende.filter((g) => !g.erz)).slice(0, warum ? 3 : 2);
-      return { kopf: rd.meinung, optionen: [erz, ...schlacke].map((g) => ({ text: g.text, ok: g.erz, info: g.info })) };
+      return { kopf: rd.meinung, optionen: [erz, ...schlacke].map((g) => ({ text: g.text, ok: g.erz, info: g.info, warum: g.warum })) };
     }),
     tipp: ZI.TIPPS.erz, wsVorher: 'eisen-roh', wsNachher: 'eisen-gluehend',
     start: 'Die anderen Begründungen klingen gut, passen aber nicht. Nur eine erklärt die Meinung wirklich.',
     lob: ['Gut sortiert!', 'Du erkennst, welche Begründung wirklich passt.'] });
   const tiefGegen = (warum) => tiefAuswahl({
-    titel: 'Gegenargument', frageText: 'Welcher Satz ist ein echtes Gegenargument?', warum,
-    items: [...(warum ? [] : mischen(ZI.JA_UND).slice(0, 2).map(aufgabeArt)), ...mischen(ZI.GEGENARGUMENTE).slice(0, warum ? 8 : 7).map(aufgabeGegen)],
+    titel: warum ? 'Einwände abwägen' : 'Gegenargument', frageText: 'Welcher Satz ist ein echtes Gegenargument?', warum,
+    items: warum ? ZI.ziehen(ZI.ABWAEGEN, 8).map((it) => ({ kopf: it.meinung, frage: 'Welche Antwort nimmt beide Einwände ernst?', optionen: it.optionen })) : [...ZI.ziehen(ZI.JA_UND, 2).map(aufgabeArt), ...ZI.ziehen(ZI.GEGENARGUMENTE, 7).map(aufgabeGegen)],
     tipp: ZI.TIPPS.gegen,
     start: 'Ein Gegenargument spricht gegen die Begründung. „Ich finde das doof“ ist nur Geschmack – kein Gegenargument.',
     lob: ['Starkes Gegenargument!', 'Du erkennst, was wirklich dagegen spricht.'] });
   const tiefLuecke = () => tiefAuswahl({
     titel: 'Welches Wort passt?', frageText: 'Welches Wort passt in die Lücke?',
-    items: mischen(ZI.bauUebung('huette2').items).slice(0, 8).map(aufgabeLuecke),
+    items: ZI.ziehen(ZI.bauUebung('huette2').items, 8, 'LUECKE').map(aufgabeLuecke),
     tipp: '„Weil“ und „denn“ nennen den GRUND. „Deshalb“ nennt die FOLGE.', wsVorher: 'eisen-roh', wsNachher: 'runenplatte',
     start: 'Jetzt kommt „deshalb“ dazu: Nennt der Satz einen Grund oder eine Folge?',
     lob: ['Gut verknüpft!', 'Du weißt, wann man weil, denn oder deshalb sagt.'] });
   const tiefFehlerjagd = (meister) => tiefAuswahl({
     titel: meister ? 'Kobold-Meister' : 'Fehlerjagd', frageText: 'Der Fehlerkobold hat Sätze verbogen. Welcher Satz ist richtig?',
-    items: meister ? mischen([...mischen(ZI.FEHLERJAGD).slice(0, 5).map(aufgabeFehler), ...mischen(ZI.bauUebung('huette2').items).slice(0, 3).map(aufgabeLuecke)])
-      : mischen(ZI.FEHLERJAGD).slice(0, 8).map(aufgabeFehler),
-    tipp: ZI.TIPPS.fehler, wsVorher: 'kobold-chaos', wsNachher: 'kobold-besiegt',
-    start: 'Achtung, der Fehlerkobold war hier! Prüfe bei jedem Satz das Komma und das Verb.',
+    warum: meister,
+    items: meister ? ZI.ziehen(ZI.ABWAEGEN, 8).map((it) => ({
+      kopf: it.meinung, frage: 'Bei welcher Antwort passt die Folgerung zu beiden Einwänden?',
+      optionen: it.optionen.map((o) => ({ ...o, text: o.text + ' Deshalb lässt sich der Plan trotz beider Sorgen erproben.' })),
+    })) : ZI.ziehen(ZI.FEHLERJAGD, 8).map(aufgabeFehler),
+    tipp: meister ? 'Eine Folgerung muss aus den Gründen folgen. Prüfe beide Sorgen, nicht nur die Satzform.' : ZI.TIPPS.fehler, wsVorher: 'kobold-chaos', wsNachher: 'kobold-besiegt',
+    start: meister ? 'Sätze können richtig klingen und trotzdem falsch folgern. Prüfe, ob die Antwort beide Einwände löst.' : 'Achtung, der Fehlerkobold war hier! Prüfe bei jedem Satz das Komma und das Verb.',
     lob: ['Kobold besiegt!', 'Du hast alle verbogenen Sätze gefunden.'], lobBild: 'kobold-besiegt' });
   const tiefTeil = () => tiefAuswahl({
     titel: 'Welcher Teil ist das?', frageText: 'Welcher Teil des Arguments ist das?',
-    items: mischen(ZI.TEIL_ERKENNEN).slice(0, 8).map((it) => aufgabeTeil(it)),
+    items: ZI.ziehen(ZI.TEIL_ERKENNEN, 8).map((it) => aufgabeTeil(it)),
     tipp: 'Meinung: Was finde ich? Begründung: Warum? Beispiel: Wie sieht das genau aus?', wsVorher: 'pergament', wsNachher: 'pergament',
     start: 'Jetzt steht jeder Satz allein – ohne die anderen Teile. Erkennst du trotzdem, was er ist?',
     lob: ['Teile erkannt!', 'Du kennst die Teile eines Arguments.'] });
   const tiefBeispiel = () => tiefAuswahl({
     titel: 'Das beste Beispiel', frageText: 'Welches Beispiel stützt genau diese Begründung?', warum: true,
-    items: mischen(ZI.BEISPIELE).slice(0, 8).map(aufgabeBeispiel),
+    items: ZI.ziehen(ZI.BEISPIELE, 8).map(aufgabeBeispiel),
     tipp: ZI.TIPPS.beispiel, wsVorher: 'eisen-roh', wsNachher: 'edelstein',
     start: 'Ein gutes Beispiel zeigt, dass die Begründung stimmt. Danach sagst du, warum es passt.',
     lob: ['Edles Beispiel!', 'Du findest Beispiele, die wirklich stützen.'] });
   const tiefKobold = () => tiefAuswahl({
     titel: 'Kobold-Kampf', frageText: 'Besiege den Fehlerkobold!', boss: true,
-    items: [...mischen(ZI.TEIL_ERKENNEN).slice(0, 2).map((it) => aufgabeTeil(it)), ...mischen(ZI.STAERKER).slice(0, 2).map((it) => staerkerItem(it, 'Welche Begründung ist stärker?')),
-      ...mischen(ZI.FEHLERJAGD).slice(0, 2).map(aufgabeFehler), ...mischen(ZI.BEISPIELE).slice(0, 2).map(aufgabeBeispiel), ...mischen(ZI.VERBESSERN).slice(0, 2).map(aufgabeVerbessern)],
+    items: [...ZI.ziehen(ZI.TEIL_ERKENNEN, 2).map((it) => aufgabeTeil(it)), ...ZI.ziehen(ZI.STAERKER, 2).map((it) => staerkerItem(it, 'Welche Begründung ist stärker?')),
+      ...ZI.ziehen(ZI.FEHLERJAGD, 2).map(aufgabeFehler), ...ZI.ziehen(ZI.BEISPIELE, 2).map(aufgabeBeispiel), ...ZI.ziehen(ZI.VERBESSERN, 2).map(aufgabeVerbessern)],
     tipp: ZI.TIPPS.boss, wsVorher: 'kobold-chaos', wsNachher: 'kobold-besiegt',
     start: 'Da ist er wieder, der Fehlerkobold – stärker als je zuvor! Nach zehn Treffern gibt er auf.',
     lob: ['Kobold besiegt!', 'Der Fehlerkobold gibt auf.'], lobBild: 'kobold-besiegt' });
-  const motorWahl = (anzahlBremsen) => mischen(ZI.MOTOR_BREMSE).slice(0, 6).map((rd) => {
+  const motorWahl = (anzahlBremsen) => ZI.ziehen(ZI.MOTOR_BREMSE, 6).map((rd) => {
     const m = mischen(rd.beitraege.filter((x) => x.motor))[0];
     const br = mischen(rd.beitraege.filter((x) => !x.motor)).slice(0, anzahlBremsen);
-    return { kopf: rd.thema, optionen: [m, ...br].map((x) => ({ text: x.text, ok: x.motor, info: x.info })) };
+    return { kopf: rd.thema, optionen: [m, ...br].map((x) => ({ text: x.text, ok: x.motor, info: x.info, warum: x.warum })) };
   });
   const tiefMotor = (warum) => tiefAuswahl({
     titel: 'Was bringt weiter?', frageText: 'Welcher Beitrag bringt das Gespräch weiter?', warum,
-    items: motorWahl(warum ? 3 : 2), tipp: ZI.TIPPS.motor,
+    items: warum ? ZI.ziehen(ZI.MOTOR_BELEGT, 7).map((it) => ({ kopf: it.meinung, frage: 'Welche Antwort nimmt den Einwand ernst?', optionen: it.optionen })) : motorWahl(2), tipp: ZI.TIPPS.motor,
     wsVorher: 'schleifstein', wsNachher: 'schleifstein',
     start: 'Jetzt stehen mehrere Beiträge nebeneinander. Nur einer bringt das Gespräch weiter.',
     lob: ['Gesprächsmotor!', 'Du erkennst, was ein Gespräch weiterbringt.'] });
   const tiefBremseMotor = (meister) => tiefAuswahl({
     titel: meister ? 'Gesprächs-Meister' : 'Aus Bremse wird Motor', frageText: 'Das bremst. Wie sagt man es besser?', warum: meister,
-    items: mischen(ZI.BREMSE_MOTOR).slice(0, 7).map((it) => ({ vorher: it.bremse, optionen: it.optionen })),
+    items: meister ? ZI.ziehen(ZI.ABWAEGEN, 7).map((it) => ({ kopf: it.meinung, frage: 'Welche Antwort berücksichtigt beide Sorgen?', optionen: it.optionen })) : ZI.ziehen(ZI.BREMSE_MOTOR, 7).map((it) => ({ vorher: it.bremse, optionen: it.optionen })),
     tipp: 'Sag deine Meinung mit Grund, statt andere schlechtzumachen: „Ich sehe das anders, weil …“',
     wsVorher: 'schleifstein', wsNachher: 'schleifstein',
     start: 'Jemand bremst das Gespräch. Finde einen Satz, der dasselbe meint – aber das Gespräch weiterbringt.',
@@ -1128,7 +1141,7 @@
   const tiefJaAber = () => {
     const gruppen = {};
     ZI.JA_UND.forEach((x) => { (gruppen[x.vorher] = gruppen[x.vorher] || []).push(x); });
-    const items = mischen(Object.values(gruppen).filter((g) => g.some((x) => x.art === 'Ja, aber …') && g.length >= 3)).slice(0, 6)
+    const items = ZI.ziehen(Object.values(gruppen).filter((g) => g.some((x) => x.art === 'Ja, aber …') && g.length >= 3).map((g) => ({ id: 'JA_ABER:' + g[0].id.split(':')[1], gruppe: g })), 6).map((x) => x.gruppe)
       .map((g) => ({ vorher: g[0].vorher, optionen: g.map((x) => ({ text: x.antwort, ok: x.art === 'Ja, aber …', info: x.art === 'Ja, aber …' ? 'Genau: Diese Antwort nimmt den Beitrag ernst und widerspricht mit einem Grund.' : ZI.ARTEN_INFO[x.art] })) }));
     tiefAuswahl({ titel: 'Finde das „Ja, aber“', frageText: 'Welche Antwort widerspricht mit einem Grund?', items,
       tipp: ZI.TIPPS.jaund, start: 'Drei Antworten auf denselben Beitrag. Welche sagt „Ja, aber …“ und nennt einen Grund?',
@@ -1136,24 +1149,24 @@
   };
   const tiefZuhoeren = () => tiefAuswahl({
     titel: 'Wer hört zu?', frageText: 'Welche Antwort zeigt, dass jemand wirklich zugehört hat?', warum: true,
-    items: mischen(ZI.ZUHOEREN).slice(0, 7).map((it) => ({ vorher: it.vorher, optionen: it.optionen })),
+    items: ZI.ziehen(ZI.ZUHOEREN, 7).map((it) => ({ vorher: it.vorher, optionen: it.optionen })),
     tipp: ZI.TIPPS.zuhoeren, wsVorher: 'schmiede-axt-werkstueck', wsNachher: 'axt-scharf',
     start: 'Pass auf Antworten auf, die etwas verdrehen. Danach sagst du, warum deine Antwort zuhört.',
     lob: ['Gut zugehört!', 'Du erkennst echtes Zuhören.'] });
   const tiefSituation = (warum) => tiefAuswahl({
     titel: 'Wer überzeugt wen?', frageText: 'Welches Argument überzeugt diese Person am besten?', warum,
-    items: mischen(ZI.SITUATIONEN).slice(0, 7).map(aufgabeSituation),
+    items: warum ? ZI.ziehen(ZI.ZUHOEREN_BELEGT, 7).map((it) => ({ vorher: it.vorher, frage: 'Was zeigt das Beispiel für die gehörte Begründung?', optionen: it.optionen })) : ZI.ziehen(ZI.SITUATIONEN, 7).map(aufgabeSituation),
     tipp: ZI.TIPPS.situation, wsVorher: 'truhe-zu', wsNachher: 'truhe-offen',
     start: 'Nicht jedes Argument überzeugt jeden. Hör genau hin, was der Person wichtig ist.',
     lob: ['Überzeugt!', 'Du gehst auf das ein, was anderen wichtig ist.'] });
   const tiefZuhoerProfi = () => tiefAuswahl({
     titel: 'Zuhör-Profi', frageText: 'Welche Antwort geht wirklich auf die Person ein?', warum: true,
-    items: mischen([...mischen(ZI.ZUHOEREN).slice(0, 4).map((it) => ({ vorher: it.vorher, optionen: it.optionen })), ...mischen(ZI.SITUATIONEN).slice(0, 4).map(aufgabeSituation)]),
+    items: ZI.ziehen(ZI.ABWAEGEN, 8).map((it) => ({ kopf: it.meinung, frage: 'Welche Antwort geht auf beide Sorgen ein?', optionen: it.optionen })),
     tipp: ZI.TIPPS.zuhoeren, start: 'Anknüpfen und überzeugen gemischt.',
     lob: ['Zuhör-Profi!', 'Du hörst zu und überzeugst.'] });
   const tiefEinwaende = (n) => {
     const items = [];
-    mischen(ZI.INSELRAT).slice(0, n >= 5 ? 4 : 3).forEach((fall) => mischen(fall.einwaende).forEach((e) => items.push(aufgabeEinwand(fall, e))));
+    ZI.ziehen(n >= 5 ? ZI.INSELRAT_ABWAEGEN : ZI.INSELRAT, n >= 5 ? 6 : 4).forEach((fall) => mischen(fall.einwaende).forEach((e) => items.push(aufgabeEinwand(fall, e))));
     tiefAuswahl({ titel: n >= 5 ? 'Großer Inselrat' : 'Einwände', frageText: 'Was antwortest du?', warum: n >= 3,
       items: items.slice(0, n >= 5 ? 10 : 8), tipp: ZI.TIPPS.inselrat, wsVorher: 'eisen-roh', wsNachher: 'eisen-roh',
       leiste: { text: 'Überzeugung', wachsen: true },
@@ -1163,7 +1176,7 @@
   function tiefDafuerDagegen() {
     sortierSpiel({
       titel: 'Dafür oder dagegen? · Tiefe ' + tiefeJetzt(),
-      runden: mischen(ZI.DAFUER_DAGEGEN).slice(0, 2),
+      runden: ZI.ziehen(ZI.DAFUER_DAGEGEN, 2),
       jaText: 'Dafür', neinText: 'Dagegen', jaUnter: 'stützt die Meinung', neinUnter: 'Gegenargument',
       frageText: 'Spricht der Satz für die Meinung oder dagegen?',
       tipp: 'Frag dich: Würde jemand diesen Satz sagen, der die Meinung gut findet? Dann ist er dafür.',
@@ -1254,14 +1267,14 @@
   function spielErz() {
     sortierSpiel({
       titel: 'Erz oder Schlacke?',
-      runden: [ZI.zufall(ZI.BEGRUENDET_RUNDEN)].concat(mischen(ZI.ERZ_SCHLACKE).slice(0, 2).map((rd) => ({ kopf: rd.meinung, karten: rd.gruende.map((g) => ({ text: g.text, ja: g.erz, info: g.info })) }))),
-      jaText: 'Erz', neinText: 'Schlacke', jaUnter: 'passt', neinUnter: 'passt nicht',
+      runden: ZI.ziehen(ZI.BEGRUENDET_RUNDEN, 1).concat(ZI.ziehen(ZI.ERZ_SCHLACKE, 2).map((rd) => ({ kopf: rd.meinung, karten: rd.gruende.map((g) => ({ text: g.text, ja: g.erz, info: g.info, warum: g.warum })) }))),
+      jaText: 'Erz', neinText: 'Schlacke', jaUnter: 'passt zum Ziel', neinUnter: 'passt nicht zum Ziel',
       erklaerung: [
-        ['Erz =', 'Die Begründung passt zur Meinung. Sie ist ein guter Grund.', 'erz'],
+        ['Erz =', 'Die Begründung erklärt das genannte Ziel. Sie ist dafür ein guter Grund.', 'erz'],
         ['Schlacke =', 'Die Begründung passt nicht. Oder sie ist kein richtiger Grund.', 'schlacke'],
         ['', 'Beim Schmieden ist Erz wertvoll. Schlacke ist der Rest.', 'bild'],
       ],
-      frageText: 'Passt die Begründung zur Meinung? Erz oder Schlacke?',
+      frageText: 'Erklärt der Grund das genannte Ziel? Erz oder Schlacke?',
       tipp: ZI.TIPPS.erz,
       start: 'Zuerst prüfen wir: Ist eine Meinung überhaupt begründet? Danach trennen wir Erz – passende Begründungen – von Schlacke.',
       wsVorher: 'eisen-roh', wsNachher: 'eisen-gluehend',
@@ -1276,7 +1289,7 @@
   function spielMotor() {
     sortierSpiel({
       titel: 'Motor oder Bremse?',
-      runden: mischen(ZI.MOTOR_BREMSE).slice(0, 2).map((rd) => ({ kopf: rd.thema, karten: rd.beitraege.map((g) => ({ text: g.text, ja: g.motor, info: g.info })) })),
+      runden: ZI.ziehen(ZI.MOTOR_BREMSE, 2).map((rd) => ({ kopf: rd.thema, karten: rd.beitraege.map((g) => ({ text: g.text, ja: g.motor, info: g.info, warum: g.warum })) })),
       jaText: 'Motor', neinText: 'Bremse',
       frageText: 'Bringt dieser Beitrag das Gespräch weiter (Motor) oder stoppt er es (Bremse)?',
       tipp: ZI.TIPPS.motor,
@@ -1294,7 +1307,8 @@
      ========================================================= */
   function spielWeilDenn(schwer) {
     // schwer (Tiefe 4): längere Sätze, das Verb wird nicht markiert, die Lösung erst nach drei Fehlern
-    const items = mischen(schwer ? ZI.WEIL_DENN.filter((x) => x.kacheln.length >= 4).concat(mischen(ZI.WEIL_DENN)).filter((x, i, a) => a.indexOf(x) === i) : ZI.WEIL_DENN).slice(0, 6);
+    if (schwer) { tiefAmbossBeleg(); return; }
+    const items = ZI.ziehen(ZI.WEIL_DENN, 6);
     const bue = buehne('eisen-roh');
     const box = h('div', { class: 'aufgabe pergament auf-pergament' });
     const rahmen = spielRahmen({ titel: 'Weil-Denn-Amboss' + (schwer ? ' · Tiefe ' + tiefeJetzt() : ''), anzahl: items.length, aufgabe: box, bue });
@@ -1641,7 +1655,11 @@
   /* Station 1: Argument-Puzzle */
   function spielPuzzle() {
     const schritte = [];
-    mischen(ZI.PUZZLE).slice(0, 2).forEach((puzzle) => mischen(puzzle).forEach((arg) => schritte.push({ arg, puzzle })));
+    const auswahl = ZI.ziehen(ZI.PUZZLE, 6);
+    for (let i = 0; i < auswahl.length; i += 3) {
+      const puzzle = auswahl.slice(i, i + 3);
+      mischen(puzzle).forEach((arg) => schritte.push({ arg, puzzle }));
+    }
     const bue = buehne('runenplatte');
     const box = h('div', { class: 'aufgabe pergament auf-pergament' });
     const rahmen = spielRahmen({ titel: 'Argument-Puzzle', anzahl: schritte.length, aufgabe: box, bue });
@@ -1688,7 +1706,7 @@
   function spielHoeren(n) {
     n = n || 1;
     const einmal = n >= 2; const wiederholen = n >= 3; const antworten = n >= 4; const ohneHilfe = n >= 5;
-    const items = mischen(ZI.HOEREN).slice(0, n >= 3 ? 4 : 5);
+    const items = ZI.ziehen(ZI.HOEREN, n >= 3 ? 4 : 5).map((it) => ({ ...it, text: n >= 5 ? it.textProfi : it.text, fragen: n >= 5 ? it.fragenProfi : n >= 3 ? it.fragenTief : it.fragen }));
     const bue = buehne('eisen-roh');
     const box = h('div', { class: 'aufgabe pergament auf-pergament' });
     const rahmen = spielRahmen({ titel: 'Hör-Stollen' + (n > 1 ? ' · Tiefe ' + n : ''), anzahl: items.length, aufgabe: box, bue });
@@ -1754,7 +1772,7 @@
 
   /* Argument-Kette (Puzzle-Stollen, Tiefe 3) */
   function spielKette() {
-    const items = mischen(ZI.KETTEN).slice(0, 8);
+    const items = ZI.ziehen(ZI.KETTEN, 8);
     const bue = buehne('eisen-roh');
     const box = h('div', { class: 'aufgabe pergament auf-pergament' });
     const rahmen = spielRahmen({ titel: 'Argument-Kette', anzahl: items.length, aufgabe: box, bue });
@@ -1828,7 +1846,7 @@
     auswahlSpiel({
       titel: 'Ja, und – ja, aber?',
       frageText: 'Wie reagiert die zweite Person?',
-      items: mischen(ZI.JA_UND).slice(0, 6).map((it) => ({ vorher: it.vorher, kopf: it.antwort,
+      items: ZI.ziehen(ZI.JA_UND, 6).map((it) => ({ vorher: it.vorher, kopf: it.antwort,
         optionen: ZI.ARTEN.map((a) => ({ text: a, ok: a === it.art, info: ZI.ARTEN_INFO[a] })) })),
       fest: true,
       tipp: ZI.TIPPS.jaund,
@@ -1843,7 +1861,7 @@
     auswahlSpiel({
       titel: 'Wer hört zu?',
       frageText: 'Welche Antwort zeigt, dass jemand wirklich zugehört hat?',
-      items: mischen(ZI.ZUHOEREN).slice(0, 6).map((it) => ({ vorher: it.vorher, optionen: it.optionen })),
+      items: ZI.ziehen(ZI.ZUHOEREN, 6).map((it) => ({ vorher: it.vorher, optionen: it.optionen })),
       tipp: ZI.TIPPS.zuhoeren,
       wsVorher: 'schmiede-axt-werkstueck', wsNachher: 'axt-scharf',
       start: 'Gute Zuhörer wiederholen richtig, was der andere gesagt hat, und gehen darauf ein. Pass auf Antworten auf, die etwas verdrehen!',
@@ -1854,8 +1872,8 @@
   /* Station 3: Überzeug den Inselrat */
   function spielInselrat() {
     const items = [];
-    mischen(ZI.INSELRAT).slice(0, 2).forEach((fall) => fall.einwaende.forEach((e) => items.push({
-      frage: e.wer + ' hat einen Einwand. Was antwortest du?', vorher: fall.meinung, kopf: e.wer + ': ' + e.einwand, ws: e.datei, optionen: e.optionen })));
+    ZI.ziehen(ZI.INSELRAT, 2).forEach((fall) => fall.einwaende.forEach((e) => items.push({
+      frage: e.wer + (tiefeJetzt() >= 5 ? ' haben zwei Einwände. Was antwortest du?' : ' hat einen Einwand. Was antwortest du?'), vorher: fall.meinung + (tiefeJetzt() >= 4 && fall.beispiel ? ' Beispiel: ' + fall.beispiel : ''), kopf: e.wer + ': ' + e.einwand, ws: e.datei, optionen: e.optionen })));
     auswahlSpiel({
       titel: 'Überzeug den Inselrat',
       frageText: 'Was antwortest du?',
@@ -2353,7 +2371,7 @@
 
   /* ---------- Begründungshand: die zwei stärksten von fünf Begründungen wählen ---------- */
   function spielHand(u, ende) {
-    const items = mischen(u.items).slice(0, 3);
+    const items = ZI.ziehen(u.items, 3, 'BAU_' + u.id);
     const bue = buehne('eisen-roh');
     const box = h('div', { class: 'aufgabe pergament auf-pergament' });
     const rahmen = spielRahmen({ titel: u.name, anzahl: items.length, aufgabe: box, bue });
@@ -2421,7 +2439,7 @@
     if (u.typ === 'sortier') {
       sortierSpiel({
         titel: u.name, frageText: u.frage, tipp: u.tipp, start: u.start,
-        runden: mischen(u.runden).slice(0, 2).map((rd) => ({ kopf: rd.kopf, karten: rd.karten })),
+        runden: ZI.ziehen(u.runden, 2, 'BAU_' + u.id).map((rd) => ({ kopf: rd.kopf, karten: rd.karten })),
         jaText: u.jaText, neinText: u.neinText,
         wsVorher: 'eisen-roh', wsNachher: 'eisen-gluehend',
         rundeFertig: u.rundeFertig, falschJa: u.falschJa, falschNein: u.falschNein, ende,
@@ -2430,7 +2448,7 @@
     }
     auswahlSpiel({
       titel: u.name, frageText: u.frage, tipp: u.tipp, start: u.start,
-      items: mischen(u.items).slice(0, 5).map((it) => ({ kopf: it.kopf, optionen: it.optionen })),
+      items: ZI.ziehen(u.items, 5, 'BAU_' + u.id).map((it) => ({ kopf: it.kopf, optionen: it.optionen })),
       wsVorher: 'eisen-roh', wsNachher: 'eisen-gluehend', ende,
     });
   }
