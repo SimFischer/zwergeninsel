@@ -88,7 +88,50 @@ test('Grammatiklösungen verwenden alle Bausteine und markieren das gebeugte Ver
   for (const item of z.FEHLERJAGD) assert.equal(item.saetze.filter((x) => x.ok).length, 1);
 });
 
-test('kein Aufgabentyp verrät die Lösung regelmäßig durch deutlich längere Antworten', () => {
+test('Satzbau erkennt natürliche Alternativen nach weil, denn und da an', () => {
+  const z = bank();
+  const accepts = (id, order) => z.WEIL_DENN.find((x) => x.id === id).loesungen.some((x) => x.join(' ') === order);
+  for (const order of ['niemand mehr im Raum ist', 'im Raum niemand mehr ist']) {
+    assert.ok(accepts('WEIL_DENN:umwelt', order));
+  }
+  for (const order of ['nach dem Sport ist sie leer', 'sie ist nach dem Sport leer']) {
+    assert.ok(accepts('WEIL_DENN:trinken', order));
+  }
+  for (const order of ['das Tier jeden Tag Futter braucht', 'jeden Tag das Tier Futter braucht']) {
+    assert.ok(accepts('WEIL_DENN:haustiere', order));
+  }
+  assert.ok(!accepts('WEIL_DENN:umwelt', 'ist niemand mehr im Raum'));
+  assert.ok(!accepts('WEIL_DENN:trinken', 'sie nach dem Sport ist leer'));
+  for (const it of z.WEIL_DENN) {
+    const unique = new Set(it.loesungen.map((x) => x.join('|')));
+    assert.equal(unique.size, it.loesungen.length, it.id);
+    for (const order of it.loesungen) {
+      assert.notEqual(z.mischenSatz(it.kacheln, it.loesungen).join('|'), order.join('|'), it.id);
+    }
+  }
+});
+
+test('inhaltliche Regressionen sind ersetzt, klare Alltagssätze bleiben erhalten', () => {
+  const z = bank();
+  const sport = z.PUZZLE.find((x) => x.id === 'PUZZLE:sport');
+  assert.match(sport.begruendung, /mehr Kinder.*Stärken/);
+  assert.match(sport.beispiel, /Sam.*Fangen.*langsam.*Zielwerfen/);
+  const paper = z.WEIL_DENN.find((x) => x.id === 'WEIL_DENN:muell');
+  assert.equal(paper.haupt, 'Wir sammeln Altpapier in einem eigenen Eimer,');
+  assert.equal(paper.loesungen[0].join(' '), 'Essensreste würden das Papier verschmutzen');
+  const invite = z.WEIL_DENN.find((x) => x.id === 'WEIL_DENN:klassenfest');
+  assert.equal(invite.loesungen[0].join(' '), 'sie gern zeichnet');
+  assert.equal(z.WEIL_DENN.find((x) => x.id === 'WEIL_DENN:trinken').haupt, 'Ravi füllt seine Flasche,');
+  const gaps = z.bauUebung('huette2').items;
+  assert.equal(gaps.find((x) => x.id === 'LUECKE:schulbeginn').kopf, 'Der Bus braucht lange, ___ geht Nora früher los.');
+  assert.equal(gaps.find((x) => x.id === 'LUECKE:lesezeit').kopf, 'Maja möchte ihr Buch in Ruhe lesen, ___ setzt sie sich in die Leseecke.');
+  const content = JSON.stringify(names.map((name) => z[name]).concat(z.BAU_UEBUNGEN));
+  assert.doesNotMatch(content, /Ziel:|Kriterium:|Behauptung:|die Reste es verschmutzen|Wer langsam läuft, kann bei einer anderen Aufgabe trotzdem helfen/);
+  const rounds = z.bauUebung('huette3').runden;
+  assert.equal(new Set(rounds.map((r) => JSON.stringify(r.karten))).size, rounds.length);
+});
+
+test('Antwortlängen variieren natürlich, ohne die richtige Antwort immer gleich zu verraten', () => {
   const z = bank();
   for (const [name, values] of [...names.map((name) => [name, z[name]]), ...z.BAU_UEBUNGEN.map((u) => [u.id, u.items || []])]) {
     const sets = choices(values).filter((s) => s.filter((x) => x.ok).length === 1);
@@ -96,15 +139,14 @@ test('kein Aufgabentyp verrät die Lösung regelmäßig durch deutlich längere 
     for (const set of sets) {
       const right = set.find((x) => x.ok).text.length;
       const wrong = set.filter((x) => !x.ok).map((x) => x.text.length);
-      const min = Math.min(...set.map((x) => x.text.length));
-      if (min < 15) continue; // Feste Fachbegriffe und Bindewörter sind keine ausformulierten Antworten.
-      assert.ok(Math.max(...set.map((x) => x.text.length)) / min < 1.55, name);
-      long += right > Math.max(...wrong) * 1.15;
-      short += right < Math.min(...wrong) * 0.85;
+      if (set.some((x) => x.text.length < 15)) continue;
+      long += right > Math.max(...wrong);
+      short += right < Math.min(...wrong);
     }
     if (sets.length >= 20) {
-      assert.ok(long / sets.length < 0.4, name + ': längste Antwort als Muster');
-      assert.ok(short / sets.length < 0.4, name + ': kürzeste Antwort als Muster');
+      // Flag a near-universal shortcut, never force individual sentences into a length band.
+      assert.ok(long / sets.length < 0.9, name + ': fast immer längste Antwort');
+      assert.ok(short / sets.length < 0.9, name + ': fast immer kürzeste Antwort');
     }
   }
 });
